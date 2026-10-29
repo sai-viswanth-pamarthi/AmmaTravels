@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #FBF9F5;
+    --text-primary: #1E2229;
+    --teal-primary: #0A3641;
+    --saffron-primary: #E58B24;
+    --border-subtle: #E5E5DF;
+  }
+
+  .dark {
+    --bg-primary: #0A141A;
+    --text-primary: #F2F4F7;
+    --teal-primary: #0D5C75;
+    --saffron-primary: #F59E0B;
+    --border-subtle: #1E2A36;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #ECE9E0;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #111B22;
+}
+::-webkit-scrollbar-thumb {
+  background: #A0AAB8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0A3641;
+}
+
+/* 3D Card Tilt & Glow */
+.choice-card-glow {
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+.choice-card-glow:hover {
+  box-shadow: 0 20px 40px -15px rgba(229, 139, 36, 0.25), 0 0 25px rgba(10, 54, 65, 0.15);
+}
+
+/* Rolling Wheel Keyframe for Preloader */
+@keyframes rollWheel {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-roll-wheel {
+  animation: rollWheel 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Day to Night Sky Transition */
+.sky-gradient-day {
+  background: linear-gradient(180deg, #3A7D99 0%, #76B4CE 50%, #E8A856 100%);
+}
+
+.sky-gradient-dusk {
+  background: linear-gradient(180deg, #1B3B4B 0%, #4D3559 50%, #C86D3B 100%);
+}
+
+.sky-gradient-night {
+  background: linear-gradient(180deg, #05131C 0%, #0A2233 60%, #15394F 100%);
+}
