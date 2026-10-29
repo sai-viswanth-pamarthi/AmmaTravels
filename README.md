@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AmmaTravels — Full-Stack Automotive Rental & Event Logistics Platform
 
 > **Brand:** AmmaTravels  
@@ -158,3 +159,6 @@ For fast review and demonstration in the Admin Portal:
 | **Operations Staff** | `staff` | `staff123` | Operations desk: View & update CRM leads, assign follow-up dates, log remarks, export CSV |
 
 *(1-click demo buttons are provided in the Admin Login modal for instant access).*
+=======
+# AmmaTravels
+>>>>>>> ed06584876143d3d254a54f78e8d484dda4b869b
