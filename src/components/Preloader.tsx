@@ -19,12 +19,12 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-teal-950 text-warm-50"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white"
         >
           {/* Rolling Wheel Icon */}
           <div className="relative w-20 h-20 mb-6">
             <svg
-              className="w-full h-full animate-roll-wheel text-saffron-500"
+              className="w-full h-full animate-roll-wheel text-red-600"
               viewBox="0 0 100 100"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -32,14 +32,14 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
               {/* Outer tyre */}
               <circle cx="50" cy="50" r="44" stroke="currentColor" strokeWidth="8" strokeDasharray="14 6" />
               {/* Inner rim */}
-              <circle cx="50" cy="50" r="28" stroke="#FBF9F5" strokeWidth="4" />
+              <circle cx="50" cy="50" r="28" stroke="#FFFFFF" strokeWidth="4" />
               {/* Hub */}
-              <circle cx="50" cy="50" r="10" fill="#E58B24" />
+              <circle cx="50" cy="50" r="10" fill="#DC2626" />
               {/* Spokes */}
-              <line x1="50" y1="22" x2="50" y2="78" stroke="#FBF9F5" strokeWidth="3" />
-              <line x1="22" y1="50" x2="78" y2="50" stroke="#FBF9F5" strokeWidth="3" />
-              <line x1="30" y1="30" x2="70" y2="70" stroke="#FBF9F5" strokeWidth="3" />
-              <line x1="30" y1="70" x2="70" y2="30" stroke="#FBF9F5" strokeWidth="3" />
+              <line x1="50" y1="22" x2="50" y2="78" stroke="#FFFFFF" strokeWidth="3" />
+              <line x1="22" y1="50" x2="78" y2="50" stroke="#FFFFFF" strokeWidth="3" />
+              <line x1="30" y1="30" x2="70" y2="70" stroke="#FFFFFF" strokeWidth="3" />
+              <line x1="30" y1="70" x2="70" y2="30" stroke="#FFFFFF" strokeWidth="3" />
             </svg>
           </div>
 
@@ -48,11 +48,11 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <h2 className="font-display font-extrabold text-2xl tracking-wider text-white">
-              AMMA<span className="text-saffron-500">TRAVELS</span>
+            <h2 className="font-display font-black text-2xl tracking-wider text-white">
+              AMMA<span className="text-red-600">TRAVELS</span>
             </h2>
-            <p className="text-xs text-teal-100 tracking-widest uppercase mt-1">
-              Every journey, a celebration
+            <p className="text-xs text-zinc-400 tracking-widest uppercase mt-1 font-semibold">
+              Pure Self-Drive Adrenaline
             </p>
           </motion.div>
         </motion.div>

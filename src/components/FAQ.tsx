@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
 export const FAQ: React.FC = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
@@ -26,21 +27,38 @@ export const FAQ: React.FC = () => {
       a: 'Yes! While pickup from our central Bhanugudi Junction hub is free, we also offer doorstep delivery and pickup across Kakinada Town, Port, and nearby localities for a nominal convenience charge.',
     },
     {
-      q: 'How far in advance should I book an Event Package?',
-      a: 'For weddings and large corporate delegations, we recommend locking in your reservation at least 2 to 4 weeks in advance, especially during the wedding muhurtham season. For birthday caravans and tour groups, 48 hours notice is sufficient.',
+      q: 'How does the "I\'m Interested" enquiry process work?',
+      a: 'Simply click "I\'m Interested" on any car or bike to submit your requested dates and pickup preferences. Our fleet operations team immediately checks live availability and contacts you within 15 minutes to confirm your vehicle reservation!',
     },
   ];
 
   return (
-    <section className="py-20 bg-warm-100/50 dark:bg-charcoal-950/50 border-t border-warm-200 dark:border-charcoal-800">
+    <motion.section
+      id="faq"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="py-20 bg-[#F4EEDF]/50 dark:bg-slate-950/50 border-t border-[#E8DFCF] dark:border-slate-800 scroll-mt-20"
+    >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-teal-700 dark:text-saffron-400 bg-teal-100/60 dark:bg-teal-950/60 px-3.5 py-1.5 rounded-full border border-teal-200 dark:border-teal-800">
-            Frequently Asked Questions
-          </span>
-          <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-charcoal-900 dark:text-warm-50 mt-3">
-            Got Questions? We Have Answers.
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="font-mono text-[11px] font-bold text-orange-600 dark:text-blue-400 bg-orange-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-orange-200 dark:border-blue-900">
+              KM 50.0 // Roadside Codex
+            </span>
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-orange-600 dark:text-blue-400 bg-orange-50 dark:bg-blue-950/60 px-3.5 py-1.5 rounded-full border border-orange-200 dark:border-blue-900">
+              Frequently Asked Questions
+            </span>
+          </div>
+
+          <h2 className="font-display text-3xl sm:text-4xl font-black text-stone-900 dark:text-white mt-3">
+            Got Questions? <span className="text-orange-600 dark:text-blue-400 hand-drawn-underline">We Have Answers.</span>
           </h2>
+
+          <div className="mt-2 text-center font-hand text-xl text-orange-500 font-bold -rotate-1">
+            <span>Clear terms • Fair level-to-level fuel • Zero surprises ⤵</span>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -49,30 +67,41 @@ export const FAQ: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-white dark:bg-charcoal-900 rounded-2xl border border-warm-200 dark:border-charcoal-800 overflow-hidden shadow-sm transition-all"
+                className="bg-[#FFFDF7] dark:bg-slate-900 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 overflow-hidden shadow-sm transition-all"
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-charcoal-900 dark:text-warm-50 hover:text-teal-900 dark:hover:text-saffron-400"
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  aria-expanded={isOpen}
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-charcoal-400 dark:text-warm-300 transition-transform ${
-                      isOpen ? 'rotate-180 text-saffron-500' : ''
+                    className={`w-5 h-5 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
                     }`}
                   />
                 </button>
 
-                {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-charcoal-600 dark:text-warm-200/80 leading-relaxed border-t border-warm-100 dark:border-charcoal-800">
-                    {faq.a}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800">
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

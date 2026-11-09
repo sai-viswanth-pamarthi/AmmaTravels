@@ -1,6 +1,14 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { SEED_VEHICLES, SEED_PACKAGES, SEED_INTERESTS } from './seed-data.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { db } from './store.js';
+import { authenticate, requireAuth } from './auth.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -8,46 +16,20 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// In-memory data store seeded with comprehensive test data
-let vehicles = [...SEED_VEHICLES];
-let packages = [...SEED_PACKAGES];
-let interests = [...SEED_INTERESTS];
-let activityLogs = [
-  {
-    id: 'log-01',
-    interestId: 'int-01',
-    adminName: 'Amma Travels Admin',
-    action: 'Stage Changed',
-    notes: 'Stage updated from Documents Verified to Confirmed after advance receipt.',
-    createdAt: '2026-10-26T14:30:00.000Z',
-  },
-  {
-    id: 'log-02',
-    interestId: 'int-03',
-    adminName: 'Amma Travels Admin',
-    action: 'Meeting Scheduled',
-    notes: 'Site visit fixed at Uppada resort on 29th Oct 10:00 AM.',
-    createdAt: '2026-10-27T09:10:00.000Z',
-  },
-];
-
-let nextVehicleSeq = 1007;
-let nextEventSeq = 2005;
-
 // ==========================================
 // 1. VEHICLE ROUTES
 // ==========================================
 
-// GET /api/vehicles (filterable by type, seats, transmission, fuel, search)
+// GET /api/vehicles (Public, filterable)
 app.get('/api/vehicles', (req, res) => {
   const { type, subType, transmission, fuel, seats, maxPrice, status, search } = req.query;
-  let result = [...vehicles];
+  let result = [...db.data.vehicles];
 
   if (type && type !== 'all') {
     result = result.filter((v) => v.type === type);
   }
   if (subType && subType !== 'all') {
-    result = result.filter((v) => v.subType.toLowerCase() === subType.toLowerCase());
+    result = result.filter((v) => v.subType?.toLowerCase() === subType.toLowerCase());
   }
   if (transmission && transmission !== 'all') {
     result = result.filter((v) => v.transmission === transmission);
@@ -77,22 +59,16 @@ app.get('/api/vehicles', (req, res) => {
   res.json({ success: true, count: result.length, vehicles: result });
 });
 
-// GET /api/vehicles/:id (with procedural 36-frame 360 viewer sequence)
+// GET /api/vehicles/:id (Public, 360 viewer sequence)
 app.get('/api/vehicles/:id', (req, res) => {
-  const vehicle = vehicles.find((v) => v.id === req.params.id);
+  const vehicle = db.data.vehicles.find((v) => v.id === req.params.id);
   if (!vehicle) {
     return res.status(404).json({ success: false, error: 'Vehicle not found' });
   }
 
-  // Generate 36 multi-angle camera perspective URLs for the 360 viewer
   const baseImg = vehicle.primaryImage;
-  const frames360 = Array.from({ length: 36 }, (_, i) => {
-    // Return sequence frame markers
-    return `${baseImg}&angle=${i * 10}`;
-  });
-
-  // Also fetch list of interested leads for this specific vehicle
-  const interestedLeads = interests.filter((i) => i.vehicleId === vehicle.id);
+  const frames360 = Array.from({ length: 36 }, (_, i) => `${baseImg}&angle=${i * 10}`);
+  const interestedLeads = db.data.interests.filter((i) => i.vehicleId === vehicle.id);
 
   res.json({
     success: true,
@@ -105,35 +81,38 @@ app.get('/api/vehicles/:id', (req, res) => {
   });
 });
 
-// POST /api/vehicles (Admin create)
-app.post('/api/vehicles', (req, res) => {
+// POST /api/vehicles (Admin only)
+app.post('/api/vehicles', requireAuth(['admin']), (req, res) => {
   const newVehicle = {
     ...req.body,
     id: `v-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  vehicles.unshift(newVehicle);
+  db.data.vehicles.unshift(newVehicle);
+  db.save();
   res.status(201).json({ success: true, vehicle: newVehicle });
 });
 
-// PUT /api/vehicles/:id (Admin update)
-app.put('/api/vehicles/:id', (req, res) => {
-  const idx = vehicles.findIndex((v) => v.id === req.params.id);
+// PUT /api/vehicles/:id (Admin only)
+app.put('/api/vehicles/:id', requireAuth(['admin']), (req, res) => {
+  const idx = db.data.vehicles.findIndex((v) => v.id === req.params.id);
   if (idx === -1) {
     return res.status(404).json({ success: false, error: 'Vehicle not found' });
   }
-  vehicles[idx] = {
-    ...vehicles[idx],
+  db.data.vehicles[idx] = {
+    ...db.data.vehicles[idx],
     ...req.body,
     updatedAt: new Date().toISOString(),
   };
-  res.json({ success: true, vehicle: vehicles[idx] });
+  db.save();
+  res.json({ success: true, vehicle: db.data.vehicles[idx] });
 });
 
-// DELETE /api/vehicles/:id
-app.delete('/api/vehicles/:id', (req, res) => {
-  vehicles = vehicles.filter((v) => v.id !== req.params.id);
+// DELETE /api/vehicles/:id (Admin only)
+app.delete('/api/vehicles/:id', requireAuth(['admin']), (req, res) => {
+  db.data.vehicles = db.data.vehicles.filter((v) => v.id !== req.params.id);
+  db.save();
   res.json({ success: true, message: 'Vehicle removed from fleet' });
 });
 
@@ -141,52 +120,62 @@ app.delete('/api/vehicles/:id', (req, res) => {
 // 2. EVENT PACKAGES ROUTES
 // ==========================================
 
-// GET /api/packages
+// GET /api/packages (Public)
 app.get('/api/packages', (req, res) => {
   const { eventType } = req.query;
-  let result = [...packages];
+  let result = [...db.data.packages];
   if (eventType && eventType !== 'all') {
-    result = result.filter((p) => p.eventType.toLowerCase() === eventType.toLowerCase());
+    result = result.filter((p) => p.eventType?.toLowerCase() === eventType.toLowerCase());
   }
   res.json({ success: true, count: result.length, packages: result });
 });
 
-// GET /api/packages/:id
+// GET /api/packages/:id (Public)
 app.get('/api/packages/:id', (req, res) => {
-  const pkg = packages.find((p) => p.id === req.params.id || p.slug === req.params.id);
+  const pkg = db.data.packages.find((p) => p.id === req.params.id || p.slug === req.params.id);
   if (!pkg) {
     return res.status(404).json({ success: false, error: 'Package not found' });
   }
-  const interestedLeads = interests.filter((i) => i.packageId === pkg.id);
-  res.json({ success: true, package: { ...pkg, interestedLeadsCount: interestedLeads.length, interestedLeads } });
+  const interestedLeads = db.data.interests.filter((i) => i.packageId === pkg.id);
+  res.json({
+    success: true,
+    package: { ...pkg, interestedLeadsCount: interestedLeads.length, interestedLeads },
+  });
 });
 
-// POST /api/packages
-app.post('/api/packages', (req, res) => {
+// POST /api/packages (Admin only)
+app.post('/api/packages', requireAuth(['admin']), (req, res) => {
   const newPkg = {
     ...req.body,
     id: `pkg-${Date.now()}`,
-    slug: req.body.slug || req.body.title.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    slug: req.body.slug || req.body.title?.toLowerCase().replace(/[^a-z0-9]/g, '-') || `pkg-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  packages.unshift(newPkg);
+  db.data.packages.unshift(newPkg);
+  db.save();
   res.status(201).json({ success: true, package: newPkg });
 });
 
-// PUT /api/packages/:id
-app.put('/api/packages/:id', (req, res) => {
-  const idx = packages.findIndex((p) => p.id === req.params.id);
+// PUT /api/packages/:id (Admin only)
+app.put('/api/packages/:id', requireAuth(['admin']), (req, res) => {
+  const idx = db.data.packages.findIndex((p) => p.id === req.params.id);
   if (idx === -1) {
     return res.status(404).json({ success: false, error: 'Package not found' });
   }
-  packages[idx] = { ...packages[idx], ...req.body, updatedAt: new Date().toISOString() };
-  res.json({ success: true, package: packages[idx] });
+  db.data.packages[idx] = {
+    ...db.data.packages[idx],
+    ...req.body,
+    updatedAt: new Date().toISOString(),
+  };
+  db.save();
+  res.json({ success: true, package: db.data.packages[idx] });
 });
 
-// DELETE /api/packages/:id
-app.delete('/api/packages/:id', (req, res) => {
-  packages = packages.filter((p) => p.id !== req.params.id);
+// DELETE /api/packages/:id (Admin only)
+app.delete('/api/packages/:id', requireAuth(['admin']), (req, res) => {
+  db.data.packages = db.data.packages.filter((p) => p.id !== req.params.id);
+  db.save();
   res.json({ success: true, message: 'Package removed' });
 });
 
@@ -194,7 +183,7 @@ app.delete('/api/packages/:id', (req, res) => {
 // 3. INTEREST SUBMISSIONS & CRM PIPELINE
 // ==========================================
 
-// POST /api/interests (Customer submit interest form)
+// POST /api/interests (Customer submit interest form - Public)
 app.post('/api/interests', (req, res) => {
   // Honeypot spam protection
   if (req.body._honeypot || req.body.honeypot || req.body.website_source || req.body.user_anti_spam) {
@@ -206,14 +195,14 @@ app.post('/api/interests', (req, res) => {
     return res.status(400).json({ success: false, error: 'Name, phone, and type are required' });
   }
 
-  // Reference ID Generator: AT-V-XXXX for vehicle, AT-E-XXXX for event
+  // Reference ID Generator
   let refId = '';
   if (type === 'vehicle') {
-    refId = `AT-V-${nextVehicleSeq}`;
-    nextVehicleSeq += 1;
+    refId = `AT-V-${db.data.nextVehicleSeq}`;
+    db.data.nextVehicleSeq += 1;
   } else {
-    refId = `AT-E-${nextEventSeq}`;
-    nextEventSeq += 1;
+    refId = `AT-E-${db.data.nextEventSeq}`;
+    db.data.nextEventSeq += 1;
   }
 
   const newInterest = {
@@ -224,9 +213,9 @@ app.post('/api/interests', (req, res) => {
     vehicleName: req.body.vehicleName,
     packageId: req.body.packageId,
     packageName: req.body.packageName,
-    name,
-    phone,
-    email,
+    name: name.trim(),
+    phone: phone.trim(),
+    email: email ? email.trim() : '',
     pickupDate: req.body.pickupDate,
     returnDate: req.body.returnDate,
     pickupLocation: req.body.pickupLocation || 'Kakinada Hub (Main Road)',
@@ -240,15 +229,15 @@ app.post('/api/interests', (req, res) => {
     status: 'Submitted',
     progressStage: 'New',
     internalNotes: 'Form submitted from public portal. Awaiting staff contact.',
-    followUpDate: new Date(Date.now() + 86400000).toISOString().split('T')[0], // tomorrow
+    followUpDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
-  interests.unshift(newInterest);
+  db.data.interests.unshift(newInterest);
 
   // Log initial activity
-  activityLogs.unshift({
+  db.data.activityLogs.unshift({
     id: `log-${Date.now()}`,
     interestId: newInterest.id,
     adminName: 'System Engine',
@@ -256,6 +245,8 @@ app.post('/api/interests', (req, res) => {
     notes: `Customer enquiry received for ${newInterest.vehicleName || newInterest.packageName}. Reference ID: ${refId}.`,
     createdAt: new Date().toISOString(),
   });
+
+  db.save();
 
   res.status(201).json({
     success: true,
@@ -265,10 +256,10 @@ app.post('/api/interests', (req, res) => {
   });
 });
 
-// GET /api/interests (Admin CRM view with filters and search)
-app.get('/api/interests', (req, res) => {
+// GET /api/interests (Admin/Staff only)
+app.get('/api/interests', requireAuth(), (req, res) => {
   const { type, stage, status, search, vehicleId, packageId } = req.query;
-  let result = [...interests];
+  let result = [...db.data.interests];
 
   if (type && type !== 'all') {
     result = result.filter((i) => i.type === type);
@@ -300,65 +291,75 @@ app.get('/api/interests', (req, res) => {
   res.json({ success: true, count: result.length, interests: result });
 });
 
-// GET /api/interests/:id (Single submission with full CRM activity history)
-app.get('/api/interests/:id', (req, res) => {
-  const item = interests.find((i) => i.id === req.params.id || i.refId === req.params.id);
+// GET /api/interests/:id (Admin/Staff only)
+app.get('/api/interests/:id', requireAuth(), (req, res) => {
+  const item = db.data.interests.find((i) => i.id === req.params.id || i.refId === req.params.id);
   if (!item) {
     return res.status(404).json({ success: false, error: 'Enquiry not found' });
   }
 
-  const logs = activityLogs.filter((l) => l.interestId === item.id);
+  const logs = db.data.activityLogs.filter((l) => l.interestId === item.id);
   res.json({ success: true, interest: item, activityLogs: logs });
 });
 
-// PUT /api/interests/:id (Admin update progress stage, notes, follow-up date)
-app.put('/api/interests/:id', (req, res) => {
-  const idx = interests.findIndex((i) => i.id === req.params.id || i.refId === req.params.id);
+// PUT /api/interests/:id (Admin/Staff only)
+app.put('/api/interests/:id', requireAuth(), (req, res) => {
+  const idx = db.data.interests.findIndex((i) => i.id === req.params.id || i.refId === req.params.id);
   if (idx === -1) {
     return res.status(404).json({ success: false, error: 'Enquiry not found' });
   }
 
-  const previousStage = interests[idx].progressStage;
+  const previousStage = db.data.interests[idx].progressStage;
   const { progressStage, internalNotes, followUpDate, status, adminName } = req.body;
 
-  interests[idx] = {
-    ...interests[idx],
-    progressStage: progressStage || interests[idx].progressStage,
-    internalNotes: internalNotes !== undefined ? internalNotes : interests[idx].internalNotes,
-    followUpDate: followUpDate !== undefined ? followUpDate : interests[idx].followUpDate,
-    status: status || (progressStage === 'Confirmed' ? 'Confirmed' : progressStage === 'Completed' ? 'Completed' : interests[idx].status),
+  db.data.interests[idx] = {
+    ...db.data.interests[idx],
+    progressStage: progressStage || db.data.interests[idx].progressStage,
+    internalNotes: internalNotes !== undefined ? internalNotes : db.data.interests[idx].internalNotes,
+    followUpDate: followUpDate !== undefined ? followUpDate : db.data.interests[idx].followUpDate,
+    status:
+      status ||
+      (progressStage === 'Confirmed'
+        ? 'Confirmed'
+        : progressStage === 'Completed'
+        ? 'Completed'
+        : db.data.interests[idx].status),
     updatedAt: new Date().toISOString(),
   };
 
   // Add activity log entry
   if (progressStage && progressStage !== previousStage) {
-    activityLogs.unshift({
+    db.data.activityLogs.unshift({
       id: `log-${Date.now()}`,
-      interestId: interests[idx].id,
-      adminName: adminName || 'Amma Travels Staff',
+      interestId: db.data.interests[idx].id,
+      adminName: adminName || (req.user?.role === 'admin' ? 'Amma Travels Admin' : 'Amma Travels Staff'),
       action: 'Stage Changed',
-      notes: `Progress stage transitioned from '${previousStage}' to '${progressStage}'. ${internalNotes ? `Note: ${internalNotes}` : ''}`,
+      notes: `Progress stage transitioned from '${previousStage}' to '${progressStage}'. ${
+        internalNotes ? `Note: ${internalNotes}` : ''
+      }`,
       createdAt: new Date().toISOString(),
     });
   } else if (internalNotes) {
-    activityLogs.unshift({
+    db.data.activityLogs.unshift({
       id: `log-${Date.now()}`,
-      interestId: interests[idx].id,
-      adminName: adminName || 'Amma Travels Staff',
+      interestId: db.data.interests[idx].id,
+      adminName: adminName || (req.user?.role === 'admin' ? 'Amma Travels Admin' : 'Amma Travels Staff'),
       action: 'Note Logged',
       notes: internalNotes,
       createdAt: new Date().toISOString(),
     });
   }
 
-  res.json({ success: true, interest: interests[idx] });
+  db.save();
+
+  res.json({ success: true, interest: db.data.interests[idx] });
 });
 
 // ==========================================
 // 4. PUBLIC ENQUIRY TRACKER
 // ==========================================
 
-// GET /api/track?refId=...&phone=...
+// GET /api/track?refId=...&phone=... (Public lookup)
 app.get('/api/track', (req, res) => {
   const { refId, phone } = req.query;
   if (!refId || !phone) {
@@ -366,7 +367,7 @@ app.get('/api/track', (req, res) => {
   }
 
   const cleanPhone = phone.replace(/[^0-9]/g, '').slice(-10);
-  const found = interests.find(
+  const found = db.data.interests.find(
     (i) =>
       i.refId.toUpperCase() === refId.toUpperCase() &&
       i.phone.replace(/[^0-9]/g, '').slice(-10) === cleanPhone
@@ -379,7 +380,6 @@ app.get('/api/track', (req, res) => {
     });
   }
 
-  // Return public tracking view (timeline: Submitted -> Contacted -> Confirmed -> Completed)
   res.json({
     success: true,
     tracking: {
@@ -402,23 +402,22 @@ app.get('/api/track', (req, res) => {
 // 5. ADMIN DASHBOARD STATS
 // ==========================================
 
-app.get('/api/stats', (req, res) => {
-  const totalVehicles = vehicles.length;
-  const availableVehicles = vehicles.filter((v) => v.status === 'Available').length;
-  const bookedVehicles = vehicles.filter((v) => v.status === 'Booked').length;
-  const maintenanceVehicles = vehicles.filter((v) => v.status === 'Maintenance').length;
+// GET /api/stats (Admin/Staff only)
+app.get('/api/stats', requireAuth(), (req, res) => {
+  const totalVehicles = db.data.vehicles.length;
+  const availableVehicles = db.data.vehicles.filter((v) => v.status === 'Available').length;
+  const bookedVehicles = db.data.vehicles.filter((v) => v.status === 'Booked').length;
+  const maintenanceVehicles = db.data.vehicles.filter((v) => v.status === 'Maintenance').length;
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const newEnquiriesToday = interests.filter((i) => i.createdAt.startsWith(todayStr)).length;
-  const confirmedBookings = interests.filter((i) => i.progressStage === 'Confirmed').length;
-  const eventEnquiries = interests.filter((i) => i.type === 'event').length;
+  const newEnquiriesToday = db.data.interests.filter((i) => i.createdAt.startsWith(todayStr)).length;
+  const confirmedBookings = db.data.interests.filter((i) => i.progressStage === 'Confirmed').length;
+  const eventEnquiries = db.data.interests.filter((i) => i.type === 'event').length;
 
-  // Approximate revenue calculation
-  const estimatedRevenue = interests
+  const estimatedRevenue = db.data.interests
     .filter((i) => i.status === 'Confirmed' || i.status === 'Completed')
     .reduce((sum, i) => sum + (i.type === 'vehicle' ? 3500 : 75000), 0);
 
-  // Grouped by day
   const enquiriesOverTime = [
     { date: 'Oct 23', count: 3 },
     { date: 'Oct 24', count: 5 },
@@ -453,53 +452,43 @@ app.get('/api/stats', (req, res) => {
 });
 
 // ==========================================
-// 6. ADMIN AUTHENTICATION
+// 6. AUTHENTICATION
 // ==========================================
 
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ success: false, error: 'Email and password required' });
+  const { username, email, password } = req.body;
+  const userIdentifier = username || email;
+
+  if (!userIdentifier || !password) {
+    return res.status(400).json({ success: false, error: 'Username and password are required' });
   }
 
-  // Pre-configured staff/admin authentication
-  if (email.toLowerCase().includes('admin') || email === 'admin@ammatravelskkd.com') {
-    return res.json({
-      success: true,
-      user: {
-        id: 'u-admin-01',
-        name: 'Amma Travels Admin',
-        email: 'admin@ammatravelskkd.com',
-        role: 'admin',
-        token: 'jwt-token-admin-session',
-      },
-    });
-  } else if (email.toLowerCase().includes('staff')) {
-    return res.json({
-      success: true,
-      user: {
-        id: 'u-staff-01',
-        name: 'Operations Staff',
-        email: 'staff@ammatravelskkd.com',
-        role: 'staff',
-        token: 'jwt-token-staff-session',
-      },
-    });
+  const result = authenticate(userIdentifier, password);
+  if (!result.success) {
+    return res.status(401).json({ success: false, error: result.error });
   }
 
-  // Standard user login
   res.json({
     success: true,
-    user: {
-      id: 'u-cust-01',
-      name: email.split('@')[0],
-      email,
-      role: 'user',
-      token: 'jwt-token-user-session',
-    },
+    user: result.user,
+    token: result.token,
   });
 });
 
+// ==========================================
+// 7. PRODUCTION STATIC ASSET SERVING
+// ==========================================
+
+const distPath = path.join(__dirname, '../dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`[AmmaTravels Server] Express API running on port ${PORT}`);
+  console.log(`[AmmaTravels Server] Persistent storage active: ${path.join(__dirname, 'data/store.json')}`);
 });

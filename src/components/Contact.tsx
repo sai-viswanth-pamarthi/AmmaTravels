@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   MapPin,
   Phone,
@@ -15,47 +16,65 @@ export const Contact: React.FC = () => {
   const whatsappUrl = getWhatsAppUrl('Hello Amma Travels, I would like to enquire about your services in Kakinada.');
 
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
+    <motion.section
+      id="contact"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left: Contact Info (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           <div>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-saffron-600 dark:text-saffron-400 bg-saffron-50 dark:bg-saffron-950/40 px-3.5 py-1.5 rounded-full border border-saffron-200 dark:border-saffron-800">
-              Visit or Call Us
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-charcoal-900 dark:text-warm-50 mt-3">
-              We're Located in Central Kakinada
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-mono text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900">
+                KM 65.0 // Basecamp Hub
+              </span>
+              <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3.5 py-1.5 rounded-full border border-blue-200 dark:border-blue-900">
+                Visit or Call Us
+              </span>
+            </div>
+
+            <h2 className="font-display text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mt-3">
+              We're Located in Central <span className="text-blue-600 dark:text-blue-400 hand-drawn-underline">Kakinada</span>
             </h2>
-            <p className="mt-3 text-sm text-charcoal-600 dark:text-warm-300">
-              Drop by our hub for vehicle keys, document verification, or a hot cup of coffee while we plan your wedding fleet.
+
+            <div className="mt-2 font-hand text-xl text-blue-500 font-bold -rotate-1">
+              <span>Drop by for keys & quick test drive ⤵</span>
+            </div>
+
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              Drop by our hub for vehicle keys, document verification, or quick test rides on our cars and bikes.
             </p>
           </div>
 
           <div className="space-y-4 pt-2">
-            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-warm-200 dark:border-charcoal-800">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/70 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-teal-900 dark:text-saffron-400 flex-shrink-0">
+            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-blue-950/60 border border-orange-200 dark:border-blue-900 flex items-center justify-center text-orange-600 dark:text-blue-400 flex-shrink-0">
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-charcoal-900 dark:text-warm-100">
+                <h4 className="font-bold text-sm text-stone-900 dark:text-white">
                   Main Operating Hub
                 </h4>
-                <p className="text-xs text-charcoal-600 dark:text-warm-300 mt-0.5">
+                <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
                   Door No. 12-4-15, Near Bhanugudi Junction, Main Road, Kakinada, Andhra Pradesh 533003
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-warm-200 dark:border-charcoal-800">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/70 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-teal-900 dark:text-saffron-400 flex-shrink-0">
+            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-blue-950/60 border border-orange-200 dark:border-blue-900 flex items-center justify-center text-orange-600 dark:text-blue-400 flex-shrink-0">
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-charcoal-900 dark:text-warm-100">
+                <h4 className="font-bold text-sm text-stone-900 dark:text-white">
                   Phone & Reservations
                 </h4>
-                <p className="text-xs text-charcoal-600 dark:text-warm-300 mt-0.5">
-                  +91 98765 43210 / +91 884 2345678
+                <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
+                  +91 88857 57966
                 </p>
                 <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
                   24/7 Roadside Breakdown Hotline Active
@@ -63,18 +82,18 @@ export const Contact: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-warm-200 dark:border-charcoal-800">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/70 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-teal-900 dark:text-saffron-400 flex-shrink-0">
+            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-blue-950/60 border border-orange-200 dark:border-blue-900 flex items-center justify-center text-orange-600 dark:text-blue-400 flex-shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-charcoal-900 dark:text-warm-100">
+                <h4 className="font-bold text-sm text-stone-900 dark:text-white">
                   Hub Timings
                 </h4>
-                <p className="text-xs text-charcoal-600 dark:text-warm-300 mt-0.5">
+                <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
                   Monday – Sunday: 6:00 AM – 10:30 PM
                 </p>
-                <p className="text-[11px] text-charcoal-500 dark:text-warm-400">
+                <p className="text-[11px] text-stone-500 dark:text-slate-400">
                   Late night & early train drops coordinated via WhatsApp
                 </p>
               </div>
@@ -85,7 +104,7 @@ export const Contact: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
+            className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-colors btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <MessageCircle className="w-4 h-4" />
             <span>Direct WhatsApp Helpline</span>
@@ -93,54 +112,54 @@ export const Contact: React.FC = () => {
         </div>
 
         {/* Right: Map & Fast Inquiry Card (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-charcoal-900 rounded-3xl border border-warm-200 dark:border-charcoal-800 overflow-hidden shadow-sm flex flex-col">
+        <div className="lg:col-span-7 bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl border border-[#E8DFCF] dark:border-slate-800 overflow-hidden soft-card-shadow flex flex-col">
           {/* Simulated Map / Route Header */}
-          <div className="relative h-64 bg-teal-950 flex flex-col items-center justify-center text-center p-6 text-warm-100">
-            <div className="w-12 h-12 rounded-full bg-saffron-500/20 border border-saffron-500/60 flex items-center justify-center text-saffron-400 mb-2">
+          <div className="relative h-64 bg-slate-950 flex flex-col items-center justify-center text-center p-6 text-white border-b border-slate-800">
+            <div className="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500/60 flex items-center justify-center text-blue-400 mb-2">
               <MapPin className="w-6 h-6 animate-bounce" />
             </div>
-            <h3 className="font-display text-xl font-bold text-warm-50">
+            <h3 className="font-display text-xl font-bold text-white">
               Kakinada City Hub Map
             </h3>
-            <p className="text-xs text-warm-300 mt-1 max-w-sm">
+            <p className="text-xs text-slate-400 mt-1 max-w-sm">
               Conveniently situated 2.1 km from Kakinada Town Railway Station and 3.5 km from Kakinada Beach Road.
             </p>
             <a
               href="https://maps.google.com/?q=Kakinada+Bhanugudi+Junction"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 px-3 py-1.5 rounded-lg bg-teal-900/80 hover:bg-teal-800 text-saffron-400 text-xs font-semibold flex items-center gap-1 border border-teal-700 transition-colors"
+              className="mt-3 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               <span>Open in Google Maps</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
 
           {/* Service Guarantee Banner */}
           <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-3.5 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700">
-                <span className="font-bold text-charcoal-900 dark:text-warm-100 block mb-1">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                <span className="font-bold text-slate-900 dark:text-white block mb-1">
                   🚗 Fast 5-Min Handover
                 </span>
-                <span className="text-charcoal-600 dark:text-warm-300">
+                <span className="text-slate-600 dark:text-slate-400">
                   Digital KYC scan and instant odometer snapshot. You drive away without waiting.
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700">
-                <span className="font-bold text-charcoal-900 dark:text-warm-100 block mb-1">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                <span className="font-bold text-slate-900 dark:text-white block mb-1">
                   🛡️ Zero Hidden Deductions
                 </span>
-                <span className="text-charcoal-600 dark:text-warm-300">
+                <span className="text-slate-600 dark:text-slate-400">
                   Security deposits returned immediately via UPI / bank transfer on check-in.
                 </span>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-warm-200 dark:border-charcoal-800 text-center">
-              <p className="text-xs text-charcoal-500 dark:text-warm-400">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Have questions about corporate invoicing or outstation GST billing? Reach our accounts team at{' '}
-                <a href="mailto:billing@ammatravels.in" className="text-teal-700 dark:text-saffron-400 font-semibold underline">
+                <a href="mailto:billing@ammatravels.in" className="text-blue-600 dark:text-blue-400 font-bold underline hover:text-blue-500">
                   billing@ammatravels.in
                 </a>
               </p>
@@ -148,6 +167,6 @@ export const Contact: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

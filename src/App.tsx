@@ -1,29 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Preloader } from './components/Preloader';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
+import { Hero, BookingSearchParams } from './components/Hero';
+import { CurrentOffers } from './components/CurrentOffers';
+import { TripPlannerSection, TripType } from './components/TripPlannerSection';
 import { VehicleCatalogue } from './components/VehicleCatalogue';
 import { Vehicle360Viewer } from './components/Vehicle360Viewer';
-import { EventPackages } from './components/EventPackages';
 import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { FAQ } from './components/FAQ';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
+import { FloatingConstructionCard } from './components/FloatingConstructionCard';
+import { LocationsModal } from './components/LocationsModal';
+import { ShuttleTrackerModal } from './components/ShuttleTrackerModal';
 import { EnquiryTracker } from './components/EnquiryTracker';
 import { VehicleInterestModal } from './components/VehicleInterestModal';
-import { EventInterestModal } from './components/EventInterestModal';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminPortal } from './components/admin/AdminPortal';
+import Lenis from 'lenis';
 
-import { Vehicle, EventPackage, InterestSubmission, User } from '@/types';
+import { Vehicle, InterestSubmission, User } from '@/types';
 import { api } from '@/lib/api';
-import { CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, X, ChevronDown, Sparkles } from 'lucide-react';
 
 export function App() {
   const [loading, setLoading] = useState(true);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [packages, setPackages] = useState<EventPackage[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // View state
@@ -32,41 +35,77 @@ export function App() {
   // Modals state
   const [selected360Vehicle, setSelected360Vehicle] = useState<Vehicle | null>(null);
   const [selectedVehicleForInterest, setSelectedVehicleForInterest] = useState<Vehicle | null>(null);
-  const [selectedPackageForInterest, setSelectedPackageForInterest] = useState<EventPackage | null>(null);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [isLocationsOpen, setIsLocationsOpen] = useState(false);
+  const [isShuttleTrackerOpen, setIsShuttleTrackerOpen] = useState(false);
+
+  // Interactive filters and promo state
+  const [activePromoCode, setActivePromoCode] = useState<string | null>(null);
+  const [externalFilterCategory, setExternalFilterCategory] = useState<string | null>(null);
+  const [lastSearchParams, setLastSearchParams] = useState<BookingSearchParams | null>(null);
 
   // Success Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Dark mode
-  const [darkMode, setDarkMode] = useState(() => {
+  // Dark mode (defaults to system preference, persisted in localStorage)
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('at_dark_mode') === 'true';
+      const saved = localStorage.getItem('at_theme');
+      if (saved !== null) {
+        return saved === 'dark';
+      }
+      const legacySaved = localStorage.getItem('at_dark_mode');
+      if (legacySaved !== null) {
+        return legacySaved === 'true';
+      }
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
-    return false;
+    return true; // minimal modern dark by default
   });
 
   useEffect(() => {
+    const root = document.documentElement;
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      localStorage.setItem('at_theme', 'dark');
       localStorage.setItem('at_dark_mode', 'true');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      localStorage.setItem('at_theme', 'light');
       localStorage.setItem('at_dark_mode', 'false');
     }
   }, [darkMode]);
 
-  // Load Initial Vehicles & Packages
+  // Synchronize with OS system theme if user has not explicitly chosen
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = (e: MediaQueryListEvent) => {
+      const saved = localStorage.getItem('at_theme');
+      if (saved === null) {
+        setDarkMode(e.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
+  }, []);
+
+  // Auto-dismiss toast after 4.5 seconds
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
+
+  // Load Initial Vehicles
   useEffect(() => {
     const initData = async () => {
       try {
-        const [vList, pList] = await Promise.all([
-          api.getVehicles(),
-          api.getPackages(),
-        ]);
+        const vList = await api.getVehicles();
         setVehicles(vList);
-        setPackages(pList);
         setCurrentUser(api.getCurrentUser());
       } catch (err) {
         console.error('Initialization error', err);
@@ -75,6 +114,24 @@ export function App() {
       }
     };
     initData();
+  }, []);
+
+  // Initialize smooth Lenis momentum scroll
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    const rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
   }, []);
 
   const handleToggleDarkMode = () => {
@@ -114,11 +171,46 @@ export function App() {
   };
 
   const handleVehicleInterestSuccess = (submission: InterestSubmission) => {
-    setToastMessage(`Booking inquiry registered! Reference ID: ${submission.refId}`);
+    setToastMessage(`Your reservation enquiry is recorded! Ref ID: ${submission.refId}`);
   };
 
-  const handleEventInterestSuccess = (submission: InterestSubmission) => {
-    setToastMessage(`Event inquiry registered! Reference ID: ${submission.refId}`);
+  // Handle Promo Code application
+  const handleApplyPromo = (code: string) => {
+    setActivePromoCode(code);
+    setToastMessage(`Discount Coupon "${code}" Applied! Enjoy 15% off across our entire fleet.`);
+  };
+
+  // Handle Search Submission from Hero Booking card
+  const handleSearchBooking = (params: BookingSearchParams) => {
+    setLastSearchParams(params);
+    if (params.promoCode) {
+      setActivePromoCode(params.promoCode);
+    }
+    setToastMessage(`Showing vehicles for ${params.pickupLocation} (${params.pickupDate} to ${params.returnDate})`);
+    handleSelectSection('vehicles');
+  };
+
+  // Handle Trip Type Selection from "What kind of trip are you planning?"
+  const handleSelectTripType = (trip: TripType) => {
+    setExternalFilterCategory(trip.filterCategory);
+    setToastMessage(`Showing vehicles curated for "${trip.title}" (${trip.suggestedVehicles})`);
+    handleSelectSection('vehicles');
+  };
+
+  // Floating orange button scroll handler
+  const handleFloatingScrollDown = () => {
+    const scrollSections = ['offers', 'trip-planner', 'vehicles', 'contact'];
+    const currentScroll = window.scrollY + 300;
+    for (const sec of scrollSections) {
+      const el = document.getElementById(sec);
+      if (el && el.offsetTop > currentScroll) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    // If near bottom, scroll back up to hero
+    const heroEl = document.getElementById('hero');
+    heroEl?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading) {
@@ -136,7 +228,6 @@ export function App() {
           onOpen360={(v) => setSelected360Vehicle(v)}
         />
 
-        {/* 360 Viewer accessible even within Admin */}
         {selected360Vehicle && (
           <Vehicle360Viewer
             vehicle={selected360Vehicle}
@@ -154,56 +245,78 @@ export function App() {
 
   // Public User View
   return (
-    <div className={`min-h-screen bg-warm-50 dark:bg-charcoal-950 text-charcoal-900 dark:text-warm-100 transition-colors duration-300 font-sans selection:bg-saffron-500 selection:text-teal-950 ${darkMode ? 'dark' : ''}`}>
-      {/* Toast Alert */}
+    <div className={`min-h-screen bg-[var(--background)] text-[var(--text)] transition-colors duration-200 font-sans selection:bg-blue-600 selection:text-white ${darkMode ? 'dark' : ''}`}>
+      {/* Modern Accessible Toast Alert with Blue Accent */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-teal-950 text-warm-50 border border-saffron-500/60 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
-          <CheckCircle2 className="w-5 h-5 text-saffron-400 flex-shrink-0" />
-          <span className="text-xs font-semibold">{toastMessage}</span>
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 text-stone-900 dark:text-slate-100 border border-[#E8DFCF] dark:border-slate-800 shadow-xl shadow-stone-900/10 dark:shadow-blue-500/10 flex items-center gap-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 transition-all duration-300"
+        >
+          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <span className="text-xs font-semibold leading-relaxed">{toastMessage}</span>
           <button
             onClick={() => setToastMessage(null)}
-            className="p-1 text-teal-300 hover:text-white"
+            className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            aria-label="Dismiss message"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Navigation */}
+      {/* Top Navigation (Matching Screenshot 1) */}
       <Navbar
         currentUser={currentUser}
         onOpenAdmin={handleOpenAdminTrigger}
         onOpenTrack={() => setIsTrackerOpen(true)}
+        onOpenLocations={() => setIsLocationsOpen(true)}
+        onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
         onSelectSection={handleSelectSection}
         darkMode={darkMode}
         onToggleDarkMode={handleToggleDarkMode}
       />
 
       <main id="hero">
-        {/* Parallax Hero */}
+        {/* Hero Section with Floating Search Booking Card & Highlights Bar (Screenshot 1) */}
         <Hero
-          onSelectOption={(choice) => {
-            handleSelectSection(choice === 'vehicles' ? 'vehicles' : 'events');
+          onSearchBooking={handleSearchBooking}
+          activePromoCode={activePromoCode}
+          onApplyPromo={handleApplyPromo}
+          onSelectOption={handleSelectSection}
+          onOpenLocationsModal={() => setIsLocationsOpen(true)}
+          onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
+        />
+
+        {/* Current Offers Section: "Deals made for your next trip" (Screenshot 2) */}
+        <CurrentOffers
+          onApplyPromo={handleApplyPromo}
+          onBookNow={(category) => {
+            if (category) setExternalFilterCategory(category);
+            handleSelectSection('vehicles');
           }}
         />
 
-        {/* Vehicles Catalogue (Cars & Bikes with Multi-Filters & 360 Studio) */}
+        {/* Start with the Journey Section: "What kind of trip are you planning?" (Screenshot 3) */}
+        <TripPlannerSection
+          onSelectTripType={handleSelectTripType}
+        />
+
+        {/* Vehicles Catalogue (Cars, SUVs, Minivans, Bikes with 360 Studio & Multi-Filters) */}
         <VehicleCatalogue
           vehicles={vehicles}
           onOpen360={(v) => setSelected360Vehicle(v)}
           onSelectInterest={(v) => setSelectedVehicleForInterest(v)}
-        />
-
-        {/* Event Management Packages */}
-        <EventPackages
-          packages={packages}
-          onSelectInterest={(pkg) => setSelectedPackageForInterest(pkg)}
+          externalFilterCategory={externalFilterCategory}
+          activePromoCode={activePromoCode}
         />
 
         {/* How It Works */}
         <HowItWorks
-          onSelectOption={(choice) => {
-            handleSelectSection(choice === 'vehicles' ? 'vehicles' : 'events');
+          onSelectOption={() => {
+            handleSelectSection('vehicles');
           }}
         />
 
@@ -213,7 +326,7 @@ export function App() {
         {/* FAQs */}
         <FAQ />
 
-        {/* Contact & Kakinada Hub Details */}
+        {/* Contact & Hub Details */}
         <Contact />
       </main>
 
@@ -224,7 +337,35 @@ export function App() {
         onOpenAdmin={handleOpenAdminTrigger}
       />
 
+      {/* Persistent On-Scroll Construction & Pivot Tech Developer Card */}
+      <FloatingConstructionCard />
+
+      {/* Floating Action Button (Screenshot 2 & 3: Vibrant Orange Circle with Down Chevron) */}
+      <button
+        onClick={handleFloatingScrollDown}
+        className="fixed bottom-7 right-7 z-40 w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
+        aria-label="Scroll to next section"
+      >
+        <ChevronDown className="w-6 h-6 group-hover:translate-y-0.5 transition-transform" />
+      </button>
+
       {/* --- MODALS --- */}
+
+      {/* Locations & Hubs Modal */}
+      <LocationsModal
+        isOpen={isLocationsOpen}
+        onClose={() => setIsLocationsOpen(false)}
+        onSelectHub={(hub) => {
+          setToastMessage(`Pickup location updated to: ${hub}`);
+          handleSelectSection('hero');
+        }}
+      />
+
+      {/* Complimentary Shuttle Tracker Modal */}
+      <ShuttleTrackerModal
+        isOpen={isShuttleTrackerOpen}
+        onClose={() => setIsShuttleTrackerOpen(false)}
+      />
 
       {/* 360 Interactive Studio Modal */}
       {selected360Vehicle && (
@@ -249,17 +390,7 @@ export function App() {
         />
       )}
 
-      {/* Event Package Interest Modal */}
-      {selectedPackageForInterest && (
-        <EventInterestModal
-          eventPackage={selectedPackageForInterest}
-          isOpen={!!selectedPackageForInterest}
-          onClose={() => setSelectedPackageForInterest(null)}
-          onSuccess={handleEventInterestSuccess}
-        />
-      )}
-
-      {/* Public Enquiry Tracker Modal */}
+      {/* Public Reservation & Enquiry Tracker Modal */}
       <EnquiryTracker
         isOpen={isTrackerOpen}
         onClose={() => setIsTrackerOpen(false)}

@@ -83,21 +83,21 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-charcoal-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-charcoal-900 rounded-3xl border border-warm-200 dark:border-charcoal-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-warm-200 dark:border-charcoal-800">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-saffron-600 dark:text-saffron-400">
+            <span className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
               Live Status Check
             </span>
-            <h3 className="font-display text-2xl font-bold text-charcoal-900 dark:text-warm-50 mt-1">
-              Track Your Enquiry
+            <h3 className="font-display text-2xl font-bold text-black dark:text-white mt-1">
+              Track Your Interest Enquiry
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-charcoal-400 hover:text-charcoal-700 dark:hover:text-warm-100 rounded-full hover:bg-warm-100 dark:hover:bg-charcoal-800"
+            className="p-2 text-zinc-400 hover:text-black dark:hover:text-white rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -108,20 +108,20 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
         <form onSubmit={handleLookup} className="mt-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Reference ID
               </label>
               <input
                 type="text"
                 value={refId}
                 onChange={(e) => setRefId(e.target.value.toUpperCase())}
-                placeholder="e.g. AT-V-1001 or AT-E-2001"
-                className="w-full px-4 py-2.5 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 font-mono text-sm placeholder-charcoal-400 focus:outline-none focus:ring-2 focus:ring-teal-700 uppercase"
+                placeholder="e.g. AT-V-1001"
+                className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white font-mono text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase transition-all"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Registered Phone Number
               </label>
               <input
@@ -129,14 +129,14 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 9876543210"
-                className="w-full px-4 py-2.5 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-sm placeholder-charcoal-400 focus:outline-none focus:ring-2 focus:ring-teal-700"
+                className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 required
               />
             </div>
           </div>
 
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-xs text-red-700 dark:text-red-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -145,31 +145,31 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl bg-teal-900 hover:bg-teal-800 text-warm-50 font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+            className="btn-interactive w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-md shadow-blue-600/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             {loading ? (
-              <Clock className="w-4 h-4 animate-spin text-saffron-400" />
+              <Clock className="w-4 h-4 animate-spin text-white" />
             ) : (
-              <Search className="w-4 h-4 text-saffron-400" />
+              <Search className="w-4 h-4 text-white" />
             )}
-            <span>{loading ? 'Checking status...' : 'Track Booking'}</span>
+            <span>{loading ? 'Checking status...' : 'Track My Interest'}</span>
           </button>
         </form>
 
         {/* Result Area */}
         {enquiry && (
-          <div className="mt-8 pt-6 border-t border-warm-200 dark:border-charcoal-800 space-y-6">
+          <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800 space-y-6">
             {/* Header info */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-warm-50 dark:bg-charcoal-800/80 border border-warm-200 dark:border-charcoal-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-saffron-400">
-                  {enquiry.type === 'vehicle' ? 'Vehicle Rental' : 'Event Package'}
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  Vehicle Rental Interest
                 </span>
-                <h4 className="font-display text-lg font-bold text-charcoal-900 dark:text-warm-50">
-                  {enquiry.vehicleName || enquiry.packageName}
+                <h4 className="font-display text-lg font-bold text-black dark:text-white">
+                  {enquiry.vehicleName || 'Vehicle Enquiry'}
                 </h4>
-                <p className="text-xs text-charcoal-500 dark:text-warm-400">
-                  Ref ID: <span className="font-mono font-bold text-teal-900 dark:text-saffron-400">{enquiry.refId}</span> • Registered to {enquiry.name}
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Ref ID: <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{enquiry.refId}</span> • Registered to {enquiry.name}
                 </p>
               </div>
 
@@ -181,13 +181,13 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                       : enquiry.status === 'Completed'
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
                       : enquiry.status === 'Cancelled'
-                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                   }`}
                 >
                   Status: {enquiry.status}
                 </span>
-                <p className="text-[11px] text-charcoal-500 dark:text-warm-400 mt-1">
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
                   Stage: {enquiry.progressStage}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
 
             {/* 4-Step Visual Progress Timeline */}
             <div className="relative">
-              <div className="absolute top-4 left-4 right-4 h-0.5 bg-warm-200 dark:bg-charcoal-700 -z-0" />
+              <div className="absolute top-4 left-4 right-4 h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-0" />
               <div className="grid grid-cols-4 gap-2 relative z-10">
                 {steps.map((st) => {
                   const state = getStepStatus(st.key, enquiry.status);
@@ -206,8 +206,8 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                           state === 'completed'
                             ? 'bg-emerald-600 text-white'
                             : state === 'current'
-                            ? 'bg-saffron-500 text-teal-950 ring-4 ring-saffron-500/20 animate-pulse'
-                            : 'bg-warm-200 dark:bg-charcoal-700 text-charcoal-500 dark:text-warm-400'
+                            ? 'bg-blue-600 text-white ring-4 ring-blue-600/20 animate-pulse'
+                            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
                         }`}
                       >
                         {state === 'completed' ? (
@@ -216,10 +216,10 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                           <span className="w-2 h-2 rounded-full bg-current" />
                         )}
                       </div>
-                      <p className="font-semibold text-xs text-charcoal-800 dark:text-warm-200 mt-2">
+                      <p className="font-bold text-xs text-zinc-900 dark:text-zinc-100 mt-2">
                         {st.label}
                       </p>
-                      <p className="text-[10px] text-charcoal-500 dark:text-warm-400 hidden sm:block">
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 hidden sm:block">
                         {st.desc}
                       </p>
                     </div>
@@ -229,52 +229,40 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
             </div>
 
             {/* Additional details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-warm-50 dark:bg-charcoal-800/40 p-4 rounded-xl border border-warm-200 dark:border-charcoal-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-50 dark:bg-zinc-900/60 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
               {enquiry.pickupDate && (
                 <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Pickup Date: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.pickupDate}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">Pickup Date: </span>
+                  <span className="font-semibold text-black dark:text-white">{enquiry.pickupDate}</span>
                 </div>
               )}
               {enquiry.returnDate && (
                 <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Return Date: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.returnDate}</span>
-                </div>
-              )}
-              {enquiry.eventDate && (
-                <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Event Date: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.eventDate}</span>
-                </div>
-              )}
-              {enquiry.guestCount && (
-                <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Guests: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.guestCount}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">Return Date: </span>
+                  <span className="font-semibold text-black dark:text-white">{enquiry.returnDate}</span>
                 </div>
               )}
               {enquiry.pickupLocation && (
                 <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Location: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.pickupLocation}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">Location: </span>
+                  <span className="font-semibold text-black dark:text-white">{enquiry.pickupLocation}</span>
                 </div>
               )}
               {enquiry.followUpDate && (
                 <div>
-                  <span className="text-charcoal-500 dark:text-warm-400">Next Follow-up: </span>
-                  <span className="font-semibold text-charcoal-900 dark:text-warm-100">{enquiry.followUpDate}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">Next Follow-up: </span>
+                  <span className="font-semibold text-black dark:text-white">{enquiry.followUpDate}</span>
                 </div>
               )}
             </div>
 
             {/* Help / WhatsApp Support */}
             <div className="flex items-center justify-between pt-3">
-              <span className="text-xs text-charcoal-500 dark:text-warm-400">
-                Need immediate help with this booking?
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                Need immediate help with this interest?
               </span>
               <a
-                href={getBookingSupportWhatsAppUrl(enquiry.refId, enquiry.vehicleName || enquiry.packageName)}
+                href={getBookingSupportWhatsAppUrl(enquiry.refId, enquiry.vehicleName || 'Vehicle')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"

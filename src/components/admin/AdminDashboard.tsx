@@ -1,97 +1,135 @@
 import React from 'react';
 import {
   Car,
-  Calendar,
   Users,
   TrendingUp,
-  DollarSign,
   Clock,
   CheckCircle2,
   AlertTriangle,
   ArrowUpRight,
-  ShieldAlert,
-  BarChart3,
-  Download
+  Download,
+  Flame,
+  KeyRound
 } from 'lucide-react';
-import { DashboardStats, User } from '@/types';
+import { DashboardStats, User, Vehicle, InterestSubmission } from '@/types';
 
 interface AdminDashboardProps {
   stats: DashboardStats;
+  vehicles: Vehicle[];
+  leads: InterestSubmission[];
   currentUser: User;
-  onNavigateTab: (tab: 'crm' | 'fleet' | 'events') => void;
+  onNavigateTab: (tab: 'crm' | 'fleet') => void;
+  onSelectVehicleForCRM: (vehicleIdOrName: string) => void;
+  onSelectStatusForFleet: (status: string) => void;
   onExportCSV: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   stats,
+  vehicles,
+  leads,
   currentUser,
   onNavigateTab,
+  onSelectVehicleForCRM,
+  onSelectStatusForFleet,
   onExportCSV,
 }) => {
+  const bookedCount = vehicles.filter((v) => v.status === 'Booked').length;
+  const availableCount = vehicles.filter((v) => v.status === 'Available').length;
+  const maintenanceCount = vehicles.filter((v) => v.status === 'Maintenance').length;
+  const totalVehicles = vehicles.length;
+
+  // Calculate interests per vehicle accurately from live leads
+  const vehicleDemand = vehicles.map((v) => {
+    const vLeads = leads.filter(
+      (l) => l.vehicleId === v.id || (l.vehicleName && l.vehicleName.toLowerCase() === v.name.toLowerCase())
+    );
+    return {
+      id: v.id,
+      name: v.name,
+      brand: v.brand,
+      subType: v.subType,
+      type: v.type,
+      image: v.primaryImage,
+      status: v.status,
+      pricePerDay: v.pricePerDay,
+      interestCount: vLeads.length,
+      recentLeads: vLeads.slice(0, 3),
+    };
+  }).sort((a, b) => b.interestCount - a.interestCount);
+
   const kpis = [
     {
-      title: 'Total Active Fleet',
-      value: stats.totalVehicles,
-      sub: `${stats.availableVehicles} Available • ${stats.bookedVehicles} On Rent`,
-      icon: Car,
-      color: 'teal',
-      badge: `${Math.round((stats.availableVehicles / (stats.totalVehicles || 1)) * 100)}% Ready`,
+      title: 'Vehicles Currently Booked',
+      value: `${bookedCount} / ${totalVehicles}`,
+      sub: `${availableCount} Available • ${maintenanceCount} in Service`,
+      icon: KeyRound,
+      isPrimary: true,
+      badge: `${bookedCount} Active Rentals`,
+      badgeColor: 'bg-red-600 text-white',
+      onClick: () => {
+        onSelectStatusForFleet('Booked');
+        onNavigateTab('fleet');
+      },
     },
     {
-      title: 'New Enquiries Today',
-      value: stats.newEnquiriesToday,
-      sub: `${stats.eventEnquiries} Events • ${stats.totalVehicles} Rides`,
-      icon: Clock,
-      color: 'amber',
+      title: 'Total Customer Inquiries',
+      value: leads.length,
+      sub: `${stats.newEnquiriesToday} new requests received today`,
+      icon: Flame,
       badge: 'Action Required',
+      badgeColor: 'bg-black text-white dark:bg-neutral-800 dark:text-red-400',
+      onClick: () => onNavigateTab('crm'),
     },
     {
-      title: 'Confirmed Bookings',
-      value: stats.confirmedBookings,
-      sub: 'Active reservations & verified docs',
+      title: 'Confirmed Inquiries',
+      value: leads.filter((l) => l.progressStage === 'Confirmed' || l.progressStage === 'Completed').length,
+      sub: 'Verified KYC & reserved dates',
       icon: CheckCircle2,
-      color: 'emerald',
-      badge: '+18% this month',
+      badge: 'High Conversion',
+      badgeColor: 'bg-emerald-600 text-white',
+      onClick: () => onNavigateTab('crm'),
     },
     {
-      title: 'Estimated Revenue Run-Rate',
-      value: `₹${(stats.estimatedRevenue || 148500).toLocaleString('en-IN')}`,
-      sub: 'Based on locked rental durations',
+      title: 'Estimated Tariff Volume',
+      value: `₹${(leads.length * 3600).toLocaleString('en-IN')}`,
+      sub: 'Projected turnover from current interest pipeline',
       icon: TrendingUp,
-      color: 'saffron',
-      badge: 'Target on track',
+      badge: 'Demand Healthy',
+      badgeColor: 'bg-neutral-900 text-neutral-100',
+      onClick: () => onNavigateTab('crm'),
     },
   ];
 
   return (
     <div className="space-y-8">
       {/* Top Welcome Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-teal-950 text-warm-50 border border-teal-900 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-black text-white border border-neutral-800 shadow-xl">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-saffron-400 bg-teal-900/80 px-2.5 py-1 rounded">
+          <span className="text-xs font-black uppercase tracking-wider text-red-500 bg-neutral-900 px-3 py-1 rounded-full border border-neutral-800">
             Operations Console • Kakinada
           </span>
-          <h2 className="font-display text-2xl font-bold mt-2">
+          <h2 className="font-display text-2xl font-black mt-2 text-white">
             Welcome back, {currentUser.name}
           </h2>
-          <p className="text-xs text-teal-200/80 mt-0.5">
-            Role: <strong className="uppercase text-saffron-400">{currentUser.role}</strong> • Real-time fleet and CRM telemetry
+          <p className="text-xs text-neutral-400 mt-0.5">
+            Role: <strong className="uppercase text-red-500">{currentUser.role}</strong> • Real-time vehicle bookings & customer interest tracking
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button
             onClick={onExportCSV}
-            className="px-3.5 py-2 rounded-xl bg-teal-900 hover:bg-teal-800 text-warm-100 text-xs font-semibold flex items-center gap-1.5 border border-teal-700/60 transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 border border-neutral-700 transition-colors"
           >
-            <Download className="w-3.5 h-3.5 text-saffron-400" />
+            <Download className="w-3.5 h-3.5 text-red-500" />
             <span>Export Leads CSV</span>
           </button>
 
           {currentUser.role === 'admin' && (
             <button
               onClick={() => onNavigateTab('fleet')}
-              className="px-3.5 py-2 rounded-xl bg-saffron-500 hover:bg-saffron-400 text-teal-950 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
             >
               <Car className="w-3.5 h-3.5" />
               <span>Manage Fleet</span>
@@ -107,24 +145,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           return (
             <div
               key={idx}
-              className="bg-white dark:bg-charcoal-900 rounded-2xl p-5 border border-warm-200 dark:border-charcoal-800 shadow-sm flex flex-col justify-between"
+              onClick={kpi.onClick}
+              className={`rounded-2xl p-5 border cursor-pointer transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between ${
+                kpi.isPrimary
+                  ? 'bg-neutral-950 text-white border-red-600/60 dark:border-red-600'
+                  : 'bg-white dark:bg-neutral-900 text-black dark:text-white border-neutral-200 dark:border-neutral-800'
+              }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-charcoal-500 dark:text-warm-400">
+                <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
                   {kpi.title}
                 </span>
-                <div className="p-2 rounded-xl bg-warm-100 dark:bg-charcoal-800 text-teal-800 dark:text-saffron-400">
+                <div className={`p-2 rounded-xl ${kpi.isPrimary ? 'bg-red-600 text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-red-600'}`}>
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
 
               <div>
-                <p className="font-display text-3xl font-extrabold text-charcoal-900 dark:text-warm-50">
+                <p className="font-display text-3xl font-black">
                   {kpi.value}
                 </p>
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-warm-100 dark:border-charcoal-800 text-[11px]">
-                  <span className="text-charcoal-500 dark:text-warm-400 truncate">{kpi.sub}</span>
-                  <span className="font-semibold text-teal-800 dark:text-saffron-400 flex-shrink-0">
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-800 text-[11px]">
+                  <span className="text-neutral-500 dark:text-neutral-400 truncate">{kpi.sub}</span>
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${kpi.badgeColor}`}>
                     {kpi.badge}
                   </span>
                 </div>
@@ -134,95 +177,159 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         })}
       </div>
 
-      {/* Charts & Analytics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Enquiries Over Time Visualizer (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-charcoal-900 rounded-3xl p-6 border border-warm-200 dark:border-charcoal-800 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="font-display font-bold text-base text-charcoal-900 dark:text-warm-50">
-                Enquiry Flow (Last 7 Days)
-              </h3>
-              <p className="text-xs text-charcoal-500 dark:text-warm-400">
-                Daily incoming vehicle rental & event package requests
-              </p>
-            </div>
-            <span className="text-xs font-bold text-teal-700 dark:text-saffron-400 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-md">
-              +24% vs Last Week
-            </span>
+      {/* Requirement 1: Booked Vehicles Overview Bar */}
+      <div className="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 className="font-display font-black text-lg text-black dark:text-white flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-red-600" />
+              <span>Fleet Booking Status: {bookedCount} of {totalVehicles} Vehicles Booked</span>
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Live status breakdown of self-drive cars and bikes across Kakinada
+            </p>
           </div>
 
-          {/* Bar Chart Representation */}
-          <div className="h-48 flex items-end justify-between gap-3 pt-6 px-2 border-b border-warm-200 dark:border-charcoal-800">
-            {stats.enquiriesOverTime?.map((item, i) => {
-              const maxCount = Math.max(...stats.enquiriesOverTime.map((d) => d.count), 1);
-              const heightPct = Math.round((item.count / maxCount) * 100);
-
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                  <span className="text-[11px] font-bold text-charcoal-700 dark:text-warm-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {item.count}
-                  </span>
-                  <div className="w-full max-w-[36px] bg-warm-100 dark:bg-charcoal-800 rounded-t-lg overflow-hidden h-36 flex items-end">
-                    <div
-                      className="w-full bg-gradient-to-t from-teal-800 to-saffron-500 rounded-t-lg transition-all duration-500 group-hover:brightness-110"
-                      style={{ height: `${heightPct}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-charcoal-500 dark:text-warm-400 font-mono">
-                    {item.date.slice(5)}
-                  </span>
-                </div>
-              );
-            })}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                onSelectStatusForFleet('Booked');
+                onNavigateTab('fleet');
+              }}
+              className="px-3 py-1.5 rounded-full text-xs font-black bg-red-600 text-white shadow-sm hover:bg-red-700 transition-colors"
+            >
+              View {bookedCount} Booked
+            </button>
+            <button
+              onClick={() => {
+                onSelectStatusForFleet('Available');
+                onNavigateTab('fleet');
+              }}
+              className="px-3 py-1.5 rounded-full text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 transition-colors"
+            >
+              View {availableCount} Available
+            </button>
           </div>
         </div>
 
-        {/* Most Requested Vehicles & Fleet Status (5 cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-charcoal-900 rounded-3xl p-6 border border-warm-200 dark:border-charcoal-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <h3 className="font-display font-bold text-base text-charcoal-900 dark:text-warm-50">
-              Most Requested Fleet Models
-            </h3>
-            <p className="text-xs text-charcoal-500 dark:text-warm-400">
-              Ranked by customer bookings in Godavari district
-            </p>
+        {/* Progress bar */}
+        <div className="w-full h-3 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden flex">
+          <div
+            className="bg-red-600 transition-all duration-500"
+            style={{ width: `${(bookedCount / (totalVehicles || 1)) * 100}%` }}
+            title={`${bookedCount} Booked`}
+          />
+          <div
+            className="bg-emerald-500 transition-all duration-500"
+            style={{ width: `${(availableCount / (totalVehicles || 1)) * 100}%` }}
+            title={`${availableCount} Available`}
+          />
+          <div
+            className="bg-amber-500 transition-all duration-500"
+            style={{ width: `${(maintenanceCount / (totalVehicles || 1)) * 100}%` }}
+            title={`${maintenanceCount} Maintenance`}
+          />
+        </div>
 
-            <div className="mt-5 space-y-3">
-              {stats.mostRequestedVehicles?.map((v, i) => (
-                <div key={i} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-warm-100 dark:bg-charcoal-800 flex items-center justify-center font-bold text-[10px] text-charcoal-700 dark:text-warm-300">
-                      {i + 1}
+        <div className="flex items-center gap-4 mt-3 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
+            <span className="font-bold text-black dark:text-white">{bookedCount} Booked ({(bookedCount / (totalVehicles || 1) * 100).toFixed(0)}%)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="font-bold text-black dark:text-white">{availableCount} Available ({(availableCount / (totalVehicles || 1) * 100).toFixed(0)}%)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span className="font-bold text-black dark:text-white">{maintenanceCount} In Service</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Requirement 2: How many interests for each vehicle (Fleet Demand Breakdown) */}
+      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded-lg bg-red-600 text-white">
+                <Flame className="w-4 h-4" />
+              </span>
+              <h3 className="font-display font-black text-xl text-black dark:text-white">
+                Customer Interests Per Vehicle
+              </h3>
+            </div>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Exact number of customer inquiries received for each car and bike in your fleet
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+              Total {leads.length} Inquiries across {totalVehicles} Vehicles
+            </span>
+            <button
+              onClick={() => onNavigateTab('crm')}
+              className="px-3.5 py-1.5 rounded-full text-xs font-black bg-black text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all flex items-center gap-1.5"
+            >
+              <span>Open Leads CRM</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Vehicle Demand Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {vehicleDemand.map((v) => (
+            <div
+              key={v.id}
+              className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 hover:border-red-600/50 transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-12 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                  <img src={v.image} alt={v.name} className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h4 className="font-display font-black text-xs text-black dark:text-white truncate max-w-[150px]">
+                    {v.name}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] text-neutral-500 font-medium">
+                      ₹{v.pricePerDay}/day
                     </span>
-                    <span className="font-semibold text-charcoal-800 dark:text-warm-100">{v.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 bg-warm-200 dark:bg-charcoal-700 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-saffron-500 h-full rounded-full"
-                        style={{ width: `${Math.min(100, v.count * 12)}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-charcoal-700 dark:text-warm-300 min-w-[20px] text-right">
-                      {v.count}
+                    <span
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        v.status === 'Booked'
+                          ? 'bg-red-600 text-white'
+                          : v.status === 'Available'
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-amber-500 text-black'
+                      }`}
+                    >
+                      {v.status}
                     </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="mt-6 pt-4 border-t border-warm-200 dark:border-charcoal-800 flex items-center justify-between">
-            <button
-              onClick={() => onNavigateTab('crm')}
-              className="text-xs font-semibold text-teal-800 dark:text-saffron-400 hover:underline flex items-center gap-1"
-            >
-              <span>View all active leads</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-            <span className="text-[11px] text-charcoal-400">Auto-synced</span>
-          </div>
+              {/* Interest Badge & View Button */}
+              <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-400 border border-red-200 dark:border-red-900">
+                  🔥 {v.interestCount} {v.interestCount === 1 ? 'Inquiry' : 'Inquiries'}
+                </span>
+                <button
+                  onClick={() => {
+                    onSelectVehicleForCRM(v.name);
+                    onNavigateTab('crm');
+                  }}
+                  className="text-[10px] font-extrabold text-neutral-700 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-0.5"
+                >
+                  <span>View Leads</span>
+                  <ArrowUpRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

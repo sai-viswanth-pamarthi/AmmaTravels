@@ -4,19 +4,58 @@
 
 @layer base {
   :root {
-    --bg-primary: #FBF9F5;
-    --text-primary: #1E2229;
-    --teal-primary: #0A3641;
-    --saffron-primary: #E58B24;
-    --border-subtle: #E5E5DF;
+    /* Theme Tokens: Soothing Warm Light Yellow / Pale Butter Linen Mode */
+    --background: #FAF6EC; /* Soft soothing pale yellow-cream shade */
+    --background-alt: #F3EBD8; /* Gentle warm yellow linen band */
+    --text: #1C1917; /* Deep warm stone */
+    --text-muted: #57534E;
+    --primary: #F97316; /* Warm Orange accent */
+    --accent: #EA580C;
+    --card: #FFFDF7; /* Warm soft cream card surface */
+    --card-subtle: #F5EEDD;
+    --border: #E8DFCF; /* Warm golden-beige border */
+    --border-subtle: #F0E8D8;
+
+    /* Legacy compatibility tokens */
+    --bg-primary: var(--background);
+    --text-primary: var(--text);
+    --card-surface: var(--card);
+    --accent-red: var(--primary);
+    --accent-gold: var(--accent);
+    --accent-dark: #1C1917;
+    --border-subtle: var(--border);
+
+    /* Responsive Type Scale using clamp() */
+    --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    --type-h1: clamp(2.25rem, 1.8rem + 2vw, 3.75rem);
+    --type-h2: clamp(1.75rem, 1.45rem + 1.4vw, 2.75rem);
+    --type-h3: clamp(1.35rem, 1.2rem + 0.8vw, 1.875rem);
+    --type-h4: clamp(1.1rem, 1rem + 0.4vw, 1.35rem);
+    --type-body-lg: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
+    --type-body-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1.05rem);
+    --type-body-sm: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9rem);
+    --type-body-xs: clamp(0.7rem, 0.68rem + 0.1vw, 0.775rem);
   }
 
   .dark {
-    --bg-primary: #0A141A;
-    --text-primary: #F2F4F7;
-    --teal-primary: #0D5C75;
-    --saffron-primary: #F59E0B;
-    --border-subtle: #1E2A36;
+    /* Theme Tokens: Minimal Modern Dark Mode with Electric Blue Accent */
+    --background: #090d16;
+    --text: #f1f5f9;
+    --primary: #3b82f6;
+    --accent: #60a5fa;
+    --card: #101626;
+    --border: #1e293b;
+
+    /* Legacy compatibility tokens */
+    --bg-primary: var(--background);
+    --text-primary: var(--text);
+    --card-surface: var(--card);
+    --accent-red: var(--primary);
+    --accent-gold: var(--accent);
+    --accent-dark: #ffffff;
+    --border-subtle: var(--border);
   }
 
   html {
@@ -24,64 +63,176 @@
   }
 
   body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: var(--type-body-base);
+    line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 200ms theme color transition */
+  @media (prefers-reduced-motion: no-preference) {
+    body, header, nav, main, section, footer, div, a, button, input, select, textarea, p, span, h1, h2, h3, h4, h5, h6 {
+      transition-property: background-color, border-color, color, fill, stroke;
+      transition-duration: 200ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  /* Exclude 3D canvas and explicitly non-transitioned elements */
+  canvas, [data-no-transition] {
+    transition: none !important;
+  }
+
+  /* Headings typography */
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-heading);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+  }
+
+  h1 { font-size: var(--type-h1); }
+  h2 { font-size: var(--type-h2); }
+  h3 { font-size: var(--type-h3); }
+  h4 { font-size: var(--type-h4); }
+
+  .font-hand {
+    font-family: 'Caveat', cursive;
+  }
+
+  /* Keyboard focus states */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #ECE9E0;
-}
-.dark ::-webkit-scrollbar-track {
-  background: #111B22;
+  background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #A0AAB8;
-  border-radius: 4px;
+  background: var(--primary);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #0A3641;
+  background: var(--accent);
 }
 
-/* 3D Card Tilt & Glow */
-.choice-card-glow {
-  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+/* Subtle Film Grain Noise Texture */
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
-.choice-card-glow:hover {
-  box-shadow: 0 20px 40px -15px rgba(229, 139, 36, 0.25), 0 0 25px rgba(10, 54, 65, 0.15);
+
+/* Minimal Modern Card Shadows */
+.soft-card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(37, 99, 235, 0.04);
+}
+
+.dark .soft-card-shadow {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(59, 130, 246, 0.12);
+}
+
+/* Interactive Card & Button Utilities */
+.card-interactive {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms ease, border-color 250ms ease;
+}
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -10px rgba(37, 99, 235, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+.dark .card-interactive:hover {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px -3px rgba(59, 130, 246, 0.25);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+.btn-interactive {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, background-color 200ms ease, opacity 200ms ease;
+}
+.btn-interactive:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+.btn-interactive:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Loading Skeleton Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.6) 0%,
+    rgba(241, 245, 249, 0.9) 50%,
+    rgba(226, 232, 240, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 22, 38, 0.6) 0%,
+    rgba(30, 41, 59, 0.8) 50%,
+    rgba(16, 22, 38, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Modern Hand-Drawn Underline with Blue Accent */
+.hand-drawn-underline {
+  position: relative;
+  display: inline-block;
+}
+.hand-drawn-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 8px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 12' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 9 C 25 3, 45 11, 70 5 C 85 2, 95 8, 99 6' stroke='%232563EB' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.dark .hand-drawn-underline::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 12' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 9 C 25 3, 45 11, 70 5 C 85 2, 95 8, 99 6' stroke='%233B82F6' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* Rolling Wheel Keyframe for Preloader */
 @keyframes rollWheel {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
 .animate-roll-wheel {
   animation: rollWheel 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Day to Night Sky Transition */
-.sky-gradient-day {
-  background: linear-gradient(180deg, #3A7D99 0%, #76B4CE 50%, #E8A856 100%);
-}
-
-.sky-gradient-dusk {
-  background: linear-gradient(180deg, #1B3B4B 0%, #4D3559 50%, #C86D3B 100%);
-}
-
-.sky-gradient-night {
-  background: linear-gradient(180deg, #05131C 0%, #0A2233 60%, #15394F 100%);
+/* Respect Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

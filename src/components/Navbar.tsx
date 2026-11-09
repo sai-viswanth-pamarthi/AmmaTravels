@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Car,
+  MapPin,
   Calendar,
   Search,
   Phone,
@@ -9,9 +10,10 @@ import {
   Sun,
   Menu,
   X,
-  Sparkles,
-  ArrowRight,
-  UserCheck
+  Bus,
+  Tag,
+  Globe,
+  ChevronDown
 } from 'lucide-react';
 import { User } from '@/types';
 
@@ -19,6 +21,8 @@ interface NavbarProps {
   currentUser: User | null;
   onOpenAdmin: () => void;
   onOpenTrack: () => void;
+  onOpenLocations: () => void;
+  onOpenShuttleTracker: () => void;
   onSelectSection: (sectionId: string) => void;
   darkMode: boolean;
   onToggleDarkMode: () => void;
@@ -29,6 +33,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onOpenAdmin,
   onOpenTrack,
+  onOpenLocations,
+  onOpenShuttleTracker,
   onSelectSection,
   darkMode,
   onToggleDarkMode,
@@ -52,195 +58,192 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
         scrolled
-          ? 'bg-teal-950/95 dark:bg-charcoal-950/95 backdrop-blur-md shadow-lg border-b border-teal-900/50 dark:border-charcoal-800 py-3'
-          : 'bg-gradient-to-b from-teal-950/90 via-teal-950/60 to-transparent py-5'
+          ? 'py-2.5 bg-[#FAF6EC]/95 dark:bg-slate-950/95 backdrop-blur-md shadow-sm border-b border-[#E8DFCF] dark:border-slate-800/80'
+          : 'py-5 bg-[#FAF6EC]/80 dark:bg-slate-950/60 backdrop-blur-sm border-b border-[#E8DFCF]/50'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
+          
           {/* Brand Logo Wordmark */}
           <button
             onClick={() => handleNavClick('hero')}
-            className="flex items-center gap-3 text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron-500 rounded-lg p-1"
+            className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl p-1"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-800 to-saffron-500 flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-display font-black text-lg shadow-sm shadow-blue-600/30 group-hover:scale-105 transition-transform duration-200">
               AT
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-display font-extrabold text-2xl tracking-tight text-warm-50 group-hover:text-saffron-300 transition-colors">
-                  Amma<span className="text-saffron-500">Travels</span>
+            <div className="flex flex-col text-left">
+              <div className="flex items-baseline gap-1">
+                <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                  Amma<span className="text-blue-600 dark:text-blue-400">Travels</span>
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-semibold bg-saffron-500/20 text-saffron-400 border border-saffron-500/30 rounded">
-                  Kakinada
-                </span>
+                <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400" />
               </div>
-              <p className="text-[11px] text-teal-200/80 font-medium tracking-wide">
-                Every journey, a celebration
-              </p>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight">
+                Kakinada Fleet & 360° Studio
+              </span>
             </div>
           </button>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          {/* Centered Desktop Navigation */}
+          <nav className="hidden xl:flex items-center gap-1.5 bg-[#F3EBD8]/90 dark:bg-slate-900/80 p-1.5 rounded-full border border-[#E8DFCF] dark:border-slate-800 backdrop-blur-md">
             <button
-              onClick={() => handleNavClick('vehicles')}
-              className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeSection === 'vehicles'
-                  ? 'text-saffron-400 bg-teal-900/40'
-                  : 'text-warm-100 hover:text-saffron-300 hover:bg-teal-900/30'
+              onClick={() => handleNavClick('hero')}
+              className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+                activeSection === 'hero'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-[#FFFDF7] dark:hover:bg-slate-800'
               }`}
             >
-              <Car className="w-4 h-4 text-saffron-400" />
-              <span>Cars & Bikes</span>
+              Home
             </button>
 
             <button
-              onClick={() => handleNavClick('events')}
-              className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeSection === 'events'
-                  ? 'text-saffron-400 bg-teal-900/40'
-                  : 'text-warm-100 hover:text-saffron-300 hover:bg-teal-900/30'
+              onClick={() => handleNavClick('vehicles')}
+              className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+                activeSection === 'vehicles'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-[#FFFDF7] dark:hover:bg-slate-800'
               }`}
             >
-              <Calendar className="w-4 h-4 text-saffron-400" />
-              <span>Event Packages</span>
+              Vehicles & Fleet
             </button>
 
             <button
               onClick={() => handleNavClick('how-it-works')}
-              className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
                 activeSection === 'how-it-works'
-                  ? 'text-saffron-400 bg-teal-900/40'
-                  : 'text-warm-100 hover:text-saffron-300 hover:bg-teal-900/30'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-[#FFFDF7] dark:hover:bg-slate-800'
               }`}
             >
               How It Works
             </button>
 
             <button
+              onClick={onOpenTrack}
+              className="px-4 py-1.5 text-xs font-semibold rounded-full text-stone-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#FFFDF7] dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-1.5"
+            >
+              <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Track Interest</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('testimonials')}
+              className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+                activeSection === 'testimonials'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-[#FFFDF7] dark:hover:bg-slate-800'
+              }`}
+            >
+              Reviews
+            </button>
+
+            <button
               onClick={() => handleNavClick('contact')}
-              className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
                 activeSection === 'contact'
-                  ? 'text-saffron-400 bg-teal-900/40'
-                  : 'text-warm-100 hover:text-saffron-300 hover:bg-teal-900/30'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-[#FFFDF7] dark:hover:bg-slate-800'
               }`}
             >
               Contact
             </button>
           </nav>
 
-          {/* Actions: Track, Dark Mode, Admin */}
-          <div className="hidden md:flex items-center gap-2.5">
-            {/* Track Enquiry Button */}
-            <button
-              onClick={onOpenTrack}
-              className="px-3.5 py-2 text-sm font-medium text-warm-100 hover:text-white bg-teal-900/50 hover:bg-teal-800/60 border border-teal-700/60 rounded-lg transition-all flex items-center gap-1.5 shadow-sm"
-              title="Track enquiry status with your Ref ID"
-            >
-              <Search className="w-3.5 h-3.5 text-saffron-400" />
-              <span>Track Enquiry</span>
-            </button>
-
-            {/* Dark Mode Toggle */}
+          {/* Right Action Items: Sun/Moon Toggle, Admin Portal, Menu Button */}
+          <div className="flex items-center gap-2.5">
+            {/* Sun / Moon Theme Toggle with 200ms transition */}
             <button
               onClick={onToggleDarkMode}
-              className="p-2 text-warm-200 hover:text-white bg-teal-900/40 hover:bg-teal-800/50 border border-teal-800/60 rounded-lg transition-colors"
+              className="p-2.5 text-stone-700 dark:text-slate-300 bg-[#F3EBD8] dark:bg-slate-900 hover:bg-[#EAE1CE] dark:hover:bg-slate-800 border border-[#E8DFCF] dark:border-slate-800 rounded-xl transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               aria-label="Toggle dark mode"
             >
-              {darkMode ? <Sun className="w-4 h-4 text-saffron-400" /> : <Moon className="w-4 h-4 text-teal-300" />}
+              {darkMode ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform duration-200 hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-blue-600 transition-transform duration-200 hover:-rotate-12" />
+              )}
             </button>
 
-            {/* Admin Portal / User Status */}
+            {/* Admin Portal access */}
             <button
               onClick={onOpenAdmin}
-              className="px-3.5 py-2 text-sm font-semibold text-teal-950 bg-saffron-500 hover:bg-saffron-400 rounded-lg transition-all flex items-center gap-1.5 shadow-md shadow-saffron-500/20 active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-stone-700 dark:text-slate-300 bg-[#F3EBD8] dark:bg-slate-900 hover:bg-[#EAE1CE] dark:hover:bg-slate-800 border border-[#E8DFCF] dark:border-slate-800 text-xs font-semibold transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
-              <Shield className="w-4 h-4 text-teal-950" />
-              <span>{currentUser?.role === 'admin' ? 'Admin Ops' : 'Admin'}</span>
-            </button>
-          </div>
-
-          {/* Mobile Menu Hamburger */}
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={onToggleDarkMode}
-              className="p-2 text-warm-200 bg-teal-900/40 border border-teal-800/60 rounded-lg"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? <Sun className="w-4 h-4 text-saffron-400" /> : <Moon className="w-4 h-4 text-teal-300" />}
+              <Shield className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>{currentUser?.role === 'admin' ? 'Admin Ops' : 'Staff'}</span>
             </button>
 
+            {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-warm-100 hover:text-white bg-teal-900/50 border border-teal-800/60 rounded-lg"
-              aria-label="Open menu"
+              className="xl:hidden p-2 text-stone-900 dark:text-slate-100 bg-[#F3EBD8] dark:bg-slate-900 hover:bg-[#EAE1CE] dark:hover:bg-slate-800 border border-[#E8DFCF] dark:border-slate-800 rounded-xl transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-teal-950/98 dark:bg-charcoal-950/98 border-b border-teal-900 px-4 pt-3 pb-6 space-y-3 mt-3 backdrop-blur-lg">
-          <div className="grid grid-cols-2 gap-2 pb-2">
-            <button
-              onClick={() => handleNavClick('vehicles')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-teal-900/40 text-warm-100 text-sm font-medium"
-            >
-              <Car className="w-4 h-4 text-saffron-400" />
-              <span>Cars & Bikes</span>
-            </button>
-            <button
-              onClick={() => handleNavClick('events')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-teal-900/40 text-warm-100 text-sm font-medium"
-            >
-              <Calendar className="w-4 h-4 text-saffron-400" />
-              <span>Event Packages</span>
-            </button>
-          </div>
-
+        <div className="xl:hidden bg-[#FFFDF7]/98 dark:bg-slate-950/98 border-b border-[#E8DFCF] dark:border-slate-800 px-6 pt-4 pb-6 space-y-3 mt-2 shadow-xl backdrop-blur-xl animate-in fade-in">
           <div className="space-y-1">
             <button
+              onClick={() => handleNavClick('hero')}
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => handleNavClick('vehicles')}
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors flex items-center justify-between"
+            >
+              <span>Vehicles & Fleet</span>
+              <span className="text-[10px] bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full font-bold">
+                Cars & Bikes
+              </span>
+            </button>
+            <button
               onClick={() => handleNavClick('how-it-works')}
-              className="w-full text-left px-3 py-2 text-sm text-warm-200 hover:text-white hover:bg-teal-900/30 rounded-md"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors"
             >
               How It Works
             </button>
-            <button
-              onClick={() => handleNavClick('contact')}
-              className="w-full text-left px-3 py-2 text-sm text-warm-200 hover:text-white hover:bg-teal-900/30 rounded-md"
-            >
-              Contact Us & Location
-            </button>
-          </div>
-
-          <div className="pt-2 border-t border-teal-900/60 flex flex-col gap-2">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenTrack();
               }}
-              className="w-full py-2.5 text-center text-sm font-medium text-warm-100 bg-teal-900/60 border border-teal-700/60 rounded-lg flex items-center justify-center gap-2"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors flex items-center gap-2"
             >
-              <Search className="w-4 h-4 text-saffron-400" />
-              <span>Track Existing Enquiry</span>
+              <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Track Your Interest</span>
             </button>
+            <button
+              onClick={() => handleNavClick('contact')}
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors"
+            >
+              Contact Hub in Kakinada
+            </button>
+          </div>
 
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenAdmin();
               }}
-              className="w-full py-2.5 text-center text-sm font-semibold text-teal-950 bg-saffron-500 rounded-lg flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30 transition-all duration-200 active:scale-98"
             >
-              <Shield className="w-4 h-4" />
-              <span>Admin Operations</span>
+              <Shield className="w-4 h-4 text-white" />
+              <span>Admin Portal Login</span>
             </button>
           </div>
         </div>

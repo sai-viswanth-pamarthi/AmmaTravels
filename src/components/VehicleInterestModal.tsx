@@ -41,33 +41,67 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
 
   if (!isOpen || !vehicle) return null;
 
+  const validate = (fieldsToValidate?: { name?: string; phone?: string; pickupDate?: string; returnDate?: string }) => {
+    const valName = fieldsToValidate?.name !== undefined ? fieldsToValidate.name : name;
+    const valPhone = fieldsToValidate?.phone !== undefined ? fieldsToValidate.phone : phone;
+    const valPickup = fieldsToValidate?.pickupDate !== undefined ? fieldsToValidate.pickupDate : pickupDate;
+    const valReturn = fieldsToValidate?.returnDate !== undefined ? fieldsToValidate.returnDate : returnDate;
+
+    const errs: Record<string, string> = {};
+
+    if (!valName.trim()) {
+      errs.name = 'Full name is required';
+    } else if (valName.trim().length < 2) {
+      errs.name = 'Name must be at least 2 characters';
+    }
+
+    const cleanPhone = valPhone.replace(/[^0-9]/g, '');
+    if (!cleanPhone) {
+      errs.phone = 'Mobile phone number is required';
+    } else if (cleanPhone.length !== 10) {
+      errs.phone = 'Please enter a valid 10-digit mobile number';
+    }
+
+    if (!valPickup) {
+      errs.pickupDate = 'Pickup date is required';
+    }
+
+    if (!valReturn) {
+      errs.returnDate = 'Return date is required';
+    } else if (valPickup && new Date(valReturn) < new Date(valPickup)) {
+      errs.returnDate = 'Return date cannot be earlier than pickup date';
+    }
+
+    setFieldErrors(errs);
+    return errs;
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    validate();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (honeypot) {
-      // Bot detected, silently reject or fail
+      // Bot detected, silently reject
       return;
     }
 
-    if (!name.trim() || !phone.trim() || !pickupDate || !returnDate) {
-      setError('Please fill in your Name, Phone Number, Pickup Date, and Return Date.');
+    setTouched({ name: true, phone: true, pickupDate: true, returnDate: true });
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setError('Please resolve the highlighted errors before submitting.');
       return;
     }
 
     const cleanPhone = phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length < 10) {
-      setError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    if (new Date(returnDate) < new Date(pickupDate)) {
-      setError('Return date cannot be earlier than pickup date.');
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
 
@@ -105,16 +139,18 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
     setReturnDate('');
     setMessage('');
     setError(null);
+    setFieldErrors({});
+    setTouched({});
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-charcoal-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-xl bg-white dark:bg-charcoal-900 rounded-3xl border border-warm-200 dark:border-charcoal-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-xl bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl border border-[#E8DFCF] dark:border-slate-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
         {/* Success View */}
         {submittedData ? (
-          <div className="text-center py-6 space-y-5">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-sm">
+          <div className="text-center py-6 space-y-5 animate-in fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
@@ -122,24 +158,24 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Inquiry Successfully Registered
               </span>
-              <h3 className="font-display text-2xl font-bold text-charcoal-900 dark:text-warm-50 mt-1">
+              <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white mt-1">
                 Your Booking Request is Logged!
               </h3>
-              <p className="mt-2 text-sm text-charcoal-600 dark:text-warm-300">
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
                 Our Kakinada fleet manager has received your reservation request for{' '}
-                <strong className="text-charcoal-900 dark:text-warm-100">{vehicle.name}</strong>.
+                <strong className="text-slate-900 dark:text-white">{vehicle.name}</strong>.
               </p>
             </div>
 
             {/* Reference ID Callout Box */}
-            <div className="p-4 rounded-2xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 text-center">
-              <p className="text-xs text-teal-700 dark:text-teal-300 font-semibold uppercase tracking-wider">
-                Booking Reference ID
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-center">
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">
+                Interest Reference ID
               </p>
-              <p className="font-mono text-2xl font-extrabold text-teal-950 dark:text-saffron-400 mt-1 tracking-wider">
+              <p className="font-mono text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-wider">
                 {submittedData.refId}
               </p>
-              <p className="text-[11px] text-charcoal-500 dark:text-warm-400 mt-1">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                 Save this Reference ID to track status anytime with your phone number ({submittedData.phone})
               </p>
             </div>
@@ -150,15 +186,15 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                 href={getVehicleWhatsAppUrl(vehicle.name, submittedData.refId)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm tracking-wide shadow-md flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm tracking-wide shadow-md flex items-center justify-center gap-2 transition-all btn-interactive"
               >
                 <PhoneCall className="w-4 h-4" />
-                <span>Confirm Instantly via WhatsApp</span>
+                <span>Coordinate Directly via WhatsApp</span>
               </a>
 
               <button
                 onClick={resetAndClose}
-                className="w-full py-2.5 px-4 rounded-xl bg-warm-100 dark:bg-charcoal-800 hover:bg-warm-200 dark:hover:bg-charcoal-700 text-charcoal-700 dark:text-warm-200 font-semibold text-xs transition-colors"
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs transition-colors"
               >
                 Done / Return to Fleet
               </button>
@@ -168,16 +204,16 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
           /* Form View */
           <div>
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-warm-200 dark:border-charcoal-800">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-teal-800 dark:text-saffron-400">
+                <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <Car className="w-6 h-6" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-saffron-600 dark:text-saffron-400">
-                    Rental Booking Inquiry
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    Express Interest
                   </span>
-                  <h3 className="font-display text-xl font-bold text-charcoal-900 dark:text-warm-50">
+                  <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white">
                     {vehicle.name}
                   </h3>
                 </div>
@@ -185,7 +221,7 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
               <button
                 onClick={resetAndClose}
-                className="p-2 text-charcoal-400 hover:text-charcoal-700 dark:hover:text-warm-100 rounded-full hover:bg-warm-100 dark:hover:bg-charcoal-800"
+                className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -193,15 +229,15 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
             </div>
 
             {/* Tariff highlight */}
-            <div className="my-4 p-3 rounded-xl bg-warm-50 dark:bg-charcoal-800/60 border border-warm-200 dark:border-charcoal-700 flex items-center justify-between text-xs">
-              <span className="text-charcoal-600 dark:text-warm-300">
-                Tariff: <strong className="text-charcoal-900 dark:text-warm-100">₹{vehicle.pricePerDay}/day</strong>
+            <div className="my-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
+              <span className="text-slate-600 dark:text-slate-300">
+                Tariff: <strong className="text-slate-900 dark:text-white">₹{vehicle.pricePerDay}/day</strong>
               </span>
-              <span className="text-charcoal-600 dark:text-warm-300">
-                Deposit: <strong className="text-charcoal-900 dark:text-warm-100">₹{vehicle.deposit}</strong>
+              <span className="text-slate-600 dark:text-slate-300">
+                Deposit: <strong className="text-slate-900 dark:text-white">₹{vehicle.deposit}</strong>
               </span>
-              <span className="text-charcoal-600 dark:text-warm-300">
-                Free Run: <strong className="text-charcoal-900 dark:text-warm-100">{vehicle.kmLimit} km/day</strong>
+              <span className="text-slate-600 dark:text-slate-300">
+                Free Run: <strong className="text-slate-900 dark:text-white">{vehicle.kmLimit} km/day</strong>
               </span>
             </div>
 
@@ -214,7 +250,7 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-3.5">
               {/* Anti-spam honeypot (hidden from screen) */}
               <input
                 type="text"
@@ -227,38 +263,74 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Your Full Name *
                   </label>
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (touched.name) validate({ name: e.target.value });
+                    }}
+                    onBlur={() => handleBlur('name')}
                     placeholder="e.g. Ramesh Varma"
-                    className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border text-slate-900 dark:text-slate-100 text-xs transition-colors duration-200 focus:outline-none focus:ring-2 ${
+                      touched.name && fieldErrors.name
+                        ? 'border-rose-500 focus:ring-rose-500/20'
+                        : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20'
+                    }`}
+                    aria-invalid={!!(touched.name && fieldErrors.name)}
+                    aria-describedby={touched.name && fieldErrors.name ? 'name-error' : undefined}
                     required
                   />
+                  {touched.name && fieldErrors.name && (
+                    <p id="name-error" className="mt-1 text-[11px] text-rose-500 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      <span>{fieldErrors.name}</span>
+                    </p>
+                  )}
                 </div>
 
+                {/* Mobile Phone */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Mobile Phone *
                   </label>
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (touched.phone) validate({ phone: e.target.value });
+                    }}
+                    onBlur={() => handleBlur('phone')}
                     placeholder="e.g. 9876543210"
-                    className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    maxLength={10}
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border text-slate-900 dark:text-slate-100 text-xs transition-colors duration-200 focus:outline-none focus:ring-2 ${
+                      touched.phone && fieldErrors.phone
+                        ? 'border-rose-500 focus:ring-rose-500/20'
+                        : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20'
+                    }`}
+                    aria-invalid={!!(touched.phone && fieldErrors.phone)}
+                    aria-describedby={touched.phone && fieldErrors.phone ? 'phone-error' : undefined}
                     required
                   />
+                  {touched.phone && fieldErrors.phone && (
+                    <p id="phone-error" className="mt-1 text-[11px] text-rose-500 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      <span>{fieldErrors.phone}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Email Address */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Email Address (Optional)
                   </label>
                   <input
@@ -266,18 +338,19 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ramesh@example.com"
-                    className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
                   />
                 </div>
 
+                {/* Pickup Location */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Pickup Location
                   </label>
                   <select
                     value={pickupLocation}
                     onChange={(e) => setPickupLocation(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
                   >
                     <option value="Kakinada Main Hub (Bhanugudi Junction)">
                       Kakinada Main Hub (Bhanugudi)
@@ -299,37 +372,71 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Pickup Date */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Pickup Date & Time *
                   </label>
                   <input
                     type="date"
                     value={pickupDate}
-                    onChange={(e) => setPickupDate(e.target.value)}
+                    onChange={(e) => {
+                      setPickupDate(e.target.value);
+                      if (touched.pickupDate) validate({ pickupDate: e.target.value });
+                    }}
+                    onBlur={() => handleBlur('pickupDate')}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border text-slate-900 dark:text-slate-100 text-xs transition-colors duration-200 focus:outline-none focus:ring-2 ${
+                      touched.pickupDate && fieldErrors.pickupDate
+                        ? 'border-rose-500 focus:ring-rose-500/20'
+                        : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20'
+                    }`}
+                    aria-invalid={!!(touched.pickupDate && fieldErrors.pickupDate)}
+                    aria-describedby={touched.pickupDate && fieldErrors.pickupDate ? 'pickup-error' : undefined}
                     required
                   />
+                  {touched.pickupDate && fieldErrors.pickupDate && (
+                    <p id="pickup-error" className="mt-1 text-[11px] text-rose-500 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      <span>{fieldErrors.pickupDate}</span>
+                    </p>
+                  )}
                 </div>
 
+                {/* Return Date */}
                 <div>
-                  <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Return Date & Time *
                   </label>
                   <input
                     type="date"
                     value={returnDate}
-                    onChange={(e) => setReturnDate(e.target.value)}
+                    onChange={(e) => {
+                      setReturnDate(e.target.value);
+                      if (touched.returnDate) validate({ returnDate: e.target.value });
+                    }}
+                    onBlur={() => handleBlur('returnDate')}
                     min={pickupDate || new Date().toISOString().split('T')[0]}
-                    className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border text-slate-900 dark:text-slate-100 text-xs transition-colors duration-200 focus:outline-none focus:ring-2 ${
+                      touched.returnDate && fieldErrors.returnDate
+                        ? 'border-rose-500 focus:ring-rose-500/20'
+                        : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20'
+                    }`}
+                    aria-invalid={!!(touched.returnDate && fieldErrors.returnDate)}
+                    aria-describedby={touched.returnDate && fieldErrors.returnDate ? 'return-error' : undefined}
                     required
                   />
+                  {touched.returnDate && fieldErrors.returnDate && (
+                    <p id="return-error" className="mt-1 text-[11px] text-rose-500 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      <span>{fieldErrors.returnDate}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Driving Licence / ID Proof URL or Notes (Optional)
                 </label>
                 <input
@@ -337,12 +444,12 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                   value={idProofUrl}
                   onChange={(e) => setIdProofUrl(e.target.value)}
                   placeholder="Drive link, DigiLocker, or present original at pickup"
-                  className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-charcoal-700 dark:text-warm-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Specific Requests or Message (Optional)
                 </label>
                 <textarea
@@ -350,7 +457,7 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Need extra helmet, child seat, early morning pickup..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-warm-50 dark:bg-charcoal-800 border border-warm-200 dark:border-charcoal-700 text-charcoal-900 dark:text-warm-100 text-xs focus:ring-2 focus:ring-teal-700 focus:outline-none resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none resize-none transition-colors"
                 />
               </div>
 
@@ -359,17 +466,17 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-400 text-teal-950 font-bold text-sm tracking-wide shadow-md shadow-saffron-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/30 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60 btn-interactive"
                 >
                   {submitting ? (
-                    <Clock className="w-4 h-4 animate-spin" />
+                    <Clock className="w-4 h-4 animate-spin text-white" />
                   ) : (
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-4 h-4 text-white" />
                   )}
-                  <span>{submitting ? 'Registering Booking...' : 'Confirm Interest & Reserve'}</span>
+                  <span>{submitting ? 'Registering Interest...' : "Submit My Interest (I'm Interested)"}</span>
                 </button>
-                <p className="text-[11px] text-center text-charcoal-500 dark:text-warm-400 mt-2">
-                  🔒 No payment required now. Verified on vehicle hand-over in Kakinada.
+                <p className="text-[11px] text-center text-slate-500 dark:text-slate-400 mt-2">
+                  🔒 No payment required upfront. Amma Travels team will coordinate your pickup directly.
                 </p>
               </div>
             </form>

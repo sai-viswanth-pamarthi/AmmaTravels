@@ -3,19 +3,13 @@ import {
   LayoutDashboard,
   Users,
   Car,
-  Calendar,
   LogOut,
-  ExternalLink,
-  Shield,
-  Download,
-  Sparkles,
   ArrowLeft
 } from 'lucide-react';
-import { User, Vehicle, EventPackage, InterestSubmission, DashboardStats } from '@/types';
+import { User, Vehicle, InterestSubmission, DashboardStats } from '@/types';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminLeadsCRM } from './AdminLeadsCRM';
 import { AdminFleetManager } from './AdminFleetManager';
-import { AdminEventManager } from './AdminEventManager';
 import { api } from '@/lib/api';
 
 interface AdminPortalProps {
@@ -31,7 +25,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onReturnToUserSite,
   onOpen360,
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet' | 'events'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet'>('dashboard');
+  const [selectedVehicleForCRM, setSelectedVehicleForCRM] = useState<string>('all');
+  const [selectedStatusForFleet, setSelectedStatusForFleet] = useState<string>('all');
+
   const [stats, setStats] = useState<DashboardStats>({
     totalVehicles: 16,
     availableVehicles: 12,
@@ -39,16 +36,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     maintenanceVehicles: 1,
     newEnquiriesToday: 5,
     confirmedBookings: 8,
-    eventEnquiries: 4,
+    eventEnquiries: 0,
     estimatedRevenue: 148500,
     enquiriesOverTime: [
-      { date: '2026-10-22', count: 4 },
-      { date: '2026-10-23', count: 6 },
-      { date: '2026-10-24', count: 5 },
       { date: '2026-10-25', count: 9 },
       { date: '2026-10-26', count: 7 },
       { date: '2026-10-27', count: 11 },
       { date: '2026-10-28', count: 5 },
+      { date: '2026-10-29', count: 8 },
+      { date: '2026-10-30', count: 12 },
+      { date: '2026-10-31', count: 6 },
     ],
     mostRequestedVehicles: [
       { name: 'Toyota Innova Crysta', count: 14 },
@@ -60,19 +57,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   });
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [packages, setPackages] = useState<EventPackage[]>([]);
   const [leads, setLeads] = useState<InterestSubmission[]>([]);
 
   const loadData = async () => {
     try {
-      const [vList, pList, lList, sData] = await Promise.all([
+      const [vList, lList, sData] = await Promise.all([
         api.getVehicles(),
-        api.getPackages(),
         api.getInterests(),
         api.getStats(),
       ]);
       setVehicles(vList);
-      setPackages(pList);
       setLeads(lList);
       setStats(sData);
     } catch (err) {
@@ -86,20 +80,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const handleExportCSV = () => {
     if (leads.length === 0) {
-      alert('No leads available to export.');
+      alert('No customer inquiries available to export.');
       return;
     }
 
     const headers = [
       'Ref ID',
-      'Category',
-      'Item Name',
+      'Vehicle Name',
       'Customer Name',
       'Phone',
       'Email',
-      'Pickup/Event Date',
+      'Pickup Date',
       'Return Date',
-      'Location',
+      'Pickup Location',
       'CRM Stage',
       'Notes',
       'Created At',
@@ -107,14 +100,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
     const rows = leads.map((l) => [
       `"${l.refId}"`,
-      `"${l.type}"`,
-      `"${(l.vehicleName || l.packageName || '').replace(/"/g, '""')}"`,
+      `"${(l.vehicleName || '').replace(/"/g, '""')}"`,
       `"${l.name.replace(/"/g, '""')}"`,
       `"${l.phone}"`,
       `"${l.email || ''}"`,
-      `"${l.pickupDate || l.eventDate || ''}"`,
+      `"${l.pickupDate || ''}"`,
       `"${l.returnDate || ''}"`,
-      `"${(l.pickupLocation || l.cityVenue || '').replace(/"/g, '""')}"`,
+      `"${(l.pickupLocation || '').replace(/"/g, '""')}"`,
       `"${l.progressStage}"`,
       `"${(l.internalNotes || '').replace(/"/g, '""')}"`,
       `"${l.createdAt}"`,
@@ -125,43 +117,53 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `AmmaTravels_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `AmmaTravels_Vehicle_Interests_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const handleSelectVehicleForCRM = (vehicleName: string) => {
+    setSelectedVehicleForCRM(vehicleName);
+    setActiveTab('crm');
+  };
+
+  const handleSelectStatusForFleet = (status: string) => {
+    setSelectedStatusForFleet(status);
+    setActiveTab('fleet');
+  };
+
   return (
-    <div className="min-h-screen bg-warm-50 dark:bg-charcoal-950 text-charcoal-900 dark:text-warm-100 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col font-sans transition-colors duration-300">
       {/* Admin Top Navigation */}
-      <header className="sticky top-0 z-40 bg-teal-950 border-b border-teal-900 px-4 sm:px-6 lg:px-8 py-3 text-warm-50 shadow-md">
+      <header className="sticky top-0 z-40 bg-black border-b border-neutral-800 px-4 sm:px-6 lg:px-8 py-3 text-white shadow-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Brand & Mode */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-800 to-saffron-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-red-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-600/30">
               AT
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-lg tracking-tight text-warm-50">
-                  Amma<span className="text-saffron-500">Travels</span>
+                <span className="font-display font-black text-lg tracking-tight text-white">
+                  Amma<span className="text-red-600">Travels</span>
                 </span>
-                <span className="px-2 py-0.5 text-[10px] uppercase font-bold bg-saffron-500 text-teal-950 rounded">
+                <span className="px-2 py-0.5 text-[10px] uppercase font-black bg-red-600 text-white rounded">
                   Admin Ops
                 </span>
               </div>
-              <p className="text-[11px] text-teal-300">Operations Control Center • Kakinada</p>
+              <p className="text-[11px] text-neutral-400">Operations Control Center • Kakinada</p>
             </div>
           </div>
 
-          {/* Tab Navigation */}
-          <nav className="hidden md:flex items-center gap-1 bg-teal-900/60 p-1 rounded-xl border border-teal-800">
+          {/* Tab Navigation (Events removed) */}
+          <nav className="hidden md:flex items-center gap-1 bg-neutral-900 p-1.5 rounded-full border border-neutral-800">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeTab === 'dashboard'
-                  ? 'bg-saffron-500 text-teal-950 shadow-sm'
-                  : 'text-warm-200 hover:text-white'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
               }`}
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
@@ -169,56 +171,51 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </button>
 
             <button
-              onClick={() => setActiveTab('crm')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              onClick={() => {
+                setSelectedVehicleForCRM('all');
+                setActiveTab('crm');
+              }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeTab === 'crm'
-                  ? 'bg-saffron-500 text-teal-950 shadow-sm'
-                  : 'text-warm-200 hover:text-white'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Leads CRM ({leads.length})</span>
+              <span>Interests CRM ({leads.length})</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('fleet')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              onClick={() => {
+                setSelectedStatusForFleet('all');
+                setActiveTab('fleet');
+              }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeTab === 'fleet'
-                  ? 'bg-saffron-500 text-teal-950 shadow-sm'
-                  : 'text-warm-200 hover:text-white'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
               }`}
             >
               <Car className="w-3.5 h-3.5" />
-              <span>Fleet ({vehicles.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                activeTab === 'events'
-                  ? 'bg-saffron-500 text-teal-950 shadow-sm'
-                  : 'text-warm-200 hover:text-white'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Events ({packages.length})</span>
+              <span>Fleet Manager ({vehicles.length})</span>
             </button>
           </nav>
 
-          {/* Right Header Actions: User pill, Return to Site, Logout */}
+          {/* Right Header Actions: Return to Site & Logout */}
           <div className="flex items-center gap-2">
             <button
               onClick={onReturnToUserSite}
-              className="px-3 py-1.5 rounded-lg bg-teal-900/80 hover:bg-teal-800 text-warm-200 hover:text-white text-xs font-medium border border-teal-800 flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 flex items-center gap-1.5 transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-saffron-400" />
-              <span className="hidden sm:inline">Public Site</span>
+              <ArrowLeft className="w-3.5 h-3.5 text-red-500" />
+              <span className="hidden sm:inline">User Site</span>
             </button>
 
             <button
               onClick={onLogout}
-              className="p-1.5 rounded-lg bg-teal-900/80 hover:bg-rose-950 text-warm-200 hover:text-rose-300 border border-teal-800 transition-colors"
+              className="p-2 rounded-xl bg-neutral-900 hover:bg-red-950 text-neutral-300 hover:text-red-400 border border-neutral-800 transition-colors"
               title="Sign Out"
+              aria-label="Sign out"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -226,38 +223,36 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         </div>
 
         {/* Mobile Tab Bar */}
-        <div className="md:hidden flex items-center justify-between gap-1 pt-2 border-t border-teal-900 mt-2">
+        <div className="md:hidden flex items-center justify-between gap-1 pt-2 border-t border-neutral-800 mt-2">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex-1 py-1.5 text-center text-xs font-semibold rounded-lg ${
-              activeTab === 'dashboard' ? 'bg-saffron-500 text-teal-950' : 'text-warm-200'
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'dashboard' ? 'bg-red-600 text-white' : 'text-neutral-300'
             }`}
           >
             Dashboard
           </button>
           <button
-            onClick={() => setActiveTab('crm')}
-            className={`flex-1 py-1.5 text-center text-xs font-semibold rounded-lg ${
-              activeTab === 'crm' ? 'bg-saffron-500 text-teal-950' : 'text-warm-200'
+            onClick={() => {
+              setSelectedVehicleForCRM('all');
+              setActiveTab('crm');
+            }}
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'crm' ? 'bg-red-600 text-white' : 'text-neutral-300'
             }`}
           >
             CRM ({leads.length})
           </button>
           <button
-            onClick={() => setActiveTab('fleet')}
-            className={`flex-1 py-1.5 text-center text-xs font-semibold rounded-lg ${
-              activeTab === 'fleet' ? 'bg-saffron-500 text-teal-950' : 'text-warm-200'
+            onClick={() => {
+              setSelectedStatusForFleet('all');
+              setActiveTab('fleet');
+            }}
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'fleet' ? 'bg-red-600 text-white' : 'text-neutral-300'
             }`}
           >
-            Fleet
-          </button>
-          <button
-            onClick={() => setActiveTab('events')}
-            className={`flex-1 py-1.5 text-center text-xs font-semibold rounded-lg ${
-              activeTab === 'events' ? 'bg-saffron-500 text-teal-950' : 'text-warm-200'
-            }`}
-          >
-            Events
+            Fleet ({vehicles.length})
           </button>
         </div>
       </header>
@@ -267,8 +262,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {activeTab === 'dashboard' && (
           <AdminDashboard
             stats={stats}
+            vehicles={vehicles}
+            leads={leads}
             currentUser={currentUser}
             onNavigateTab={setActiveTab}
+            onSelectVehicleForCRM={handleSelectVehicleForCRM}
+            onSelectStatusForFleet={handleSelectStatusForFleet}
             onExportCSV={handleExportCSV}
           />
         )}
@@ -276,6 +275,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {activeTab === 'crm' && (
           <AdminLeadsCRM
             leads={leads}
+            vehicles={vehicles}
+            initialVehicleFilter={selectedVehicleForCRM}
             currentUser={currentUser}
             onRefreshLeads={loadData}
             onExportCSV={handleExportCSV}
@@ -285,17 +286,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {activeTab === 'fleet' && (
           <AdminFleetManager
             vehicles={vehicles}
+            leads={leads}
             currentUser={currentUser}
+            initialStatusFilter={selectedStatusForFleet}
             onRefreshVehicles={loadData}
             onOpen360={onOpen360}
-          />
-        )}
-
-        {activeTab === 'events' && (
-          <AdminEventManager
-            packages={packages}
-            currentUser={currentUser}
-            onRefreshPackages={loadData}
+            onViewVehicleInterests={handleSelectVehicleForCRM}
           />
         )}
       </main>

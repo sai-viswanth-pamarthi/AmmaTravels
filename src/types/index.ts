@@ -50,6 +50,9 @@ export interface Vehicle {
   gallery: string[];
   has360View?: boolean;
   frames360?: string[]; // 24-36 frame URLs or generated procedural angles
+  model3dUrl?: string; // 3D model asset path
+  model3dType?: 'fbx' | 'gltf' | 'glb';
+  textureBasePath?: string;
   isFeatured?: boolean;
 }
 

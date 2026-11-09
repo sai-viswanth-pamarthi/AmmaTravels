@@ -3,10 +3,10 @@ import { SEED_VEHICLES, SEED_PACKAGES, SEED_INTERESTS } from '../../server/seed-
 
 // Local storage keys for resilient offline / zero-setup client execution
 const STORAGE_KEYS = {
-  VEHICLES: 'at_vehicles_v2',
-  PACKAGES: 'at_packages_v2',
-  INTERESTS: 'at_interests_v2',
-  LOGS: 'at_activity_logs_v2',
+  VEHICLES: 'at_vehicles_v4',
+  PACKAGES: 'at_packages_v3',
+  INTERESTS: 'at_interests_v3',
+  LOGS: 'at_activity_logs_v3',
   AUTH: 'at_auth_user',
 };
 
@@ -27,17 +27,17 @@ function setStorage<T>(key: string, value: T): void {
   }
 }
 
-// Initialize local store if empty
-if (typeof window !== 'undefined') {
-  if (!localStorage.getItem(STORAGE_KEYS.VEHICLES)) {
-    setStorage(STORAGE_KEYS.VEHICLES, SEED_VEHICLES);
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.PACKAGES)) {
-    setStorage(STORAGE_KEYS.PACKAGES, SEED_PACKAGES);
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.INTERESTS)) {
-    setStorage(STORAGE_KEYS.INTERESTS, SEED_INTERESTS);
-  }
+function getAuthHeaders(): Record<string, string> {
+  try {
+    const user = getStorage<User | null>(STORAGE_KEYS.AUTH, null);
+    if (user?.token) {
+      return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      };
+    }
+  } catch {}
+  return { 'Content-Type': 'application/json' };
 }
 
 export const api = {
@@ -113,7 +113,7 @@ export const api = {
       const url = vehicle.id ? `/api/vehicles/${vehicle.id}` : '/api/vehicles';
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(vehicle),
       });
       if (res.ok) {
@@ -153,7 +153,7 @@ export const api = {
 
   async deleteVehicle(id: string): Promise<void> {
     try {
-      await fetch(`/api/vehicles/${id}`, { method: 'DELETE' });
+      await fetch(`/api/vehicles/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     } catch {}
     let list = getStorage<Vehicle[]>(STORAGE_KEYS.VEHICLES, SEED_VEHICLES as any);
     list = list.filter((v) => v.id !== id);
@@ -184,7 +184,7 @@ export const api = {
       const url = pkg.id ? `/api/packages/${pkg.id}` : '/api/packages';
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(pkg),
       });
       if (res.ok) {
@@ -272,7 +272,7 @@ export const api = {
   async getInterests(filters?: { type?: string; stage?: string; status?: string; search?: string }): Promise<InterestSubmission[]> {
     try {
       const query = new URLSearchParams(filters as any).toString();
-      const res = await fetch(`/api/interests?${query}`);
+      const res = await fetch(`/api/interests?${query}`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         return data.interests;
@@ -313,7 +313,7 @@ export const api = {
     try {
       const res = await fetch(`/api/interests/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ progressStage: stage, internalNotes, followUpDate, adminName }),
       });
       if (res.ok) {
@@ -354,7 +354,7 @@ export const api = {
 
   async getActivityLogs(interestId: string): Promise<ActivityLog[]> {
     try {
-      const res = await fetch(`/api/interests/${interestId}/logs`);
+      const res = await fetch(`/api/interests/${interestId}/logs`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         return data.logs;
@@ -389,7 +389,7 @@ export const api = {
   // --- DASHBOARD STATS ---
   async getDashboardStats(): Promise<DashboardStats> {
     try {
-      const res = await fetch('/api/stats');
+      const res = await fetch('/api/stats', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         return data.stats;
@@ -444,15 +444,42 @@ export const api = {
   },
 
   async login(username: string, password: string, role: 'admin' | 'staff' = 'admin'): Promise<User> {
-    const user: User = {
-      id: `u-${Date.now()}`,
-      name: role === 'admin' ? 'Amma Travels Admin' : 'Operations Desk',
-      email: `${username}@ammatravels.in`,
-      role,
-      token: `token-${Date.now()}`,
-    };
-    this.setCurrentUser(user);
-    return user;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const user: User = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+          token: data.token,
+        };
+        this.setCurrentUser(user);
+        return user;
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Invalid credentials');
+      }
+    } catch (err: any) {
+      if (err.message && !err.message.includes('fetch') && !err.message.includes('Failed to fetch')) {
+        throw err;
+      }
+      // Offline fallback
+      const user: User = {
+        id: `u-${Date.now()}`,
+        name: role === 'admin' ? 'Amma Travels Admin' : 'Operations Desk',
+        email: `${username}@ammatravels.in`,
+        role,
+        token: `token-${Date.now()}`,
+      };
+      this.setCurrentUser(user);
+      return user;
+    }
   },
 
   logout(): void {

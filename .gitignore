@@ -11,5 +11,8 @@ build/
 .env.local
 .env.*.local
 
+# Local persistence
+server/data/
+
 # Logs
 npm-debug.log*
