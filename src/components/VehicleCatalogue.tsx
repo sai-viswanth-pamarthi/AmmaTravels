@@ -318,30 +318,6 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
         )}
       </div>
 
-      {/* Vehicle Search Bar */}
-      <div className="max-w-2xl mx-auto mb-8 px-2">
-        <div className="relative flex items-center">
-          <Search className="absolute left-4 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search vehicles by name, brand, model, or fuel (e.g. Fortuner, Swift, Thar, BMW, Activa)..."
-            className="w-full pl-11 pr-10 py-3 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-              title="Clear search"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* Vehicle Grid Anchor and Dynamic Category Header */}
       <div id="vehicles-grid" className="scroll-mt-36">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-3 border-b border-slate-200 dark:border-slate-800 gap-2">
