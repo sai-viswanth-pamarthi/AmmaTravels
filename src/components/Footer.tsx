@@ -14,6 +14,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useBusinessSettings } from '@/lib/settings';
+import { getGeneralSupportWhatsAppUrl } from '@/lib/whatsapp';
 
 interface FooterProps {
   onSelectSection: (section: string) => void;
@@ -173,6 +174,16 @@ export const Footer: React.FC<FooterProps> = ({
                 <Mail className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                 <span>{settings.secondaryEmail || settings.email}</span>
               </p>
+              <div className="pt-1">
+                <a
+                  href={getGeneralSupportWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/40 text-xs font-semibold transition-all"
+                >
+                  <span>💬 WhatsApp Support</span>
+                </a>
+              </div>
             </div>
 
             <div className="pt-3">

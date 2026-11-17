@@ -21,6 +21,12 @@ export interface User {
   token?: string;
 }
 
+export interface VehicleColorVariant {
+  name: string;
+  hex: string;
+  image?: string;
+}
+
 export interface Vehicle {
   id: string;
   name: string;
@@ -46,7 +52,7 @@ export interface Vehicle {
     topSpeedKmph?: number;
   };
   features: string[];
-  colors?: Array<{ name: string; hex: string } | string>;
+  colors?: Array<VehicleColorVariant | string>;
   primaryImage: string;
   gallery: string[];
   has360View?: boolean;

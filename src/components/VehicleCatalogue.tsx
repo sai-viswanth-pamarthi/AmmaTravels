@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Vehicle } from '@/types';
 import { getVehicleWhatsAppUrl } from '@/lib/whatsapp';
+import { resolvePrimaryVehicleImage } from '@/lib/vehicleMedia';
 
 interface VehicleCatalogueProps {
   vehicles: Vehicle[];
@@ -423,7 +424,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                   {/* Image Container with Badges */}
                   <div className="relative h-52 bg-gradient-to-tr from-[#F4EEDF] to-[#FAF6EC] dark:from-slate-950 dark:to-slate-850 overflow-hidden flex items-center justify-center p-4">
                     <img
-                      src={vehicle.primaryImage}
+                      src={resolvePrimaryVehicleImage(vehicle)}
                       alt={vehicle.name}
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 filter drop-shadow-md"
                       loading="lazy"

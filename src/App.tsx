@@ -19,6 +19,7 @@ import { EnquiryTracker } from './components/EnquiryTracker';
 import { VehicleInterestModal } from './components/VehicleInterestModal';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminPortal } from './components/admin/AdminPortal';
+import { FloatingWhatsAppButton } from './components/WhatsAppButton';
 import Lenis from 'lenis';
 
 import { Vehicle, InterestSubmission, User } from '@/types';
@@ -404,6 +405,9 @@ export function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Floating 24/7 WhatsApp Quick Helpline */}
+      {currentView !== 'admin' && <FloatingWhatsAppButton />}
 
       {/* --- GLOBAL MODALS --- */}
 

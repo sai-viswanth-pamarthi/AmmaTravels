@@ -23,6 +23,11 @@ import {
 } from 'lucide-react';
 import { Vehicle } from '@/types';
 import { getVehicleWhatsAppUrl } from '@/lib/whatsapp';
+import {
+  resolveVehicleColorVariants,
+  resolveVehicleImageForColor,
+  resolveCompleteVehicleGallery,
+} from '@/lib/vehicleMedia';
 
 interface VehicleDetailModalProps {
   vehicle: Vehicle | null;
@@ -30,59 +35,6 @@ interface VehicleDetailModalProps {
   onClose: () => void;
   onSelectInterest: (vehicle: Vehicle, selectedColor?: string) => void;
 }
-
-// Curated realistic vehicle images by color family
-const COLOR_IMAGE_MAP: Record<string, { car: string; bike: string }> = {
-  white: {
-    car: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1200&q=80',
-  },
-  red: {
-    car: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80',
-  },
-  black: {
-    car: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1200&q=80',
-  },
-  blue: {
-    car: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1200&q=80',
-  },
-  silver: {
-    car: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1200&q=80',
-  },
-  grey: {
-    car: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1200&q=80',
-  },
-  green: {
-    car: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1200&q=80',
-  },
-  bronze: {
-    car: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
-    bike: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1200&q=80',
-  },
-};
-
-const DEFAULT_CAR_COLORS = [
-  { name: 'Pearl Arctic White', hex: '#F8FAFC' },
-  { name: 'Crimson Red', hex: '#DC2626' },
-  { name: 'Midnight Black', hex: '#0F172A' },
-  { name: 'Magma Grey', hex: '#4B5563' },
-  { name: 'Nexa Blue', hex: '#1E3A8A' },
-  { name: 'Silky Silver', hex: '#CBD5E1' },
-];
-
-const DEFAULT_BIKE_COLORS = [
-  { name: 'Stealth Black', hex: '#18181B' },
-  { name: 'Fireball Red', hex: '#B91C1C' },
-  { name: 'Chrome Bronze', hex: '#78350F' },
-  { name: 'Halcyon Green', hex: '#14532D' },
-  { name: 'Pure White', hex: '#F1F5F9' },
-];
 
 export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
   vehicle,
@@ -120,65 +72,34 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
 
   const isBike = vehicle.type === 'bike';
 
-  // Compute available colors
+  // Compute available colors (model-specific online variants with photos)
   const availableColors = useMemo(() => {
-    if (vehicle.colors && vehicle.colors.length > 0) {
-      return vehicle.colors.map((c) => {
-        if (typeof c === 'string') {
-          const lower = c.toLowerCase();
-          let hex = '#4B5563';
-          if (lower.includes('white')) hex = '#F8FAFC';
-          else if (lower.includes('red') || lower.includes('maroon') || lower.includes('crimson')) hex = '#DC2626';
-          else if (lower.includes('black') || lower.includes('stealth')) hex = '#0F172A';
-          else if (lower.includes('blue') || lower.includes('nexa')) hex = '#1D4ED8';
-          else if (lower.includes('silver')) hex = '#CBD5E1';
-          else if (lower.includes('green') || lower.includes('halcyon')) hex = '#15803D';
-          else if (lower.includes('bronze') || lower.includes('brown')) hex = '#78350F';
-          else if (lower.includes('grey') || lower.includes('gray')) hex = '#4B5563';
-          return { name: c, hex };
-        }
-        return c;
-      });
-    }
-    return isBike ? DEFAULT_BIKE_COLORS : DEFAULT_CAR_COLORS;
-  }, [vehicle, isBike]);
+    return resolveVehicleColorVariants(vehicle);
+  }, [vehicle]);
 
   const [selectedColor, setSelectedColor] = useState<string>(
     availableColors[0]?.name || 'Standard Factory'
   );
 
-  // Photo gallery list
-  const galleryImages = useMemo(() => {
-    const list = [vehicle.primaryImage];
-    if (vehicle.gallery && vehicle.gallery.length > 0) {
-      vehicle.gallery.forEach((img) => {
-        if (img && !list.includes(img)) list.push(img);
-      });
-    }
-    // Add additional contextual model shots if less than 3
-    if (list.length < 3) {
-      if (isBike) {
-        list.push('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1200&q=80');
-        list.push('https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80');
-      } else {
-        list.push('https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80');
-        list.push('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80');
+  // Sync selected color if vehicle changes
+  useEffect(() => {
+    if (vehicle) {
+      const cols = resolveVehicleColorVariants(vehicle);
+      if (cols.length > 0) {
+        setSelectedColor(cols[0].name);
       }
     }
-    return list;
-  }, [vehicle, isBike]);
+  }, [vehicle]);
 
-  // Dynamically resolve image based on chosen color!
+  // Complete multi-view photo gallery (different model angles + all color editions)
+  const galleryItems = useMemo(() => {
+    return resolveCompleteVehicleGallery(vehicle);
+  }, [vehicle]);
+
+  // Dynamically resolve image based on chosen color (exact model photo in selected color!)
   const currentVehicleImage = useMemo(() => {
-    const colLower = selectedColor.toLowerCase();
-    for (const [key, mapping] of Object.entries(COLOR_IMAGE_MAP)) {
-      if (colLower.includes(key)) {
-        return isBike ? mapping.bike : mapping.car;
-      }
-    }
-    // Default to primary vehicle image
-    return vehicle.primaryImage;
-  }, [selectedColor, vehicle.primaryImage, isBike]);
+    return resolveVehicleImageForColor(vehicle, selectedColor);
+  }, [vehicle, selectedColor]);
 
   const engineCc = vehicle.specs?.engineCc || (isBike ? 350 : 1197);
   const mileage = vehicle.specs?.mileageKmpl || (isBike ? 36 : 21);
@@ -252,7 +173,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
                 <ImageIcon className="w-4 h-4" />
                 <span className="hidden sm:inline">View Photo Gallery</span>
                 <span className="text-[11px] bg-white/20 px-1.5 py-0.2 rounded-full">
-                  {galleryImages.length}
+                  {galleryItems.length}
                 </span>
               </button>
 
@@ -353,7 +274,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
                     className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-slate-900/85 hover:bg-blue-600 text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-lg flex items-center gap-1.5 transition-colors"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
-                    <span>Photos ({galleryImages.length})</span>
+                    <span>Photos ({galleryItems.length})</span>
                   </button>
 
                   {/* Bottom Left: Selected Color Indicator Pill */}
@@ -644,14 +565,14 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
         >
           <div className="relative w-full max-w-5xl h-[88vh] flex flex-col justify-between">
             {/* Gallery Lightbox Top Bar */}
-            <div className="flex items-center justify-between text-white pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between text-white pb-3 border-b border-white/10 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-blue-400" />
                 <h3 className="font-bold text-base sm:text-lg">
-                  {vehicle.name} — Photo Gallery
+                  {vehicle.name} — Photo Showcase & Colors
                 </h3>
                 <span className="text-xs text-slate-400">
-                  ({galleryActiveIndex + 1} of {galleryImages.length})
+                  ({galleryActiveIndex + 1} of {galleryItems.length})
                 </span>
               </div>
 
@@ -667,19 +588,28 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
 
             {/* Main Active Photo with Prev/Next Controls */}
             <div className="relative flex-1 my-3 rounded-3xl overflow-hidden bg-black/50 border border-white/10 flex items-center justify-center">
-              <img
-                src={galleryImages[galleryActiveIndex]}
-                alt={`${vehicle.name} view ${galleryActiveIndex + 1}`}
-                className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition-all duration-300"
-              />
+              {galleryItems[galleryActiveIndex] && (
+                <img
+                  src={galleryItems[galleryActiveIndex].url}
+                  alt={galleryItems[galleryActiveIndex].label}
+                  className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition-all duration-300"
+                />
+              )}
+
+              {/* Angle / Color Label Tag */}
+              {galleryItems[galleryActiveIndex] && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-xs font-semibold shadow-xl text-center pointer-events-none max-w-[90%] truncate">
+                  {galleryItems[galleryActiveIndex].label}
+                </div>
+              )}
 
               {/* Prev Button */}
-              {galleryImages.length > 1 && (
+              {galleryItems.length > 1 && (
                 <button
                   type="button"
                   onClick={() =>
                     setGalleryActiveIndex((prev) =>
-                      prev === 0 ? galleryImages.length - 1 : prev - 1
+                      prev === 0 ? galleryItems.length - 1 : prev - 1
                     )
                   }
                   className="absolute left-4 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 shadow-xl transition-transform active:scale-90"
@@ -690,12 +620,12 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
               )}
 
               {/* Next Button */}
-              {galleryImages.length > 1 && (
+              {galleryItems.length > 1 && (
                 <button
                   type="button"
                   onClick={() =>
                     setGalleryActiveIndex((prev) =>
-                      prev === galleryImages.length - 1 ? 0 : prev + 1
+                      prev === galleryItems.length - 1 ? 0 : prev + 1
                     )
                   }
                   className="absolute right-4 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 shadow-xl transition-transform active:scale-90"
@@ -707,19 +637,23 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
             </div>
 
             {/* Bottom Thumbnails Strip */}
-            <div className="flex items-center justify-center gap-2 overflow-x-auto py-2">
-              {galleryImages.map((imgUrl, idx) => (
+            <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto py-2 px-1 flex-shrink-0">
+              {galleryItems.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setGalleryActiveIndex(idx)}
-                  className={`relative w-20 h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
+                  className={`relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all group ${
                     galleryActiveIndex === idx
                       ? 'border-blue-500 scale-105 shadow-lg'
                       : 'border-white/20 opacity-50 hover:opacity-100'
                   }`}
+                  title={item.label}
                 >
-                  <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={item.url} alt={item.label} className="w-full h-full object-cover" />
+                  <span className="absolute inset-x-0 bottom-0 bg-black/80 text-[8px] text-white truncate px-1 text-center font-medium">
+                    {item.label.split('—')[1]?.trim() || item.label}
+                  </span>
                 </button>
               ))}
             </div>

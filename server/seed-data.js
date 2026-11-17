@@ -226,9 +226,9 @@ export const SEED_VEHICLES = [
       'Keyless Push Button Ignition',
       'Agile City Maneuverability'
     ],
-    primaryImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+    primaryImage: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
     gallery: [
-      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80'
     ],
     has360View: false,
     isFeatured: false,
@@ -358,9 +358,9 @@ export const SEED_VEHICLES = [
     status: 'Available',
     specs: { engineCc: 452, mileageKmpl: 30.0, powerBhp: '40.0 bhp' },
     features: ['Liquid Cooled Sherpa 450 Engine', 'Full TFT Display with Google Maps', 'Long Travel Suspension', 'Ride by Wire'],
-    primaryImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
+    primaryImage: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
     gallery: [
-      'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80'
+      'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80'
     ],
     has360View: true,
     isFeatured: true,
@@ -410,9 +410,9 @@ export const SEED_VEHICLES = [
     status: 'Available',
     specs: { engineCc: 0, mileageKmpl: 105.0, powerBhp: '6.2 kW' },
     features: ['105km TrueRange per Charge', 'Warp Mode Acceleration', 'Touchscreen Dashboard with Onboard GPS', 'Fast Home Charger Included'],
-    primaryImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
+    primaryImage: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80',
     gallery: [
-      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80'
+      'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80'
     ],
     has360View: true,
     isFeatured: true,

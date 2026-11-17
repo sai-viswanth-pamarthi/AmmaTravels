@@ -21,6 +21,7 @@ import {
 import { Vehicle } from '@/types';
 import { BookingSearchParams } from './Hero';
 import { getGeneralSupportWhatsAppUrl } from '@/lib/whatsapp';
+import { resolvePrimaryVehicleImage } from '@/lib/vehicleMedia';
 
 interface VehiclesPageProps {
   vehicles: Vehicle[];
@@ -334,7 +335,7 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({
                 {/* Image and Badges */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-950/5 dark:bg-slate-950">
                   <img
-                    src={vehicle.primaryImage}
+                    src={resolvePrimaryVehicleImage(vehicle)}
                     alt={vehicle.name}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"

@@ -3,7 +3,7 @@ import { SEED_VEHICLES, SEED_PACKAGES, SEED_INTERESTS } from '../../server/seed-
 
 // Local storage keys for resilient offline / zero-setup client execution
 const STORAGE_KEYS = {
-  VEHICLES: 'at_vehicles_v4',
+  VEHICLES: 'at_vehicles_v5',
   PACKAGES: 'at_packages_v3',
   INTERESTS: 'at_interests_v3',
   LOGS: 'at_activity_logs_v3',

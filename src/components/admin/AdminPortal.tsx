@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
-  Users,
   Car,
   Settings,
   LogOut,
@@ -9,7 +8,6 @@ import {
 } from 'lucide-react';
 import { User, Vehicle, InterestSubmission, DashboardStats } from '@/types';
 import { AdminDashboard } from './AdminDashboard';
-import { AdminLeadsCRM } from './AdminLeadsCRM';
 import { AdminFleetManager } from './AdminFleetManager';
 import { AdminSettingsManager } from './AdminSettingsManager';
 import { api } from '@/lib/api';
@@ -27,8 +25,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onReturnToUserSite,
   onOpen360,
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet' | 'settings'>('dashboard');
-  const [selectedVehicleForCRM, setSelectedVehicleForCRM] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'settings'>('dashboard');
   const [selectedStatusForFleet, setSelectedStatusForFleet] = useState<string>('all');
 
   const [stats, setStats] = useState<DashboardStats>({
@@ -125,9 +122,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     document.body.removeChild(link);
   };
 
-  const handleSelectVehicleForCRM = (vehicleName: string) => {
-    setSelectedVehicleForCRM(vehicleName);
-    setActiveTab('crm');
+  const handleSelectVehicleForCRM = (_vehicleName: string) => {
+    setActiveTab('fleet');
   };
 
   const handleSelectStatusForFleet = (status: string) => {
@@ -158,7 +154,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
           </div>
 
-          {/* Tab Navigation (Events removed) */}
+          {/* Tab Navigation (Dashboard, Fleet Manager, Hub Settings) */}
           <nav className="hidden md:flex items-center gap-1 bg-neutral-900 p-1.5 rounded-full border border-neutral-800">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -170,21 +166,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span>Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setSelectedVehicleForCRM('all');
-                setActiveTab('crm');
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'crm'
-                  ? 'bg-red-600 text-white shadow-sm'
-                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Interests CRM ({leads.length})</span>
             </button>
 
             <button
@@ -248,17 +229,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </button>
           <button
             onClick={() => {
-              setSelectedVehicleForCRM('all');
-              setActiveTab('crm');
-            }}
-            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
-              activeTab === 'crm' ? 'bg-red-600 text-white' : 'text-neutral-300'
-            }`}
-          >
-            CRM ({leads.length})
-          </button>
-          <button
-            onClick={() => {
               setSelectedStatusForFleet('all');
               setActiveTab('fleet');
             }}
@@ -288,19 +258,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             leads={leads}
             currentUser={currentUser}
             onNavigateTab={setActiveTab}
-            onSelectVehicleForCRM={handleSelectVehicleForCRM}
+            onSelectVehicleForCRM={() => setActiveTab('fleet')}
             onSelectStatusForFleet={handleSelectStatusForFleet}
-            onExportCSV={handleExportCSV}
-          />
-        )}
-
-        {activeTab === 'crm' && (
-          <AdminLeadsCRM
-            leads={leads}
-            vehicles={vehicles}
-            initialVehicleFilter={selectedVehicleForCRM}
-            currentUser={currentUser}
-            onRefreshLeads={loadData}
             onExportCSV={handleExportCSV}
           />
         )}
@@ -312,8 +271,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             currentUser={currentUser}
             initialStatusFilter={selectedStatusForFleet}
             onRefreshVehicles={loadData}
-            onOpen360={onOpen360}
-            onViewVehicleInterests={handleSelectVehicleForCRM}
+            onOpen360={onOpen360 || (() => {})}
+            onViewVehicleInterests={() => setActiveTab('fleet')}
           />
         )}
 
