@@ -113,30 +113,40 @@ export const Vehicle360Viewer: React.FC<Vehicle360ViewerProps> = ({
   const whatsappUrl = getVehicleWhatsAppUrl(vehicle.name);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-5xl bg-[#FAF6EC] dark:bg-slate-900 rounded-3xl border border-[#E8DFCF] dark:border-slate-800 shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-5xl bg-[#FAF6EC] dark:bg-slate-900 rounded-3xl border border-[#E8DFCF] dark:border-slate-800 shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92dvh]">
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8DFCF] dark:border-slate-800 bg-[#FFFDF7] dark:bg-slate-950">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
-                {vehicle.type.toUpperCase()} • {vehicle.subType}
-              </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#E8DFCF] dark:border-slate-800 bg-[#FFFDF7] dark:bg-slate-950 gap-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
+                  {vehicle.type.toUpperCase()} • {vehicle.subType}
+                </span>
+              </div>
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+                {vehicle.name}{' '}
+                <span className="text-xs sm:text-sm font-normal text-slate-500 dark:text-slate-400">
+                  ({vehicle.year})
+                </span>
+              </h2>
             </div>
-            <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
-              {vehicle.name}{' '}
-              <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
-                ({vehicle.year})
-              </span>
-            </h2>
+
+            <button
+              onClick={onClose}
+              className="sm:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Tab switchers */}
-            <div className="hidden sm:flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <div className="flex items-center gap-2 justify-between sm:justify-end">
+            {/* Tab switchers visible on all screens */}
+            <div className="flex overflow-x-auto no-scrollbar bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full sm:w-auto">
               <button
                 onClick={() => setActiveTab('360')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 min-h-[36px] text-xs font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                   activeTab === '360'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -146,29 +156,29 @@ export const Vehicle360Viewer: React.FC<Vehicle360ViewerProps> = ({
               </button>
               <button
                 onClick={() => setActiveTab('gallery')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 min-h-[36px] text-xs font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                   activeTab === 'gallery'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400'
                 }`}
               >
-                Photo Gallery ({vehicle.gallery.length})
+                Photos ({vehicle.gallery.length})
               </button>
               <button
                 onClick={() => setActiveTab('specs')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 min-h-[36px] text-xs font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                   activeTab === 'specs'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400'
                 }`}
               >
-                Technical Specs
+                Specs
               </button>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />

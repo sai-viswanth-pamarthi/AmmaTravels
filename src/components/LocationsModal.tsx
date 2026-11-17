@@ -54,11 +54,11 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-[#FFFDF7] dark:bg-neutral-900 border border-[#E8DFCF] dark:border-neutral-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-[#FFFDF7] dark:bg-neutral-900 border border-[#E8DFCF] dark:border-neutral-800 rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-neutral-400 hover:text-black dark:hover:text-white bg-[#F6F0DF] dark:bg-neutral-800 transition-colors"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-neutral-400 hover:text-black dark:hover:text-white bg-[#F6F0DF] dark:bg-neutral-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
           aria-label="Close locations"
         >
           <X className="w-5 h-5" />
@@ -112,7 +112,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
                     onSelectHub(hub.name);
                     onClose();
                   }}
-                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md flex-shrink-0"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md flex-shrink-0"
                 >
                   <Navigation className="w-3.5 h-3.5" />
                   <span>Select Hub</span>

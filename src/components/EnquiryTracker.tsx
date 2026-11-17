@@ -84,20 +84,20 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
+      <div className="relative w-full max-w-2xl bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-y-auto max-h-[90dvh] my-auto p-5 sm:p-8">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
               Live Status Check
             </span>
-            <h3 className="font-display text-2xl font-bold text-black dark:text-white mt-1">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-black dark:text-white mt-1">
               Track Your Interest Enquiry
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-black dark:hover:text-white rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-black dark:hover:text-white rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -116,7 +116,7 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                 value={refId}
                 onChange={(e) => setRefId(e.target.value.toUpperCase())}
                 placeholder="e.g. AT-V-1001"
-                className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white font-mono text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase transition-all"
+                className="w-full px-4 py-2.5 min-h-[44px] rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white font-mono text-base sm:text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase transition-all"
                 required
               />
             </div>
@@ -129,7 +129,7 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 9876543210"
-                className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full px-4 py-2.5 min-h-[44px] rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white text-base sm:text-sm placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 required
               />
             </div>
@@ -145,7 +145,7 @@ export const EnquiryTracker: React.FC<EnquiryTrackerProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="btn-interactive w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-md shadow-blue-600/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="btn-interactive w-full py-3.5 px-4 min-h-[48px] rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-md shadow-blue-600/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             {loading ? (
               <Clock className="w-4 h-4 animate-spin text-white" />

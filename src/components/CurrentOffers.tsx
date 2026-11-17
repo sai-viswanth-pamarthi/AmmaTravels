@@ -115,7 +115,7 @@ export const CurrentOffers: React.FC<CurrentOffersProps> = ({
                 {/* Primary Button */}
                 <button
                   onClick={() => onBookNow(offer.category)}
-                  className="px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-orange-500/30 flex items-center gap-1.5 transition-all active:scale-95 group/btn"
+                  className="px-5 py-2.5 min-h-[44px] rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-orange-500/30 flex items-center gap-1.5 transition-all active:scale-95 group/btn"
                 >
                   <span>{offer.primaryAction}</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
@@ -125,7 +125,7 @@ export const CurrentOffers: React.FC<CurrentOffersProps> = ({
                 {offer.hasCode && offer.promoCode && (
                   <button
                     onClick={() => handleCopyCode(offer.promoCode!)}
-                    className="px-4 py-2.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white font-mono font-bold text-xs tracking-wider border border-white/20 flex items-center gap-1.5 transition-all hover:border-orange-500/70"
+                    className="px-4 py-2.5 min-h-[44px] rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white font-mono font-bold text-xs tracking-wider border border-white/20 flex items-center gap-1.5 transition-all hover:border-orange-500/70"
                     title="Tap to copy and apply discount"
                   >
                     {copiedCode === offer.promoCode ? (

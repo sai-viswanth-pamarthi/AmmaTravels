@@ -251,7 +251,7 @@ export function App() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 text-stone-900 dark:text-slate-100 border border-[#E8DFCF] dark:border-slate-800 shadow-xl shadow-stone-900/10 dark:shadow-blue-500/10 flex items-center gap-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 transition-all duration-300"
+          className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 max-w-[calc(100vw-2rem)] sm:max-w-md p-4 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 text-stone-900 dark:text-slate-100 border border-[#E8DFCF] dark:border-slate-800 shadow-xl shadow-stone-900/10 dark:shadow-blue-500/10 flex items-center gap-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 transition-all duration-300"
         >
           <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
             <CheckCircle2 className="w-5 h-5" />
@@ -343,7 +343,7 @@ export function App() {
       {/* Floating Action Button (Screenshot 2 & 3: Vibrant Orange Circle with Down Chevron) */}
       <button
         onClick={handleFloatingScrollDown}
-        className="fixed bottom-7 right-7 z-40 w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
+        className="fixed bottom-4 sm:bottom-7 right-4 sm:right-7 z-40 w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
         aria-label="Scroll to next section"
       >
         <ChevronDown className="w-6 h-6 group-hover:translate-y-0.5 transition-transform" />

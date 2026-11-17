@@ -74,7 +74,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onSelectOption }) => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className="relative bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl p-8 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive group"
+                className="relative bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl p-5 sm:p-8 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive group"
               >
                 {/* Step Connector Arrow for Desktop */}
                 {idx < 2 && (
@@ -106,10 +106,10 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onSelectOption }) => {
           })}
         </div>
 
-        <div className="mt-14 text-center">
+        <div className="mt-12 sm:mt-14 text-center">
           <button
             onClick={() => onSelectOption('vehicles')}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/30 transition-all btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 min-h-[48px] rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/30 transition-all btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <span>Explore Entire Fleet Now</span>
             <ArrowRight className="w-4 h-4" />

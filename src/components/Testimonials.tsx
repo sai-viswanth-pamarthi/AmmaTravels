@@ -70,7 +70,7 @@ export const Testimonials: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
-            className="bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl p-8 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive flex flex-col justify-between"
+            className="bg-[#FFFDF7] dark:bg-slate-900 rounded-3xl p-5 sm:p-8 border border-[#E8DFCF] dark:border-slate-800 soft-card-shadow card-interactive flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center gap-1 mb-4 text-amber-400">
@@ -85,7 +85,7 @@ export const Testimonials: React.FC = () => {
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#E8DFCF] dark:border-slate-800 flex items-center justify-between">
+            <div className="mt-6 pt-4 border-t border-[#E8DFCF] dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h4 className="font-display font-bold text-sm text-slate-900 dark:text-white">
                   {rev.name}
@@ -94,7 +94,7 @@ export const Testimonials: React.FC = () => {
                   {rev.role}
                 </p>
               </div>
-              <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-900">
+              <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-900 flex-shrink-0">
                 {rev.vehicle}
               </span>
             </div>

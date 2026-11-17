@@ -205,7 +205,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onReturnToUserSite}
-              className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 flex items-center gap-1.5 transition-colors"
+              className="min-h-[44px] px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-red-500" />
               <span className="hidden sm:inline">User Site</span>
@@ -213,7 +213,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             <button
               onClick={onLogout}
-              className="p-2 rounded-xl bg-neutral-900 hover:bg-red-950 text-neutral-300 hover:text-red-400 border border-neutral-800 transition-colors"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl bg-neutral-900 hover:bg-red-950 text-neutral-300 hover:text-red-400 border border-neutral-800 transition-colors"
               title="Sign Out"
               aria-label="Sign out"
             >
@@ -222,37 +222,48 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         </div>
 
-        {/* Mobile Tab Bar */}
-        <div className="md:hidden flex items-center justify-between gap-1 pt-2 border-t border-neutral-800 mt-2">
+        {/* Mobile Tab Navigation */}
+        <div className="md:hidden mt-2.5 pt-2.5 border-t border-neutral-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
-              activeTab === 'dashboard' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'dashboard'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            Dashboard
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>Dashboard</span>
           </button>
+
           <button
             onClick={() => {
               setSelectedVehicleForCRM('all');
               setActiveTab('crm');
             }}
-            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
-              activeTab === 'crm' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'crm'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            CRM ({leads.length})
+            <Users className="w-3.5 h-3.5" />
+            <span>CRM ({leads.length})</span>
           </button>
+
           <button
             onClick={() => {
               setSelectedStatusForFleet('all');
               setActiveTab('fleet');
             }}
-            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
-              activeTab === 'fleet' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'fleet'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            Fleet ({vehicles.length})
+            <Car className="w-3.5 h-3.5" />
+            <span>Fleet ({vehicles.length})</span>
           </button>
         </div>
       </header>

@@ -40,10 +40,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-md bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8">
+      <div className="relative w-full max-w-md bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-y-auto max-h-[90dvh] my-auto p-5 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-[#E8DFCF] dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">
               <Shield className="w-5 h-5" />
             </div>
             <div>
@@ -58,7 +58,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-black dark:hover:text-white rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-black dark:hover:text-white rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
@@ -87,7 +88,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               <button
                 type="button"
                 onClick={() => setRole('admin')}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`flex-1 py-2 min-h-[40px] text-xs font-bold rounded-lg transition-all ${
                   role === 'admin'
                     ? 'bg-red-600 text-white shadow-sm'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
@@ -98,7 +99,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               <button
                 type="button"
                 onClick={() => setRole('staff')}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`flex-1 py-2 min-h-[40px] text-xs font-bold rounded-lg transition-all ${
                   role === 'staff'
                     ? 'bg-red-600 text-white shadow-sm'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
@@ -120,7 +121,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter username (e.g. admin)"
-                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full pl-9 pr-3.5 py-2.5 min-h-[44px] text-base sm:text-xs rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
               />
             </div>
@@ -137,7 +138,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full pl-9 pr-3.5 py-2.5 min-h-[44px] text-base sm:text-xs rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
               />
             </div>
@@ -146,7 +147,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
+            className="w-full py-3.5 px-4 min-h-[48px] rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-sm tracking-wide shadow-md transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
           >
             <Shield className="w-4 h-4" />
             <span>{loading ? 'Authenticating...' : 'Sign In to Operations'}</span>

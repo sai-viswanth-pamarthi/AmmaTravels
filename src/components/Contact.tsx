@@ -104,7 +104,7 @@ export const Contact: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-colors btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="w-full py-3.5 px-4 min-h-[48px] rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-colors btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <MessageCircle className="w-4 h-4" />
             <span>Direct WhatsApp Helpline</span>
@@ -128,7 +128,7 @@ export const Contact: React.FC = () => {
               href="https://maps.google.com/?q=Kakinada+Bhanugudi+Junction"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="mt-3 px-4 py-2.5 min-h-[44px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               <span>Open in Google Maps</span>
               <ExternalLink className="w-3.5 h-3.5" />

@@ -164,14 +164,14 @@ export const Hero: React.FC<HeroProps> = ({
             <span>AMMA TRAVELS · CAR & BIKE RENTALS</span>
           </div>
 
-          {/* Huge Bold Title */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05] max-w-3xl drop-shadow-lg font-display">
+          {/* Huge Bold Title with fluid clamp */}
+          <h1 className="text-3xl xs:text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05] max-w-3xl drop-shadow-lg font-display">
             Drive Into Your <br className="hidden sm:inline" />
             Next Adventure
           </h1>
 
           {/* Glassmorphic Promo Card */}
-          <div className="max-w-xl rounded-2xl bg-slate-950/60 backdrop-blur-xl border border-white/20 p-5 sm:p-6 shadow-2xl relative overflow-hidden text-left">
+          <div className="max-w-xl rounded-2xl bg-slate-950/60 backdrop-blur-xl border border-white/20 p-4 sm:p-6 shadow-2xl relative overflow-hidden text-left">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1.5">
                 <span className="text-xs sm:text-sm font-bold text-blue-400 uppercase tracking-wider block">
@@ -186,7 +186,7 @@ export const Hero: React.FC<HeroProps> = ({
               <button
                 type="button"
                 onClick={handleApplyHeroBannerPromo}
-                className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-wider uppercase shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 flex-shrink-0 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                className="px-5 py-3 min-h-[44px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-wider uppercase shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 flex-shrink-0 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
               >
                 <Tag className="w-3.5 h-3.5" />
                 <span>FALL15</span>
@@ -197,23 +197,23 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* Empty bottom spacer for overlapping search card */}
-        <div className="h-10 sm:h-14 lg:h-16" />
+        <div className="h-8 sm:h-14 lg:h-16" />
       </div>
 
       {/* --- FLOATING BOOKING SEARCH CARD --- */}
-      <div className="relative z-30 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 -mt-20 sm:-mt-24 lg:-mt-28">
+      <div className="relative z-30 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-24 lg:-mt-28">
         <form
           onSubmit={handleFormSubmit}
-          className="rounded-[2rem] bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 shadow-2xl p-5 sm:p-7 space-y-5 transition-colors"
+          className="rounded-[2rem] bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 shadow-2xl p-4 sm:p-7 space-y-4 sm:space-y-5 transition-colors"
         >
           {/* Promo code confirmation banner if activated */}
           {promoAppliedAlert && (
             <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-between animate-in fade-in">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                 <span>Promo code <strong>{promoCodeInput}</strong> has been applied! 15% discount will be calculated on your rental.</span>
               </div>
-              <span className="text-[10px] uppercase tracking-wider font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full">ACTIVE</span>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full flex-shrink-0">ACTIVE</span>
             </div>
           )}
 
@@ -221,7 +221,7 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-stretch">
             
             {/* Input 1: PICK-UP LOCATION */}
-            <div className="lg:col-span-4 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3">
+            <div className="lg:col-span-4 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3 min-h-[58px]">
               <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-5 h-5" />
               </div>
@@ -232,7 +232,7 @@ export const Hero: React.FC<HeroProps> = ({
                 <select
                   value={pickupLocation}
                   onChange={(e) => setPickupLocation(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm sm:text-base text-stone-900 dark:text-white focus:outline-none cursor-pointer truncate"
+                  className="w-full bg-transparent font-bold text-base sm:text-base text-stone-900 dark:text-white focus:outline-none cursor-pointer truncate"
                 >
                   {KAKINADA_LOCATIONS.map((loc) => (
                     <option key={loc} value={loc} className="bg-[#FFFDF7] dark:bg-neutral-900 text-black dark:text-white">
@@ -244,7 +244,7 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             {/* Input 2: PICK-UP DATE & TIME (3 Cols) */}
-            <div className="lg:col-span-3 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3">
+            <div className="lg:col-span-3 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3 min-h-[58px]">
               <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
                 <Calendar className="w-5 h-5" />
               </div>
@@ -257,7 +257,7 @@ export const Hero: React.FC<HeroProps> = ({
                     type="date"
                     value={pickupDate}
                     onChange={(e) => setPickupDate(e.target.value)}
-                    className="w-full bg-transparent font-bold text-xs sm:text-sm text-stone-900 dark:text-white focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-base sm:text-sm text-stone-900 dark:text-white focus:outline-none cursor-pointer"
                   />
                 </div>
                 <div>
@@ -269,14 +269,14 @@ export const Hero: React.FC<HeroProps> = ({
                     type="time"
                     value={pickupTime}
                     onChange={(e) => setPickupTime(e.target.value)}
-                    className="w-full bg-transparent font-bold text-xs sm:text-sm text-stone-900 dark:text-white focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-base sm:text-sm text-stone-900 dark:text-white focus:outline-none cursor-pointer"
                   />
                 </div>
               </div>
             </div>
 
             {/* Input 3: RETURN DATE & TIME (3 Cols) */}
-            <div className="lg:col-span-3 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3">
+            <div className="lg:col-span-3 rounded-2xl border border-[#E8DFCF] dark:border-slate-800 p-3 sm:p-3.5 hover:border-orange-500/70 transition-all bg-[#F6F0DF]/60 dark:bg-slate-950/40 flex items-center gap-3 min-h-[58px]">
               <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
                 <Calendar className="w-5 h-5" />
               </div>
@@ -289,7 +289,7 @@ export const Hero: React.FC<HeroProps> = ({
                     type="date"
                     value={returnDate}
                     onChange={(e) => setReturnDate(e.target.value)}
-                    className="w-full bg-transparent font-bold text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-base sm:text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
                   />
                 </div>
                 <div>
@@ -301,7 +301,7 @@ export const Hero: React.FC<HeroProps> = ({
                     type="time"
                     value={returnTime}
                     onChange={(e) => setReturnTime(e.target.value)}
-                    className="w-full bg-transparent font-bold text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-base sm:text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
                   />
                 </div>
               </div>
@@ -311,7 +311,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="lg:col-span-2 flex items-stretch">
               <button
                 type="submit"
-                className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base tracking-wide shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="w-full py-3.5 sm:py-4 px-6 min-h-[48px] rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base tracking-wide shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <span>Book Now</span>
               </button>
@@ -331,7 +331,7 @@ export const Hero: React.FC<HeroProps> = ({
                 <select
                   value={returnLocation}
                   onChange={(e) => setReturnLocation(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-base sm:text-sm text-slate-900 dark:text-white focus:outline-none cursor-pointer"
                 >
                   {KAKINADA_LOCATIONS.map((loc) => (
                     <option key={loc} value={loc} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
@@ -358,7 +358,7 @@ export const Hero: React.FC<HeroProps> = ({
                   placeholder="e.g. FALL15 or MOVE15"
                   value={promoCodeInput}
                   onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                  className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 uppercase"
+                  className="px-3.5 py-2.5 min-h-[44px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-base sm:text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 uppercase flex-1 sm:flex-initial"
                 />
                 <button
                   type="button"
@@ -369,7 +369,7 @@ export const Hero: React.FC<HeroProps> = ({
                       setTimeout(() => setPromoAppliedAlert(false), 3000);
                     }
                   }}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:bg-slate-800 transition-colors btn-interactive"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:bg-slate-800 transition-colors btn-interactive flex-shrink-0"
                 >
                   Apply
                 </button>
@@ -377,14 +377,14 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
           )}
 
-          {/* Bottom Toggles Row */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+          {/* Bottom Toggles Row with 44px minimum tap targets */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
             {/* Toggle 1: Return to a different location */}
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <label className="flex items-center justify-between sm:justify-start gap-2.5 cursor-pointer select-none py-2 min-h-[44px] w-full sm:w-auto">
               <span>Return to a different location</span>
               <div
                 onClick={() => setIsDifferentReturn(!isDifferentReturn)}
-                className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
+                className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out flex-shrink-0 ${
                   isDifferentReturn ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                 }`}
               >
@@ -397,11 +397,11 @@ export const Hero: React.FC<HeroProps> = ({
             </label>
 
             {/* Toggle 2: Have a Promo Code? */}
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <label className="flex items-center justify-between sm:justify-start gap-2.5 cursor-pointer select-none py-2 min-h-[44px] w-full sm:w-auto">
               <span>Have a Promo Code?</span>
               <div
                 onClick={() => setHasPromoCode(!hasPromoCode)}
-                className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
+                className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out flex-shrink-0 ${
                   hasPromoCode ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                 }`}
               >
@@ -416,7 +416,7 @@ export const Hero: React.FC<HeroProps> = ({
         </form>
 
         {/* --- FEATURE HIGHLIGHTS BAR --- */}
-        <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-between gap-6 py-4 px-2 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold">
+        <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-6 py-3 sm:py-4 px-2 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold">
           <div className="flex items-center gap-2">
             <Car className="w-4 h-4 text-blue-500" />
             <span>Latest Models</span>

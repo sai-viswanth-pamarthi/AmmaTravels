@@ -239,31 +239,31 @@ export const Footer: React.FC<FooterProps> = ({
             {/* Phone 1 */}
             <a
               href="tel:8885757966"
-              className="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex-1 xs:flex-initial justify-center"
               title="Call Pivot Tech Contact 1"
             >
-              <Phone className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span className="font-semibold">+91 88857 57966</span>
+              <Phone className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              <span className="font-semibold whitespace-nowrap">+91 88857 57966</span>
             </a>
 
             {/* Phone 2 */}
             <a
               href="tel:9346105182"
-              className="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex-1 xs:flex-initial justify-center"
               title="Call Pivot Tech Contact 2"
             >
-              <Phone className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span className="font-semibold">+91 93461 05182</span>
+              <Phone className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              <span className="font-semibold whitespace-nowrap">+91 93461 05182</span>
             </a>
 
             {/* Email */}
             <a
               href="mailto:saiviswanth55@gmail.com"
-              className="px-4 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-blue-200 border border-blue-500/40 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-blue-200 border border-blue-500/40 transition-all flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 w-full xs:w-auto justify-center max-w-full"
               title="Email Pivot Tech"
             >
-              <Mail className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span className="font-semibold">saiviswanth55@gmail.com</span>
+              <Mail className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              <span className="font-semibold truncate">saiviswanth55@gmail.com</span>
             </a>
           </div>
         </div>
@@ -275,21 +275,21 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="flex items-center gap-4">
             <button
               onClick={() => onSelectSection('hero')}
-              className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-blue-400"
+              className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-blue-400 min-h-[44px] flex items-center"
             >
               Privacy Policy
             </button>
             <span>•</span>
             <button
               onClick={() => onSelectSection('hero')}
-              className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-blue-400"
+              className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-blue-400 min-h-[44px] flex items-center"
             >
               Rental Terms
             </button>
             <span>•</span>
             <button
               onClick={scrollToTop}
-              className="p-2 rounded-full bg-slate-900 hover:bg-slate-800 text-blue-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-slate-900 hover:bg-slate-800 text-blue-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               title="Back to top"
             >
               <ArrowUp className="w-4 h-4" />

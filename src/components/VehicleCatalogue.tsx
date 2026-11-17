@@ -180,7 +180,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* Cars Fleet Tab */}
           <button
             onClick={() => handleTabSwitch('car')}
-            className={`relative flex-1 py-3 px-3 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            className={`relative flex-1 py-2.5 sm:py-3 px-2 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] ${
               selectedType === 'car'
                 ? 'text-white font-extrabold'
                 : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -193,9 +193,10 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <Car className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedType === 'car' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
-            <span className="tracking-tight">Cars Fleet</span>
-            <span className={`text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold ${
+            <Car className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${selectedType === 'car' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
+            <span className="tracking-tight hidden xs:inline">Cars Fleet</span>
+            <span className="tracking-tight xs:hidden">Cars</span>
+            <span className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold ${
               selectedType === 'car' ? 'bg-white/20 text-white' : 'bg-amber-100/60 dark:bg-slate-800 text-stone-700 dark:text-slate-300'
             }`}>
               {carCount}
@@ -205,7 +206,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* Bikes & Scooters Tab */}
           <button
             onClick={() => handleTabSwitch('bike')}
-            className={`relative flex-1 py-3 px-3 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            className={`relative flex-1 py-2.5 sm:py-3 px-2 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] ${
               selectedType === 'bike'
                 ? 'text-white font-extrabold'
                 : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -218,9 +219,10 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <Bike className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedType === 'bike' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
-            <span className="tracking-tight">Bikes & Scooters</span>
-            <span className={`text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold ${
+            <Bike className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${selectedType === 'bike' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
+            <span className="tracking-tight hidden xs:inline">Bikes & Scooters</span>
+            <span className="tracking-tight xs:hidden">Bikes</span>
+            <span className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold ${
               selectedType === 'bike' ? 'bg-white/20 text-white' : 'bg-amber-100/60 dark:bg-slate-800 text-stone-700 dark:text-slate-300'
             }`}>
               {bikeCount}
@@ -230,7 +232,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* All Fleet Toggle */}
           <button
             onClick={() => handleTabSwitch('all')}
-            className={`relative px-3 sm:px-4 py-3 rounded-full text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            className={`relative px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] flex items-center justify-center ${
               selectedType === 'all'
                 ? 'text-white font-extrabold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -243,7 +245,8 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <span>All ({vehicles.length})</span>
+            <span className="hidden xs:inline">All ({vehicles.length})</span>
+            <span className="xs:hidden">All</span>
           </button>
         </div>
 
@@ -266,7 +269,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search Swift, BMW, Thar, Himalayan, Activa..."
-                className="flex-1 bg-transparent py-1 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+                className="flex-1 bg-transparent py-2 text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
                 autoFocus
               />
               {searchTerm && (
@@ -475,7 +478,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                         {/* 360 Viewer trigger */}
                         <button
                           onClick={() => onOpen360(vehicle)}
-                          className="w-full py-2.5 px-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-1.5 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          className="w-full py-2.5 px-2 min-h-[44px] text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-1.5 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                           <RotateCcw className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                           <span>360° Studio</span>
@@ -485,7 +488,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                         <button
                           onClick={() => onSelectInterest(vehicle)}
                           disabled={vehicle.status === 'Maintenance'}
-                          className="w-full py-2.5 px-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-98 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          className="w-full py-2.5 px-2 min-h-[44px] text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-98 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>I'm Interested</span>

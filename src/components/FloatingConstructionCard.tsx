@@ -10,36 +10,41 @@ import {
 } from 'lucide-react';
 
 export const FloatingConstructionCard: React.FC = () => {
-  // Starts expanded by default so it's immediately visible across the website while scrolling
-  const [isMinimized, setIsMinimized] = useState(false);
+  // Starts minimized on mobile/tablet so it doesn't obstruct critical content or forms, expanded on desktop
+  const [isMinimized, setIsMinimized] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return false;
+  });
 
   return (
     <aside
       aria-label="Website Status & Developer Info"
-      className="fixed bottom-3 left-3 sm:bottom-5 sm:left-5 z-40 max-w-xl lg:max-w-2xl w-[calc(100%-1.5rem)] sm:w-auto transition-all duration-300 select-none print:hidden pointer-events-auto"
+      className="fixed bottom-20 left-3 sm:bottom-5 sm:left-5 z-40 max-w-xl lg:max-w-2xl w-[calc(100%-1.5rem)] sm:w-auto transition-all duration-300 select-none print:hidden pointer-events-auto"
     >
       {/* Minimized Pill View */}
       {isMinimized ? (
         <button
           onClick={() => setIsMinimized(false)}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950/95 hover:bg-slate-900 border border-amber-500/60 shadow-2xl text-white backdrop-blur-xl transition-all duration-200 hover:scale-[1.02] active:scale-98 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+          className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-slate-950/95 hover:bg-slate-900 border border-amber-500/60 shadow-2xl text-white backdrop-blur-xl transition-all duration-200 hover:scale-[1.02] active:scale-98 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 max-w-[calc(100vw-2rem)]"
           title="Click to view Construction status and Pivot Tech contact details"
           aria-expanded="false"
         >
-          <span className="relative flex h-2.5 w-2.5">
+          <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
           </span>
-          <Construction className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
-          <span className="text-xs font-bold text-amber-300 tracking-wide">
+          <Construction className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform flex-shrink-0" />
+          <span className="text-xs font-bold text-amber-300 tracking-wide whitespace-nowrap">
             Under Construction
           </span>
-          <span className="text-slate-500">•</span>
-          <span className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+          <span className="hidden xs:inline text-slate-500">•</span>
+          <span className="hidden xs:flex text-xs font-semibold text-slate-200 items-center gap-1.5 whitespace-nowrap">
             <Code2 className="w-3.5 h-3.5 text-blue-400" />
             <span>Built by Pivot Tech</span>
           </span>
-          <ChevronUp className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors ml-1" />
+          <ChevronUp className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors ml-0.5 flex-shrink-0" />
         </button>
       ) : (
         /* Expanded Floating Stack matching the user reference screenshot */

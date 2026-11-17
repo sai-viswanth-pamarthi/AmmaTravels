@@ -114,14 +114,14 @@ export const TripPlannerSection: React.FC<TripPlannerSectionProps> = ({
         <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
             onClick={handlePrev}
-            className="w-10 h-10 rounded-full border border-[#E8DFCF] dark:border-neutral-700 bg-[#FFFDF7] dark:bg-neutral-900 text-stone-800 dark:text-neutral-200 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center transition-all shadow-sm active:scale-95"
+            className="w-11 h-11 rounded-full border border-[#E8DFCF] dark:border-neutral-700 bg-[#FFFDF7] dark:bg-neutral-900 text-stone-800 dark:text-neutral-200 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center transition-all shadow-sm active:scale-95"
             aria-label="Previous trip type"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNext}
-            className="w-10 h-10 rounded-full border border-[#E8DFCF] dark:border-neutral-700 bg-[#FFFDF7] dark:bg-neutral-900 text-stone-800 dark:text-neutral-200 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center transition-all shadow-sm active:scale-95"
+            className="w-11 h-11 rounded-full border border-[#E8DFCF] dark:border-neutral-700 bg-[#FFFDF7] dark:bg-neutral-900 text-stone-800 dark:text-neutral-200 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center transition-all shadow-sm active:scale-95"
             aria-label="Next trip type"
           >
             <ChevronRight className="w-5 h-5" />
@@ -183,7 +183,7 @@ export const TripPlannerSection: React.FC<TripPlannerSectionProps> = ({
 
         <button
           onClick={() => onSelectTripType(selectedTrip)}
-          className="w-full sm:w-auto px-6 py-3 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 group flex-shrink-0"
+          className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 group flex-shrink-0"
         >
           <span>Search these vehicles</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

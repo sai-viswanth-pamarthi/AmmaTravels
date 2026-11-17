@@ -43,7 +43,7 @@ export const FAQ: React.FC = () => {
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
             <span className="font-mono text-[11px] font-bold text-orange-600 dark:text-blue-400 bg-orange-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-orange-200 dark:border-blue-900">
               KM 50.0 // Roadside Codex
             </span>
