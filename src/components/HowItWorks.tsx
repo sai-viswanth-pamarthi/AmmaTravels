@@ -10,8 +10,8 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onSelectOption }) => {
   const steps = [
     {
       num: '01',
-      title: 'Choose & Inspect 360°',
-      desc: 'Browse verified hatchbacks, sedans, 4x4 SUVs, and bikes. Inspect the vehicle virtually with 360° studio rotation before expressing interest.',
+      title: 'Choose & Inspect Vehicle',
+      desc: 'Browse verified hatchbacks, sedans, 4x4 SUVs, and bikes. Inspect high-definition photos, custom colors, and full specs before expressing interest.',
       icon: Search,
       tag: 'Total Transparency',
     },

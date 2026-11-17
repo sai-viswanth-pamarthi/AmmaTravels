@@ -23,7 +23,7 @@ export const Testimonials: React.FC = () => {
     {
       name: 'Aditya Prasad',
       role: 'Solo Rider & Tech Professional',
-      text: 'Hired the Royal Enfield Himalayan 450 for a weekend coastal ride through Coringa, Yanam, and Antarvedi. Loved the 360° online preview feature and the helmet was genuinely clean and high quality.',
+      text: 'Hired the Royal Enfield Himalayan 450 for a weekend coastal ride through Coringa, Yanam, and Antarvedi. Loved the seamless booking experience and the helmet was genuinely clean and high quality.',
       rating: 5,
       vehicle: 'RE Himalayan 450',
       location: 'Hyderabad to Kakinada',

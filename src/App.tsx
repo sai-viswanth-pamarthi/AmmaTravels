@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Preloader } from './components/Preloader';
 import { Navbar } from './components/Navbar';
 import { Hero, BookingSearchParams } from './components/Hero';
-import { CurrentOffers } from './components/CurrentOffers';
-import { TripPlannerSection, TripType } from './components/TripPlannerSection';
+import { WebsiteMotoBanner } from './components/WebsiteMotoBanner';
 import { VehicleCatalogue } from './components/VehicleCatalogue';
-import { Vehicle360Viewer } from './components/Vehicle360Viewer';
+import { VehiclesPage } from './components/VehiclesPage';
+import { VehicleDetailModal } from './components/VehicleDetailModal';
 import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { FAQ } from './components/FAQ';
@@ -29,12 +30,13 @@ export function App() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // View state
-  const [currentView, setCurrentView] = useState<'public' | 'admin'>('public');
+  // View state: 'public' (Home page) | 'vehicles-page' (Full vehicles list) | 'admin'
+  const [currentView, setCurrentView] = useState<'public' | 'vehicles-page' | 'admin'>('public');
 
   // Modals state
-  const [selected360Vehicle, setSelected360Vehicle] = useState<Vehicle | null>(null);
+  const [selectedVehicleForDetails, setSelectedVehicleForDetails] = useState<Vehicle | null>(null);
   const [selectedVehicleForInterest, setSelectedVehicleForInterest] = useState<Vehicle | null>(null);
+  const [selectedColorForInterest, setSelectedColorForInterest] = useState<string | undefined>(undefined);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
@@ -77,74 +79,68 @@ export function App() {
     }
   }, [darkMode]);
 
-  // Synchronize with OS system theme if user has not explicitly chosen
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemChange = (e: MediaQueryListEvent) => {
-      const saved = localStorage.getItem('at_theme');
-      if (saved === null) {
-        setDarkMode(e.matches);
-      }
-    };
-    mediaQuery.addEventListener('change', handleSystemChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemChange);
-  }, []);
+  const handleToggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
 
-  // Auto-dismiss toast after 4.5 seconds
-  useEffect(() => {
-    if (!toastMessage) return;
-    const timer = setTimeout(() => {
-      setToastMessage(null);
-    }, 4500);
-    return () => clearTimeout(timer);
-  }, [toastMessage]);
-
-  // Load Initial Vehicles
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        const vList = await api.getVehicles();
-        setVehicles(vList);
-        setCurrentUser(api.getCurrentUser());
-      } catch (err) {
-        console.error('Initialization error', err);
-      } finally {
-        setTimeout(() => setLoading(false), 600);
-      }
-    };
-    initData();
-  }, []);
-
-  // Initialize smooth Lenis momentum scroll
+  // Initialize Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
       smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      infinite: false,
     });
+
+    (window as any).__lenis = lenis;
+
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
-    const rafId = requestAnimationFrame(raf);
+
+    requestAnimationFrame(raf);
+
     return () => {
-      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);
 
-  const handleToggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  // Fetch initial fleet and user session
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const list = await api.getVehicles();
+        setVehicles(list);
+        const user = api.getCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+        }
+      } catch (err) {
+        console.error('Failed to initialize fleet', err);
+      }
+    };
+    init();
 
+    const handleAuthChange = () => {
+      setCurrentUser(api.getCurrentUser());
+    };
+    window.addEventListener('at_auth_changed', handleAuthChange);
+    return () => window.removeEventListener('at_auth_changed', handleAuthChange);
+  }, []);
+
+  // Navigation handlers
   const handleSelectSection = (sectionId: string) => {
-    if (currentView === 'admin') {
+    if (currentView !== 'public') {
       setCurrentView('public');
       setTimeout(() => {
         const el = document.getElementById(sectionId);
         el?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, 150);
     } else {
       const el = document.getElementById(sectionId);
       el?.scrollIntoView({ behavior: 'smooth' });
@@ -174,32 +170,16 @@ export function App() {
     setToastMessage(`Your reservation enquiry is recorded! Ref ID: ${submission.refId}`);
   };
 
-  // Handle Promo Code application
-  const handleApplyPromo = (code: string) => {
-    setActivePromoCode(code);
-    setToastMessage(`Discount Coupon "${code}" Applied! Enjoy 15% off across our entire fleet.`);
-  };
-
-  // Handle Search Submission from Hero Booking card
+  // Handle Search Submission from Hero "I'm Interested" card
   const handleSearchBooking = (params: BookingSearchParams) => {
     setLastSearchParams(params);
-    if (params.promoCode) {
-      setActivePromoCode(params.promoCode);
-    }
-    setToastMessage(`Showing vehicles for ${params.pickupLocation} (${params.pickupDate} to ${params.returnDate})`);
-    handleSelectSection('vehicles');
-  };
-
-  // Handle Trip Type Selection from "What kind of trip are you planning?"
-  const handleSelectTripType = (trip: TripType) => {
-    setExternalFilterCategory(trip.filterCategory);
-    setToastMessage(`Showing vehicles curated for "${trip.title}" (${trip.suggestedVehicles})`);
+    setToastMessage(`Showing vehicles for ${params.pickupLocation} (${params.pickupDate} to ${params.returnDate}). Choose your vehicle and click "I'm Interested".`);
     handleSelectSection('vehicles');
   };
 
   // Floating orange button scroll handler
   const handleFloatingScrollDown = () => {
-    const scrollSections = ['offers', 'trip-planner', 'vehicles', 'contact'];
+    const scrollSections = ['vehicles', 'how-it-works', 'testimonials', 'faq', 'contact'];
     const currentScroll = window.scrollY + 300;
     for (const sec of scrollSections) {
       const el = document.getElementById(sec);
@@ -217,36 +197,9 @@ export function App() {
     return <Preloader onComplete={() => setLoading(false)} />;
   }
 
-  // Admin View
-  if (currentView === 'admin' && currentUser) {
-    return (
-      <div className={darkMode ? 'dark' : ''}>
-        <AdminPortal
-          currentUser={currentUser}
-          onLogout={handleLogout}
-          onReturnToUserSite={() => setCurrentView('public')}
-          onOpen360={(v) => setSelected360Vehicle(v)}
-        />
-
-        {selected360Vehicle && (
-          <Vehicle360Viewer
-            vehicle={selected360Vehicle}
-            isOpen={!!selected360Vehicle}
-            onClose={() => setSelected360Vehicle(null)}
-            onSelectInterest={(v) => {
-              setSelected360Vehicle(null);
-              setSelectedVehicleForInterest(v);
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // Public User View
   return (
-    <div className={`min-h-screen bg-[var(--background)] text-[var(--text)] transition-colors duration-200 font-sans selection:bg-blue-600 selection:text-white ${darkMode ? 'dark' : ''}`}>
-      {/* Modern Accessible Toast Alert with Blue Accent */}
+    <div className={darkMode ? 'dark' : ''}>
+      {/* Modern Accessible Toast Alert */}
       {toastMessage && (
         <div
           role="status"
@@ -267,89 +220,192 @@ export function App() {
         </div>
       )}
 
-      {/* Top Navigation (Matching Screenshot 1) */}
-      <Navbar
-        currentUser={currentUser}
-        onOpenAdmin={handleOpenAdminTrigger}
-        onOpenTrack={() => setIsTrackerOpen(true)}
-        onOpenLocations={() => setIsLocationsOpen(true)}
-        onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
-        onSelectSection={handleSelectSection}
-        darkMode={darkMode}
-        onToggleDarkMode={handleToggleDarkMode}
-      />
+      {/* Page Navigation Animated Container */}
+      <AnimatePresence mode="wait">
+        {/* VIEW 1: ADMIN PORTAL */}
+        {currentView === 'admin' && currentUser ? (
+          <motion.div
+            key="admin-page-view"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <AdminPortal
+              currentUser={currentUser}
+              onLogout={handleLogout}
+              onReturnToUserSite={() => setCurrentView('public')}
+              onOpen360={(v) => setSelectedVehicleForDetails(v)}
+            />
+          </motion.div>
+        ) : currentView === 'vehicles-page' ? (
+          /* VIEW 2: DEDICATED SEPARATE VEHICLES PAGE */
+          <motion.div
+            key="all-vehicles-view"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <VehiclesPage
+              vehicles={vehicles}
+              onBackToHome={() => {
+                setCurrentView('public');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenDetails={(v) => setSelectedVehicleForDetails(v)}
+              onOpen360={(v) => setSelectedVehicleForDetails(v)}
+              onSelectInterest={(v) => {
+                setSelectedColorForInterest(undefined);
+                setSelectedVehicleForInterest(v);
+              }}
+              lastSearchParams={lastSearchParams}
+              darkMode={darkMode}
+            />
+          </motion.div>
+        ) : (
+          /* VIEW 3: PUBLIC HOME PAGE */
+          <motion.div
+            key="home-page-view"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className={`min-h-screen bg-[var(--background)] text-[var(--text)] transition-colors duration-200 font-sans selection:bg-blue-600 selection:text-white ${darkMode ? 'dark' : ''}`}
+          >
+            {/* Top Navigation */}
+            <Navbar
+              currentUser={currentUser}
+              onOpenAdmin={handleOpenAdminTrigger}
+              onOpenTrack={() => setIsTrackerOpen(true)}
+              onOpenLocations={() => setIsLocationsOpen(true)}
+              onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
+              onSelectSection={handleSelectSection}
+              darkMode={darkMode}
+              onToggleDarkMode={handleToggleDarkMode}
+            />
 
-      <main id="hero">
-        {/* Hero Section with Floating Search Booking Card & Highlights Bar (Screenshot 1) */}
-        <Hero
-          onSearchBooking={handleSearchBooking}
-          activePromoCode={activePromoCode}
-          onApplyPromo={handleApplyPromo}
-          onSelectOption={handleSelectSection}
-          onOpenLocationsModal={() => setIsLocationsOpen(true)}
-          onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
-        />
+            <main id="hero">
+              {/* Hero Section with Official Centered Banner & Floating Card */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+              >
+                <Hero
+                  onSearchBooking={handleSearchBooking}
+                  activePromoCode={null}
+                  onApplyPromo={() => {}}
+                  onSelectOption={handleSelectSection}
+                  onOpenLocationsModal={() => setIsLocationsOpen(true)}
+                  onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
+                />
+              </motion.div>
 
-        {/* Current Offers Section: "Deals made for your next trip" (Screenshot 2) */}
-        <CurrentOffers
-          onApplyPromo={handleApplyPromo}
-          onBookNow={(category) => {
-            if (category) setExternalFilterCategory(category);
-            handleSelectSection('vehicles');
-          }}
-        />
+              {/* 3-Step Website Moto Visual Guide */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <WebsiteMotoBanner
+                  onExploreFleet={() => handleSelectSection('vehicles')}
+                />
+              </motion.div>
 
-        {/* Start with the Journey Section: "What kind of trip are you planning?" (Screenshot 3) */}
-        <TripPlannerSection
-          onSelectTripType={handleSelectTripType}
-        />
+              {/* Vehicles Catalogue */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <VehicleCatalogue
+                  vehicles={vehicles}
+                  onOpenDetails={(v) => setSelectedVehicleForDetails(v)}
+                  onOpen360={(v) => setSelectedVehicleForDetails(v)}
+                  onSelectInterest={(v) => {
+                    setSelectedColorForInterest(undefined);
+                    setSelectedVehicleForInterest(v);
+                  }}
+                  onViewAllVehicles={() => {
+                    setCurrentView('vehicles-page');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  externalFilterCategory={externalFilterCategory}
+                  activePromoCode={null}
+                />
+              </motion.div>
 
-        {/* Vehicles Catalogue (Cars, SUVs, Minivans, Bikes with 360 Studio & Multi-Filters) */}
-        <VehicleCatalogue
-          vehicles={vehicles}
-          onOpen360={(v) => setSelected360Vehicle(v)}
-          onSelectInterest={(v) => setSelectedVehicleForInterest(v)}
-          externalFilterCategory={externalFilterCategory}
-          activePromoCode={activePromoCode}
-        />
+              {/* How It Works */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <HowItWorks
+                  onSelectOption={() => {
+                    handleSelectSection('vehicles');
+                  }}
+                />
+              </motion.div>
 
-        {/* How It Works */}
-        <HowItWorks
-          onSelectOption={() => {
-            handleSelectSection('vehicles');
-          }}
-        />
+              {/* Real Customer Reviews */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Testimonials />
+              </motion.div>
 
-        {/* Real Customer Testimonials */}
-        <Testimonials />
+              {/* FAQs */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <FAQ />
+              </motion.div>
 
-        {/* FAQs */}
-        <FAQ />
+              {/* Contact & Hub Details */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Contact />
+              </motion.div>
+            </main>
 
-        {/* Contact & Hub Details */}
-        <Contact />
-      </main>
+            {/* Footer */}
+            <Footer
+              onSelectSection={handleSelectSection}
+              onOpenTrack={() => setIsTrackerOpen(true)}
+              onOpenAdmin={handleOpenAdminTrigger}
+            />
 
-      {/* Footer */}
-      <Footer
-        onSelectSection={handleSelectSection}
-        onOpenTrack={() => setIsTrackerOpen(true)}
-        onOpenAdmin={handleOpenAdminTrigger}
-      />
+            {/* Persistent On-Scroll Construction Card */}
+            <FloatingConstructionCard />
 
-      {/* Persistent On-Scroll Construction & Pivot Tech Developer Card */}
-      <FloatingConstructionCard />
+            {/* Floating Action Button */}
+            <button
+              onClick={handleFloatingScrollDown}
+              className="fixed bottom-7 right-7 z-40 w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
+              aria-label="Scroll to next section"
+            >
+              <ChevronDown className="w-6 h-6 group-hover:translate-y-0.5 transition-transform" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Floating Action Button (Screenshot 2 & 3: Vibrant Orange Circle with Down Chevron) */}
-      <button
-        onClick={handleFloatingScrollDown}
-        className="fixed bottom-7 right-7 z-40 w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
-        aria-label="Scroll to next section"
-      >
-        <ChevronDown className="w-6 h-6 group-hover:translate-y-0.5 transition-transform" />
-      </button>
-
-      {/* --- MODALS --- */}
+      {/* --- GLOBAL MODALS --- */}
 
       {/* Locations & Hubs Modal */}
       <LocationsModal
@@ -367,14 +423,15 @@ export function App() {
         onClose={() => setIsShuttleTrackerOpen(false)}
       />
 
-      {/* 360 Interactive Studio Modal */}
-      {selected360Vehicle && (
-        <Vehicle360Viewer
-          vehicle={selected360Vehicle}
-          isOpen={!!selected360Vehicle}
-          onClose={() => setSelected360Vehicle(null)}
-          onSelectInterest={(v) => {
-            setSelected360Vehicle(null);
+      {/* Vehicle Detail Modal with Color Selection & Rich Specs */}
+      {selectedVehicleForDetails && (
+        <VehicleDetailModal
+          vehicle={selectedVehicleForDetails}
+          isOpen={!!selectedVehicleForDetails}
+          onClose={() => setSelectedVehicleForDetails(null)}
+          onSelectInterest={(v, color) => {
+            setSelectedVehicleForDetails(null);
+            setSelectedColorForInterest(color);
             setSelectedVehicleForInterest(v);
           }}
         />
@@ -385,8 +442,13 @@ export function App() {
         <VehicleInterestModal
           vehicle={selectedVehicleForInterest}
           isOpen={!!selectedVehicleForInterest}
-          onClose={() => setSelectedVehicleForInterest(null)}
+          onClose={() => {
+            setSelectedVehicleForInterest(null);
+            setSelectedColorForInterest(undefined);
+          }}
+          selectedColor={selectedColorForInterest}
           onSuccess={handleVehicleInterestSuccess}
+          initialParams={lastSearchParams}
         />
       )}
 

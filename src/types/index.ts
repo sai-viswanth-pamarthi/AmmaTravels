@@ -46,6 +46,7 @@ export interface Vehicle {
     topSpeedKmph?: number;
   };
   features: string[];
+  colors?: Array<{ name: string; hex: string } | string>;
   primaryImage: string;
   gallery: string[];
   has360View?: boolean;
@@ -77,6 +78,7 @@ export interface InterestSubmission {
   type: InterestType;
   vehicleId?: string;
   vehicleName?: string;
+  selectedColor?: string;
   packageId?: string;
   packageName?: string;
   

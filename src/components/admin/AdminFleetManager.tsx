@@ -94,8 +94,9 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
       primaryImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
       gallery: ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'],
       features: ['Dual Airbags', 'Touchscreen Infotainment', 'Chilled AC', 'Bluetooth Audio'],
-      specs: { engineCc: 1197, mileageKmpl: 22 },
-      has360View: true,
+      specs: { engineCc: 1197, mileageKmpl: 22, bootSpaceLiters: 268 },
+      colors: ['Pearl Arctic White', 'Magma Grey', 'Splendid Silver', 'Fire Red', 'Midnight Black'],
+      has360View: false,
     });
     setIsModalOpen(true);
   };
@@ -324,15 +325,6 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
                     {/* Actions */}
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => onOpen360(v)}
-                          className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200"
-                          title="360 Studio Preview"
-                          aria-label="360 preview"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                        </button>
-
                         {currentUser.role === 'admin' && (
                           <>
                             <button
@@ -380,8 +372,58 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSave} className="space-y-4 text-xs max-h-[80vh] overflow-y-auto pr-1">
+              {/* Category / Type Selection */}
+              <div>
+                <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Vehicle Category (Two Wheeler vs Four Wheeler) *
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const isCar = true;
+                      setEditingVehicle({
+                        ...editingVehicle,
+                        type: 'car',
+                        subType: isCar ? 'Hatchback' : editingVehicle.subType,
+                        seats: editingVehicle.seats && editingVehicle.seats > 2 ? editingVehicle.seats : 5,
+                      });
+                    }}
+                    className={`py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+                      editingVehicle.type === 'car'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                        : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-blue-400'
+                    }`}
+                  >
+                    <Car className="w-4 h-4" />
+                    <span>Four Wheeler (Car / SUV)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingVehicle({
+                        ...editingVehicle,
+                        type: 'bike',
+                        subType: 'Cruiser Bike',
+                        seats: 2,
+                      });
+                    }}
+                    className={`py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+                      editingVehicle.type === 'bike'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                        : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-blue-400'
+                    }`}
+                  >
+                    <Bike className="w-4 h-4" />
+                    <span>Two Wheeler (Bike / Scooter)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Identity Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
                     Vehicle Full Name *
@@ -390,26 +432,197 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
                     type="text"
                     value={editingVehicle.name || ''}
                     onChange={(e) => setEditingVehicle({ ...editingVehicle, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:ring-2 focus:ring-red-600 focus:outline-none"
+                    placeholder="e.g. Maruti Suzuki Swift VXi"
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                    Type *
+                    Brand / Manufacturer *
+                  </label>
+                  <input
+                    type="text"
+                    value={editingVehicle.brand || ''}
+                    onChange={(e) => setEditingVehicle({ ...editingVehicle, brand: e.target.value })}
+                    placeholder="e.g. Maruti, Royal Enfield, Hyundai"
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                    Sub-Category / Body Type *
                   </label>
                   <select
-                    value={editingVehicle.type || 'car'}
-                    onChange={(e) => setEditingVehicle({ ...editingVehicle, type: e.target.value as VehicleType })}
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    value={editingVehicle.subType || (editingVehicle.type === 'bike' ? 'Cruiser Bike' : 'Hatchback')}
+                    onChange={(e) => setEditingVehicle({ ...editingVehicle, subType: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none cursor-pointer"
                   >
-                    <option value="car">Car</option>
-                    <option value="bike">Bike</option>
+                    {editingVehicle.type === 'bike' ? (
+                      <>
+                        <option value="Cruiser Bike">Cruiser Bike (Classic / Bullet)</option>
+                        <option value="Adventure Bike">Adventure Tourer (Himalayan / Xpulse)</option>
+                        <option value="Street / Roadster">Street Roadster (Duke / Hunter)</option>
+                        <option value="Scooter">Scooter / Moped (Activa / Jupiter)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Hatchback">Hatchback (Swift / Baleno)</option>
+                        <option value="Sedan">Sedan (Verna / Dzire / City)</option>
+                        <option value="Compact SUV">Compact SUV (Brezza / Creta / Nexon)</option>
+                        <option value="4x4 Adventure SUV">4x4 Adventure SUV (Thar / Jimny)</option>
+                        <option value="7-Seater MPV">7-Seater MPV (Innova Crysta / Ertiga)</option>
+                        <option value="Luxury Car">Luxury Car (BMW / Audi / Fortuner)</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>
 
+              {/* Technical Specifications Section */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-neutral-850 border border-slate-200 dark:border-neutral-800 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  <Settings className="w-4 h-4" />
+                  <span>Technical Specifications</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Transmission
+                    </label>
+                    <select
+                      value={editingVehicle.transmission || 'Manual'}
+                      onChange={(e) => setEditingVehicle({ ...editingVehicle, transmission: e.target.value as any })}
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    >
+                      <option value="Manual">Manual</option>
+                      <option value="Automatic">Automatic</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Fuel Type
+                    </label>
+                    <select
+                      value={editingVehicle.fuel || 'Petrol'}
+                      onChange={(e) => setEditingVehicle({ ...editingVehicle, fuel: e.target.value as any })}
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    >
+                      <option value="Petrol">Petrol</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Electric">Electric</option>
+                      <option value="CNG">CNG</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Seats Capacity
+                    </label>
+                    <input
+                      type="number"
+                      value={editingVehicle.seats || (editingVehicle.type === 'bike' ? 2 : 5)}
+                      onChange={(e) => setEditingVehicle({ ...editingVehicle, seats: Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                      min={1}
+                      max={12}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Model Year
+                    </label>
+                    <input
+                      type="number"
+                      value={editingVehicle.year || 2024}
+                      onChange={(e) => setEditingVehicle({ ...editingVehicle, year: Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Engine Displacement (CC)
+                    </label>
+                    <input
+                      type="number"
+                      value={editingVehicle.specs?.engineCc || 0}
+                      onChange={(e) => setEditingVehicle({
+                        ...editingVehicle,
+                        specs: { ...(editingVehicle.specs || {}), engineCc: Number(e.target.value) },
+                      })}
+                      placeholder="e.g. 1197 or 350"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Mileage (km/l or km/chg)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={editingVehicle.specs?.mileageKmpl || 0}
+                      onChange={(e) => setEditingVehicle({
+                        ...editingVehicle,
+                        specs: { ...(editingVehicle.specs || {}), mileageKmpl: Number(e.target.value) },
+                      })}
+                      placeholder="e.g. 22 or 38"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Boot Space (Liters)
+                    </label>
+                    <input
+                      type="number"
+                      value={editingVehicle.specs?.bootSpaceLiters || (editingVehicle.type === 'car' ? 300 : 20)}
+                      onChange={(e) => setEditingVehicle({
+                        ...editingVehicle,
+                        specs: { ...(editingVehicle.specs || {}), bootSpaceLiters: Number(e.target.value) },
+                      })}
+                      placeholder="e.g. 268"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Available Color Options */}
+                <div>
+                  <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                    Available Colors (comma-separated names)
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      Array.isArray(editingVehicle.colors)
+                        ? editingVehicle.colors
+                            .map((c) => (typeof c === 'string' ? c : c.name))
+                            .join(', ')
+                        : 'Pearl White, Crimson Red, Midnight Black, Granite Grey'
+                    }
+                    onChange={(e) => {
+                      const list = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+                      setEditingVehicle({ ...editingVehicle, colors: list });
+                    }}
+                    placeholder="e.g. Pearl White, Crimson Red, Midnight Black, Granite Grey, Royal Blue"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Tariffs & Deposit */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
@@ -462,6 +675,7 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
                 </div>
               </div>
 
+              {/* Primary Image URL */}
               <div>
                 <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
                   Primary Image URL *
@@ -472,6 +686,23 @@ export const AdminFleetManager: React.FC<AdminFleetManagerProps> = ({
                   onChange={(e) => setEditingVehicle({ ...editingVehicle, primaryImage: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
                   required
+                />
+              </div>
+
+              {/* Features and Inclusions */}
+              <div>
+                <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                  Key Features / Inclusions (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  value={Array.isArray(editingVehicle.features) ? editingVehicle.features.join(', ') : ''}
+                  onChange={(e) => setEditingVehicle({
+                    ...editingVehicle,
+                    features: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                  })}
+                  placeholder="e.g. Dual Airbags, Chilled AC, Touchscreen, Bluetooth, Free Helmet"
+                  className="w-full px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white focus:outline-none"
                 />
               </div>
 

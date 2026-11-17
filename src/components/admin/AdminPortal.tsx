@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   Car,
+  Settings,
   LogOut,
   ArrowLeft
 } from 'lucide-react';
@@ -10,13 +11,14 @@ import { User, Vehicle, InterestSubmission, DashboardStats } from '@/types';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminLeadsCRM } from './AdminLeadsCRM';
 import { AdminFleetManager } from './AdminFleetManager';
+import { AdminSettingsManager } from './AdminSettingsManager';
 import { api } from '@/lib/api';
 
 interface AdminPortalProps {
   currentUser: User;
   onLogout: () => void;
   onReturnToUserSite: () => void;
-  onOpen360: (v: Vehicle) => void;
+  onOpen360?: (v: Vehicle) => void;
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -25,7 +27,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onReturnToUserSite,
   onOpen360,
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet' | 'settings'>('dashboard');
   const [selectedVehicleForCRM, setSelectedVehicleForCRM] = useState<string>('all');
   const [selectedStatusForFleet, setSelectedStatusForFleet] = useState<string>('all');
 
@@ -199,6 +201,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <Car className="w-3.5 h-3.5" />
               <span>Fleet Manager ({vehicles.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+                activeTab === 'settings'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>Hub & Contact Settings</span>
+            </button>
           </nav>
 
           {/* Right Header Actions: Return to Site & Logout */}
@@ -254,6 +268,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           >
             Fleet ({vehicles.length})
           </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'settings' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            }`}
+          >
+            Settings
+          </button>
         </div>
       </header>
 
@@ -293,6 +315,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             onOpen360={onOpen360}
             onViewVehicleInterests={handleSelectVehicleForCRM}
           />
+        )}
+
+        {activeTab === 'settings' && (
+          <AdminSettingsManager />
         )}
       </main>
     </div>

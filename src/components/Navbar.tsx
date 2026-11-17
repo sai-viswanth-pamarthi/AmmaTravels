@@ -61,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
         scrolled
           ? 'py-2.5 bg-[#FAF6EC]/95 dark:bg-slate-950/95 backdrop-blur-md shadow-sm border-b border-[#E8DFCF] dark:border-slate-800/80'
-          : 'py-5 bg-[#FAF6EC]/80 dark:bg-slate-950/60 backdrop-blur-sm border-b border-[#E8DFCF]/50'
+          : 'py-3 sm:py-3.5 bg-[#FAF6EC]/85 dark:bg-slate-950/75 backdrop-blur-md border-b border-[#E8DFCF]/50'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,18 +72,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick('hero')}
             className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl p-1"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-display font-black text-lg shadow-sm shadow-blue-600/30 group-hover:scale-105 transition-transform duration-200">
-              AT
-            </div>
+            <img
+              src="/logo.jpg"
+              alt="AmmaTravelskkd Logo"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-white dark:border-slate-800 shadow-md group-hover:scale-105 transition-transform duration-200 flex-shrink-0"
+            />
             <div className="flex flex-col text-left">
-              <div className="flex items-baseline gap-1">
+              <div className="flex items-baseline gap-0.5">
                 <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
-                  Amma<span className="text-blue-600 dark:text-blue-400">Travels</span>
+                  Amma<span className="text-blue-600 dark:text-blue-400">Travels</span><span className="text-blue-600 dark:text-blue-400 lowercase font-extrabold text-base sm:text-lg">kkd</span>
                 </span>
-                <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400" />
               </div>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight">
-                Kakinada Fleet & 360° Studio
+                Amma Enterprises
               </span>
             </div>
           </button>
@@ -176,7 +177,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-stone-700 dark:text-slate-300 bg-[#F3EBD8] dark:bg-slate-900 hover:bg-[#EAE1CE] dark:hover:bg-slate-800 border border-[#E8DFCF] dark:border-slate-800 text-xs font-semibold transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               <Shield className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>{currentUser?.role === 'admin' ? 'Admin Ops' : 'Staff'}</span>
+              <span>{currentUser?.role === 'admin' ? 'Admin Portal' : 'Admin'}</span>
             </button>
 
             {/* Mobile Hamburger Menu Toggle */}

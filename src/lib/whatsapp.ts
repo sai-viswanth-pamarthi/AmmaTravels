@@ -1,12 +1,19 @@
-export const DEFAULT_WHATSAPP_NUMBER = '918885757966';
-export const BUSINESS_PHONE = DEFAULT_WHATSAPP_NUMBER;
+import { getBusinessSettings } from './settings';
 
-export function getWhatsAppUrl(text: string, phone: string = DEFAULT_WHATSAPP_NUMBER): string {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
-  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+export function getEffectiveWhatsAppNumber(): string {
+  try {
+    return getBusinessSettings().whatsapp.replace(/[^0-9]/g, '');
+  } catch {
+    return '918885757966';
+  }
 }
 
-export function getGeneralSupportWhatsAppUrl(phone: string = DEFAULT_WHATSAPP_NUMBER): string {
+export function getWhatsAppUrl(text: string, phone?: string): string {
+  const targetPhone = (phone ? phone.replace(/[^0-9]/g, '') : getEffectiveWhatsAppNumber());
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+export function getGeneralSupportWhatsAppUrl(phone?: string): string {
   return getWhatsAppUrl('Hello Amma Travels, I would like to enquire about your services in Kakinada.', phone);
 }
 
@@ -14,7 +21,7 @@ export function getVehicleEnquiryWhatsAppUrl(
   vehicleName: string,
   pickupDate?: string,
   returnDate?: string,
-  phone: string = DEFAULT_WHATSAPP_NUMBER
+  phone?: string
 ): string {
   let msg = `Hello Amma Travels, I am interested in renting the ${vehicleName} in Kakinada.`;
   if (pickupDate && returnDate) {
@@ -26,9 +33,9 @@ export function getVehicleEnquiryWhatsAppUrl(
 export function getBookingSupportWhatsAppUrl(
   bookingRef: string,
   vehicleName?: string,
-  phone: string = DEFAULT_WHATSAPP_NUMBER
+  phone?: string
 ): string {
-  let msg = `Hello Amma Travels, I need assistance regarding my booking ${bookingRef}`;
+  let msg = `Hello Amma Travels, I need assistance regarding my enquiry reference ${bookingRef}`;
   if (vehicleName) {
     msg += ` for ${vehicleName}.`;
   }
@@ -36,7 +43,7 @@ export function getBookingSupportWhatsAppUrl(
 }
 
 export function getVehicleWhatsAppUrl(vehicleName: string, refId?: string): string {
-  let msg = `Hello AmmaTravels, I am interested in renting the ${vehicleName} in Kakinada.`;
+  let msg = `Hello Amma Travels, I am interested in renting the ${vehicleName} in Kakinada.`;
   if (refId) {
     msg += ` My enquiry reference ID is ${refId}.`;
   }
@@ -44,7 +51,7 @@ export function getVehicleWhatsAppUrl(vehicleName: string, refId?: string): stri
 }
 
 export function getEventWhatsAppUrl(packageName: string, refId?: string): string {
-  let msg = `Hello AmmaTravels, I would like to enquire about your "${packageName}" event package in Kakinada.`;
+  let msg = `Hello Amma Travels, I would like to enquire about your "${packageName}" package in Kakinada.`;
   if (refId) {
     msg += ` My enquiry reference ID is ${refId}.`;
   }
