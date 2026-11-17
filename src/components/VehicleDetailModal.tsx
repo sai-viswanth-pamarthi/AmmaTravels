@@ -58,15 +58,27 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
         lenis.stop();
       }
 
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          if (isGalleryOpen) {
+            setIsGalleryOpen(false);
+          } else {
+            onClose();
+          }
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
       return () => {
         document.body.style.overflow = origBodyOverflow;
         document.documentElement.style.overflow = origHtmlOverflow;
         if (lenis && typeof lenis.start === 'function') {
           lenis.start();
         }
+        window.removeEventListener('keydown', handleKeyDown);
       };
     }
-  }, [isOpen]);
+  }, [isOpen, isGalleryOpen, onClose]);
 
   if (!isOpen || !vehicle) return null;
 
@@ -119,6 +131,11 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({
       {/* --- MAIN VEHICLE DETAILS DIALOG (SCROLL IS ISOLATED TO THIS DIALOG ONLY) --- */}
       <div
         data-lenis-prevent
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
         className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/80 backdrop-blur-md overflow-hidden animate-in fade-in duration-200"
       >
         <div

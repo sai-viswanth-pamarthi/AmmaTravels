@@ -20,6 +20,36 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  React.useEffect(() => {
+    if (isOpen) {
+      const origBodyOverflow = document.body.style.overflow;
+      const origHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+
+      const lenis = (window as any).__lenis;
+      if (lenis && typeof lenis.stop === 'function') {
+        lenis.stop();
+      }
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = origBodyOverflow;
+        document.documentElement.style.overflow = origHtmlOverflow;
+        if (lenis && typeof lenis.start === 'function') {
+          lenis.start();
+        }
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,8 +75,19 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-md bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+    <div
+      data-lenis-prevent
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+    >
+      <div
+        data-lenis-prevent
+        className="relative w-full max-w-md bg-[#FFFDF7] dark:bg-black rounded-3xl border border-[#E8DFCF] dark:border-zinc-800 shadow-2xl overflow-hidden my-auto p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200"
+      >
         <div className="flex items-center justify-between pb-4 border-b border-[#E8DFCF] dark:border-zinc-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center shadow-md shadow-red-600/30">
