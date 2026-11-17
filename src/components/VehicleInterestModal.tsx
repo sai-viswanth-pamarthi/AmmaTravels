@@ -10,7 +10,13 @@ import {
   PhoneCall,
   Clock,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Copy,
+  Check,
+  CreditCard,
+  UploadCloud,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Vehicle, InterestSubmission } from '@/types';
 import { api } from '@/lib/api';
@@ -62,6 +68,34 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
+  const [showUpiAdvance, setShowUpiAdvance] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText('ammatravelskkd@okaxis');
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2500);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('File exceeds 5MB limit. Please upload a smaller image or PDF.');
+      return;
+    }
+    setUploadError(null);
+    setUploadedFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setIdProofUrl(`Uploaded Document: ${file.name} (${Math.round(file.size / 1024)} KB)`);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Pre-fill fields from search bar if available
   React.useEffect(() => {
@@ -206,6 +240,85 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                 Save this Reference ID to track status anytime with your phone number ({submittedData.phone})
               </p>
+            </div>
+
+            {/* Instant Advance Lock (UPI) Accordion Card */}
+            <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-left space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+                    ₹
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                      Lock Vehicle with ₹500 Advance (Optional)
+                    </h4>
+                    <p className="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400">
+                      Instantly guarantee booking & eliminate waiting (100% refundable up to 24h)
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowUpiAdvance(!showUpiAdvance)}
+                  className="p-1.5 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/60 text-slate-700 dark:text-slate-300 transition-colors"
+                  aria-label="Toggle UPI payment details"
+                >
+                  {showUpiAdvance ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {showUpiAdvance && (
+                <div className="pt-3 border-t border-amber-200 dark:border-amber-800/60 space-y-3 animate-in fade-in">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                    {/* Dynamic QR Code */}
+                    <div className="flex flex-col items-center">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                          `upi://pay?pa=ammatravelskkd@okaxis&pn=AmmaTravels&am=500&tr=${submittedData.refId}&tn=Advance Lock ${submittedData.refId}`
+                        )}`}
+                        alt="UPI QR Code for ₹500 Advance"
+                        className="w-28 h-28 rounded-lg border border-slate-200 dark:border-slate-700"
+                      />
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Scan in any UPI App</span>
+                    </div>
+
+                    {/* UPI Details */}
+                    <div className="flex-1 space-y-2 text-center sm:text-left w-full">
+                      <div>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">UPI VPA (PhonePe / GPay / Paytm)</span>
+                        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 mt-0.5">
+                          <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">ammatravelskkd@okaxis</span>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                          >
+                            {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedUpi ? 'Copied!' : 'Copy'}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                        <span>Advance Deposit:</span>
+                        <strong className="text-emerald-600 dark:text-emerald-400 font-bold">₹500.00</strong>
+                      </div>
+
+                      <a
+                        href={`upi://pay?pa=ammatravelskkd@okaxis&pn=AmmaTravels&am=500&tr=${submittedData.refId}&tn=Advance Lock ${submittedData.refId}`}
+                        className="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>Pay ₹500 via Mobile UPI</span>
+                      </a>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
+                    Share your payment screenshot via WhatsApp below to lock vehicle status immediately.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* WhatsApp Deep Link CTA */}
@@ -472,15 +585,32 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Driving Licence / ID Proof URL or Notes (Optional)
+                  Driving Licence / ID Proof (Optional for Faster Handover)
                 </label>
-                <input
-                  type="text"
-                  value={idProofUrl}
-                  onChange={(e) => setIdProofUrl(e.target.value)}
-                  placeholder="Drive link, DigiLocker, or present original at pickup"
-                  className="w-full px-3.5 py-2.5 min-h-[44px] rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
-                />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-dashed border-blue-400 dark:border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold transition-colors">
+                    <UploadCloud className="w-4 h-4" />
+                    <span className="truncate max-w-[200px]">
+                      {uploadedFileName ? `Attached: ${uploadedFileName}` : 'Upload Licence (Image/PDF)'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    value={idProofUrl}
+                    onChange={(e) => setIdProofUrl(e.target.value)}
+                    placeholder="Or Drive / DigiLocker / Pickup link"
+                    className="flex-1 px-3.5 py-2.5 min-h-[44px] rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
+                  />
+                </div>
+                {uploadError && (
+                  <p className="text-[11px] text-rose-500 mt-1 font-medium">{uploadError}</p>
+                )}
               </div>
 
               <div>

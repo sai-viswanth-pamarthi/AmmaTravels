@@ -13,8 +13,82 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Security Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=()');
+  next();
+});
+
+// Lightweight In-Memory Rate Limiting
+function createRateLimiter({ windowMs, maxRequests, message }) {
+  const ipCounts = new Map();
+
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, record] of ipCounts.entries()) {
+      if (now > record.resetTime) {
+        ipCounts.delete(ip);
+      }
+    }
+  }, windowMs).unref();
+
+  return (req, res, next) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    let record = ipCounts.get(ip);
+
+    if (!record || now > record.resetTime) {
+      record = { count: 1, resetTime: now + windowMs };
+      ipCounts.set(ip, record);
+      return next();
+    }
+
+    record.count += 1;
+    if (record.count > maxRequests) {
+      return res.status(429).json({
+        success: false,
+        error: message || 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil((record.resetTime - now) / 1000),
+      });
+    }
+
+    next();
+  };
+}
+
+const authRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 20,
+  message: 'Too many login attempts. Please wait 15 minutes before retrying.',
+});
+
+const interestRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 40,
+  message: 'Hourly submission limit reached. Please contact us directly on WhatsApp.',
+});
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+
+// Health Check Endpoint (for Docker/Render/Cloud monitoring)
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'ammatravels-api',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    store: {
+      vehiclesCount: db.data.vehicles.length,
+      packagesCount: db.data.packages.length,
+      interestsCount: db.data.interests.length,
+    },
+  });
+});
 
 // ==========================================
 // 1. VEHICLE ROUTES
@@ -184,7 +258,7 @@ app.delete('/api/packages/:id', requireAuth(['admin']), (req, res) => {
 // ==========================================
 
 // POST /api/interests (Customer submit interest form - Public)
-app.post('/api/interests', (req, res) => {
+app.post('/api/interests', interestRateLimiter, (req, res) => {
   // Honeypot spam protection
   if (req.body._honeypot || req.body.honeypot || req.body.website_source || req.body.user_anti_spam) {
     return res.status(400).json({ success: false, error: 'Spam detected' });
@@ -455,7 +529,7 @@ app.get('/api/stats', requireAuth(), (req, res) => {
 // 6. AUTHENTICATION
 // ==========================================
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', authRateLimiter, (req, res) => {
   const { username, email, password } = req.body;
   const userIdentifier = username || email;
 
