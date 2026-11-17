@@ -169,7 +169,7 @@ export function VehicleCard({
             href={bookUrl}
             className="py-2.5 px-3 rounded-xl text-xs font-bold text-center bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 hover:from-gold-300 hover:to-gold-400 shadow-md shadow-gold-500/10 transition-all flex items-center justify-center gap-1 active:scale-98"
           >
-            <span>Book Now</span>
+            <span>I'm Interested</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

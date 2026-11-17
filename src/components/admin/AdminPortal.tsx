@@ -4,11 +4,13 @@ import {
   Car,
   Settings,
   LogOut,
-  ArrowLeft
+  ArrowLeft,
+  Users
 } from 'lucide-react';
 import { User, Vehicle, InterestSubmission, DashboardStats } from '@/types';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminFleetManager } from './AdminFleetManager';
+import { AdminLeadsCRM } from './AdminLeadsCRM';
 import { AdminSettingsManager } from './AdminSettingsManager';
 import { api } from '@/lib/api';
 
@@ -25,7 +27,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onReturnToUserSite,
   onOpen360,
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'leads' | 'settings'>('dashboard');
   const [selectedStatusForFleet, setSelectedStatusForFleet] = useState<string>('all');
 
   const [stats, setStats] = useState<DashboardStats>({
@@ -184,6 +186,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </button>
 
             <button
+              onClick={() => setActiveTab('leads')}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+                activeTab === 'leads'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Customer Interests ({leads.length})</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('settings')}
               className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeTab === 'settings'
@@ -239,6 +253,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             Fleet ({vehicles.length})
           </button>
           <button
+            onClick={() => setActiveTab('leads')}
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'leads' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            }`}
+          >
+            Interests ({leads.length})
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
               activeTab === 'settings' ? 'bg-red-600 text-white' : 'text-neutral-300'
@@ -258,7 +280,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             leads={leads}
             currentUser={currentUser}
             onNavigateTab={setActiveTab}
-            onSelectVehicleForCRM={() => setActiveTab('fleet')}
+            onSelectVehicleForCRM={() => setActiveTab('leads')}
             onSelectStatusForFleet={handleSelectStatusForFleet}
             onExportCSV={handleExportCSV}
           />
@@ -272,7 +294,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             initialStatusFilter={selectedStatusForFleet}
             onRefreshVehicles={loadData}
             onOpen360={onOpen360 || (() => {})}
-            onViewVehicleInterests={() => setActiveTab('fleet')}
+            onViewVehicleInterests={() => setActiveTab('leads')}
+          />
+        )}
+
+        {activeTab === 'leads' && (
+          <AdminLeadsCRM
+            leads={leads}
+            vehicles={vehicles}
+            currentUser={currentUser}
+            onRefreshLeads={loadData}
+            onExportCSV={handleExportCSV}
           />
         )}
 

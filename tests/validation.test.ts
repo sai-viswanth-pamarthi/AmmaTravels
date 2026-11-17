@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   getWhatsAppUrl,
   getVehicleEnquiryWhatsAppUrl,
+  getVehicleWhatsAppUrl,
   getBookingSupportWhatsAppUrl,
   DEFAULT_WHATSAPP_NUMBER,
 } from '../src/lib/whatsapp';
@@ -32,5 +33,14 @@ describe('Input Validation & Safe Communication Utilities', () => {
 
     expect(url).toContain('AT-2026-1001');
     expect(url).toContain('Honda%20Activa%206G');
+  });
+
+  it('generates WhatsApp interest message including vehicle name, reference ID and dates', () => {
+    const url = getVehicleWhatsAppUrl('Toyota Innova Crysta', 'AT-V-1008', '2026-11-20', '2026-11-22');
+
+    expect(url).toContain('Innova%20Crysta');
+    expect(url).toContain('AT-V-1008');
+    expect(url).toContain('2026-11-20');
+    expect(url).toContain('2026-11-22');
   });
 });

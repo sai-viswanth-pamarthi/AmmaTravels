@@ -43,10 +43,18 @@ export function getVehicleEnquiryWhatsAppUrl(
   return getWhatsAppUrl(msg, phone);
 }
 
-export function getVehicleWhatsAppUrl(vehicleName: string, refId?: string): string {
+export function getVehicleWhatsAppUrl(
+  vehicleName: string,
+  refId?: string,
+  pickupDate?: string,
+  returnDate?: string
+): string {
   let msg = `Hello ${BUSINESS_NAME}, I am interested in renting the ${vehicleName} in Kakinada.`;
   if (refId) {
     msg += ` My enquiry reference ID is ${refId}.`;
+  }
+  if (pickupDate && returnDate) {
+    msg += ` Rental dates: ${pickupDate} to ${returnDate}.`;
   }
   return getWhatsAppUrl(msg);
 }

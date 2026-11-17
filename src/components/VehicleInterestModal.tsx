@@ -11,12 +11,7 @@ import {
   Clock,
   ShieldCheck,
   AlertCircle,
-  Copy,
-  Check,
-  CreditCard,
-  UploadCloud,
-  ChevronDown,
-  ChevronUp
+  UploadCloud
 } from 'lucide-react';
 import { Vehicle, InterestSubmission } from '@/types';
 import { api } from '@/lib/api';
@@ -68,16 +63,8 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
-  const [showUpiAdvance, setShowUpiAdvance] = useState(false);
-  const [copiedUpi, setCopiedUpi] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
-  const handleCopyUpi = () => {
-    navigator.clipboard.writeText('ammatravelskkd@okaxis');
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2500);
-  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -242,95 +229,51 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
               </p>
             </div>
 
-            {/* Instant Advance Lock (UPI) Accordion Card */}
-            <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-left space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
-                    ₹
-                  </div>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                      Lock Vehicle with ₹500 Advance (Optional)
-                    </h4>
-                    <p className="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400">
-                      Instantly guarantee booking & eliminate waiting (100% refundable up to 24h)
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowUpiAdvance(!showUpiAdvance)}
-                  className="p-1.5 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/60 text-slate-700 dark:text-slate-300 transition-colors"
-                  aria-label="Toggle UPI payment details"
-                >
-                  {showUpiAdvance ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
+            {/* Requested Rental Dates & Booking Summary Card */}
+            <div className="p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 text-left space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-bold text-blue-900 dark:text-blue-300">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span>Requested Rental Dates</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-extrabold text-[11px]">
+                  No Payment Required Upfront
+                </span>
               </div>
 
-              {showUpiAdvance && (
-                <div className="pt-3 border-t border-amber-200 dark:border-amber-800/60 space-y-3 animate-in fade-in">
-                  <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                    {/* Dynamic QR Code */}
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-                          `upi://pay?pa=ammatravelskkd@okaxis&pn=AmmaTravels&am=500&tr=${submittedData.refId}&tn=Advance Lock ${submittedData.refId}`
-                        )}`}
-                        alt="UPI QR Code for ₹500 Advance"
-                        className="w-28 h-28 rounded-lg border border-slate-200 dark:border-slate-700"
-                      />
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Scan in any UPI App</span>
-                    </div>
-
-                    {/* UPI Details */}
-                    <div className="flex-1 space-y-2 text-center sm:text-left w-full">
-                      <div>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">UPI VPA (PhonePe / GPay / Paytm)</span>
-                        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 mt-0.5">
-                          <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">ammatravelskkd@okaxis</span>
-                          <button
-                            type="button"
-                            onClick={handleCopyUpi}
-                            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                          >
-                            {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                            <span>{copiedUpi ? 'Copied!' : 'Copy'}</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
-                        <span>Advance Deposit:</span>
-                        <strong className="text-emerald-600 dark:text-emerald-400 font-bold">₹500.00</strong>
-                      </div>
-
-                      <a
-                        href={`upi://pay?pa=ammatravelskkd@okaxis&pn=AmmaTravels&am=500&tr=${submittedData.refId}&tn=Advance Lock ${submittedData.refId}`}
-                        className="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        <span>Pay ₹500 via Mobile UPI</span>
-                      </a>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-                    Share your payment screenshot via WhatsApp below to lock vehicle status immediately.
-                  </p>
+              <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-xl border border-blue-100 dark:border-slate-800">
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold block">Pickup Date</span>
+                  <strong className="text-sm text-slate-900 dark:text-white font-mono">{submittedData.pickupDate}</strong>
                 </div>
-              )}
+                <div className="text-slate-400 font-bold px-2">→</div>
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold block">Return Date</span>
+                  <strong className="text-sm text-slate-900 dark:text-white font-mono">{submittedData.returnDate}</strong>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-0.5">
+                <span>Selected Pickup Hub:</span>
+                <strong className="text-slate-900 dark:text-white">{submittedData.pickupLocation}</strong>
+              </div>
             </div>
 
             {/* WhatsApp Deep Link CTA */}
             <div className="space-y-3 pt-2">
               <a
-                href={getVehicleWhatsAppUrl(vehicle.name, submittedData.refId)}
+                href={getVehicleWhatsAppUrl(
+                  vehicle.name,
+                  submittedData.refId,
+                  submittedData.pickupDate,
+                  submittedData.returnDate
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm tracking-wide shadow-md flex items-center justify-center gap-2 transition-all btn-interactive"
               >
                 <PhoneCall className="w-4 h-4" />
-                <span>Coordinate Directly via WhatsApp</span>
+                <span>Confirm Interest on WhatsApp ({submittedData.pickupDate} to {submittedData.returnDate})</span>
               </a>
 
               <button
