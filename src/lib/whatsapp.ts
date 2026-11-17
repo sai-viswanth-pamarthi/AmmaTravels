@@ -36,7 +36,7 @@ export function getVehicleEnquiryWhatsAppUrl(
   returnDate?: string,
   phone: string = DEFAULT_WHATSAPP_NUMBER
 ): string {
-  let msg = `Hello ${BUSINESS_NAME}, I am interested in renting the ${vehicleName}.`;
+  let msg = `Hello ${BUSINESS_NAME}, I am interested in renting the ${vehicleName} in Kakinada.`;
   if (pickupDate && returnDate) {
     msg += ` Rental dates: ${pickupDate} to ${returnDate}.`;
   }
@@ -44,7 +44,7 @@ export function getVehicleEnquiryWhatsAppUrl(
 }
 
 export function getVehicleWhatsAppUrl(vehicleName: string, refId?: string): string {
-  let msg = `Hello ${BUSINESS_NAME}, I am interested in renting the ${vehicleName}.`;
+  let msg = `Hello ${BUSINESS_NAME}, I am interested in renting the ${vehicleName} in Kakinada.`;
   if (refId) {
     msg += ` My enquiry reference ID is ${refId}.`;
   }
@@ -52,7 +52,7 @@ export function getVehicleWhatsAppUrl(vehicleName: string, refId?: string): stri
 }
 
 export function getEventWhatsAppUrl(packageName: string, refId?: string): string {
-  let msg = `Hello ${BUSINESS_NAME}, I would like to enquire about your "${packageName}" package.`;
+  let msg = `Hello ${BUSINESS_NAME}, I would like to enquire about your "${packageName}" package in Kakinada.`;
   if (refId) {
     msg += ` My enquiry reference ID is ${refId}.`;
   }
