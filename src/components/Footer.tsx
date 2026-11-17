@@ -13,6 +13,8 @@ import {
   Code2,
   Sparkles
 } from 'lucide-react';
+import { useBusinessSettings } from '@/lib/settings';
+import { getGeneralSupportWhatsAppUrl } from '@/lib/whatsapp';
 
 interface FooterProps {
   onSelectSection: (section: string) => void;
@@ -25,6 +27,8 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenTrack,
   onOpenAdmin,
 }) => {
+  const [settings] = useBusinessSettings();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -36,17 +40,19 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Brand Info (2 cols) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-600/30">
-                AT
-              </div>
+              <img
+                src="/logo.jpg"
+                alt="AmmaTravelskkd Logo"
+                className="w-11 h-11 rounded-full object-cover border border-white/20 shadow-md flex-shrink-0"
+              />
               <span className="font-display font-black text-2xl tracking-tight text-white">
-                Amma<span className="text-blue-500">Travels</span>
+                Amma<span className="text-blue-500">Travels</span><span className="text-blue-500 font-extrabold lowercase text-lg">kkd</span>
               </span>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
               Kakinada’s premier self-drive automotive and bike rental service.
-              Dedicated to safe journeys, transparent tariffs, 360° virtual inspection, and pure Godavari hospitality.
+              Dedicated to safe journeys, transparent tariffs, verified fleet, and pure Godavari hospitality.
             </p>
 
             <div className="flex items-center gap-3 pt-2 text-xs text-slate-400">
@@ -70,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onSelectSection('vehicles')}
                   className="hover:text-blue-400 transition-colors focus-visible:outline-none focus-visible:text-blue-400"
                 >
-                  2023 BMW M3 Touring (3D 360°)
+                  2023 BMW M3 Touring (High Performance)
                 </button>
               </li>
               <li>
@@ -78,7 +84,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onSelectSection('vehicles')}
                   className="hover:text-blue-400 transition-colors focus-visible:outline-none focus-visible:text-blue-400"
                 >
-                  Audi A6 C8 Limousine (3D 360°)
+                  Audi A6 C8 Limousine (Executive Sedan)
                 </button>
               </li>
               <li>
@@ -124,7 +130,7 @@ export const Footer: React.FC<FooterProps> = ({
             <ul className="space-y-2 text-xs text-slate-400">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                <span>360° Virtual Inspection</span>
+                <span>Verified Multi-Point Inspection</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
@@ -158,16 +164,26 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="text-xs text-slate-400 space-y-2">
               <p className="flex items-start gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <span>Bhanugudi Junction, Kakinada, AP 533003</span>
+                <span>{settings.primaryAddress}</span>
               </p>
               <p className="flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                <span>+91 88857 57966</span>
+                <span>{settings.phone}</span>
               </p>
               <p className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                <span>rentals@ammatravels.in</span>
+                <span>{settings.secondaryEmail || settings.email}</span>
               </p>
+              <div className="pt-1">
+                <a
+                  href={getGeneralSupportWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/40 text-xs font-semibold transition-all"
+                >
+                  <span>💬 WhatsApp Support</span>
+                </a>
+              </div>
             </div>
 
             <div className="pt-3">
@@ -176,7 +192,7 @@ export const Footer: React.FC<FooterProps> = ({
                 className="px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-blue-400 border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <Shield className="w-3.5 h-3.5" />
-                <span>Staff & Admin Portal</span>
+                <span>Admin Portal</span>
               </button>
             </div>
           </div>

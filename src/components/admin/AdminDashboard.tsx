@@ -1,15 +1,16 @@
 import React from 'react';
 import {
   Car,
-  Users,
+  Bike,
   TrendingUp,
   Clock,
   CheckCircle2,
   AlertTriangle,
   ArrowUpRight,
-  Download,
+  Settings,
   Flame,
-  KeyRound
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 import { DashboardStats, User, Vehicle, InterestSubmission } from '@/types';
 
@@ -18,10 +19,10 @@ interface AdminDashboardProps {
   vehicles: Vehicle[];
   leads: InterestSubmission[];
   currentUser: User;
-  onNavigateTab: (tab: 'crm' | 'fleet') => void;
-  onSelectVehicleForCRM: (vehicleIdOrName: string) => void;
+  onNavigateTab: (tab: 'fleet' | 'settings') => void;
+  onSelectVehicleForCRM?: (vehicleIdOrName: string) => void;
   onSelectStatusForFleet: (status: string) => void;
-  onExportCSV: () => void;
+  onExportCSV?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -30,33 +31,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   leads,
   currentUser,
   onNavigateTab,
-  onSelectVehicleForCRM,
   onSelectStatusForFleet,
-  onExportCSV,
 }) => {
   const bookedCount = vehicles.filter((v) => v.status === 'Booked').length;
   const availableCount = vehicles.filter((v) => v.status === 'Available').length;
   const maintenanceCount = vehicles.filter((v) => v.status === 'Maintenance').length;
   const totalVehicles = vehicles.length;
-
-  // Calculate interests per vehicle accurately from live leads
-  const vehicleDemand = vehicles.map((v) => {
-    const vLeads = leads.filter(
-      (l) => l.vehicleId === v.id || (l.vehicleName && l.vehicleName.toLowerCase() === v.name.toLowerCase())
-    );
-    return {
-      id: v.id,
-      name: v.name,
-      brand: v.brand,
-      subType: v.subType,
-      type: v.type,
-      image: v.primaryImage,
-      status: v.status,
-      pricePerDay: v.pricePerDay,
-      interestCount: vLeads.length,
-      recentLeads: vLeads.slice(0, 3),
-    };
-  }).sort((a, b) => b.interestCount - a.interestCount);
+  const carCount = vehicles.filter((v) => v.type === 'car').length;
+  const bikeCount = vehicles.filter((v) => v.type === 'bike').length;
 
   const kpis = [
     {
@@ -73,31 +55,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       },
     },
     {
-      title: 'Total Customer Inquiries',
-      value: leads.length,
-      sub: `${stats.newEnquiriesToday} new requests received today`,
-      icon: Flame,
-      badge: 'Action Required',
-      badgeColor: 'bg-black text-white dark:bg-neutral-800 dark:text-red-400',
-      onClick: () => onNavigateTab('crm'),
-    },
-    {
-      title: 'Confirmed Inquiries',
-      value: leads.filter((l) => l.progressStage === 'Confirmed' || l.progressStage === 'Completed').length,
-      sub: 'Verified KYC & reserved dates',
+      title: 'Available for Immediate Hire',
+      value: `${availableCount} Vehicles`,
+      sub: `${carCount} Cars & ${bikeCount} Bikes ready in Kakinada`,
       icon: CheckCircle2,
-      badge: 'High Conversion',
+      badge: 'Ready to Dispatch',
       badgeColor: 'bg-emerald-600 text-white',
-      onClick: () => onNavigateTab('crm'),
+      onClick: () => {
+        onSelectStatusForFleet('Available');
+        onNavigateTab('fleet');
+      },
     },
     {
-      title: 'Estimated Tariff Volume',
-      value: `₹${(leads.length * 3600).toLocaleString('en-IN')}`,
-      sub: 'Projected turnover from current interest pipeline',
-      icon: TrendingUp,
-      badge: 'Demand Healthy',
-      badgeColor: 'bg-neutral-900 text-neutral-100',
-      onClick: () => onNavigateTab('crm'),
+      title: 'Total Fleet Capacity',
+      value: `${totalVehicles} Units`,
+      sub: `${carCount} Cars, SUVs & ${bikeCount} Bikes, Scooters`,
+      icon: Car,
+      badge: 'Full Inventory',
+      badgeColor: 'bg-blue-600 text-white',
+      onClick: () => {
+        onSelectStatusForFleet('all');
+        onNavigateTab('fleet');
+      },
+    },
+    {
+      title: 'Maintenance & Service',
+      value: `${maintenanceCount} Units`,
+      sub: maintenanceCount > 0 ? 'Under routine technical inspection' : 'All vehicles in prime operating condition',
+      icon: AlertTriangle,
+      badge: maintenanceCount > 0 ? 'In Garage' : '100% Operational',
+      badgeColor: maintenanceCount > 0 ? 'bg-amber-500 text-black' : 'bg-neutral-800 text-emerald-400',
+      onClick: () => {
+        onSelectStatusForFleet('Maintenance');
+        onNavigateTab('fleet');
+      },
     },
   ];
 
@@ -113,28 +104,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             Welcome back, {currentUser.name}
           </h2>
           <p className="text-xs text-neutral-400 mt-0.5">
-            Role: <strong className="uppercase text-red-500">{currentUser.role}</strong> • Real-time vehicle bookings & customer interest tracking
+            Role: <strong className="uppercase text-red-500">{currentUser.role}</strong> • Fleet management, tariffs & location operations
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button
-            onClick={onExportCSV}
+            onClick={() => onNavigateTab('settings')}
             className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 border border-neutral-700 transition-colors"
           >
-            <Download className="w-3.5 h-3.5 text-red-500" />
-            <span>Export Leads CSV</span>
+            <Settings className="w-3.5 h-3.5 text-red-500" />
+            <span>Hub & Settings</span>
           </button>
 
-          {currentUser.role === 'admin' && (
-            <button
-              onClick={() => onNavigateTab('fleet')}
-              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
-            >
-              <Car className="w-3.5 h-3.5" />
-              <span>Manage Fleet</span>
-            </button>
-          )}
+          <button
+            onClick={() => onNavigateTab('fleet')}
+            className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
+          >
+            <Car className="w-3.5 h-3.5" />
+            <span>Manage Fleet</span>
+          </button>
         </div>
       </div>
 
@@ -247,32 +236,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Requirement 2: How many interests for each vehicle (Fleet Demand Breakdown) */}
+      {/* Fleet Inventory Quick Status Grid */}
       <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-800">
           <div>
             <div className="flex items-center gap-2">
               <span className="p-1 rounded-lg bg-red-600 text-white">
-                <Flame className="w-4 h-4" />
+                <Car className="w-4 h-4" />
               </span>
               <h3 className="font-display font-black text-xl text-black dark:text-white">
-                Customer Interests Per Vehicle
+                Fleet Inventory & Operational Status
               </h3>
             </div>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              Exact number of customer inquiries received for each car and bike in your fleet
+              Current deployment status of cars, SUVs, and bikes across Kakinada
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
-              Total {leads.length} Inquiries across {totalVehicles} Vehicles
+              {totalVehicles} Registered Vehicles
             </span>
             <button
-              onClick={() => onNavigateTab('crm')}
-              className="px-3.5 py-1.5 rounded-full text-xs font-black bg-black text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all flex items-center gap-1.5"
+              onClick={() => onNavigateTab('fleet')}
+              className="px-3.5 py-1.5 rounded-full text-xs font-black bg-red-600 text-white hover:bg-red-700 transition-all flex items-center gap-1.5 shadow-sm"
             >
-              <span>Open Leads CRM</span>
+              <span>Manage Fleet</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -280,14 +269,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Vehicle Demand Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {vehicleDemand.map((v) => (
+          {vehicles.map((v) => (
             <div
               key={v.id}
               className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 hover:border-red-600/50 transition-all"
             >
               <div className="flex items-center gap-3">
                 <div className="w-14 h-12 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                  <img src={v.image} alt={v.name} className="w-full h-full object-contain" />
+                  <img src={v.primaryImage} alt={v.name} className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h4 className="font-display font-black text-xs text-black dark:text-white truncate max-w-[150px]">
@@ -312,19 +301,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Interest Badge & View Button */}
+              {/* Status Badge & Action */}
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-400 border border-red-200 dark:border-red-900">
-                  🔥 {v.interestCount} {v.interestCount === 1 ? 'Inquiry' : 'Inquiries'}
+                <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400">
+                  {v.type === 'car' ? '🚗 Car / SUV' : '🏍️ Bike'}
                 </span>
                 <button
                   onClick={() => {
-                    onSelectVehicleForCRM(v.name);
-                    onNavigateTab('crm');
+                    onSelectStatusForFleet(v.status);
+                    onNavigateTab('fleet');
                   }}
-                  className="text-[10px] font-extrabold text-neutral-700 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-0.5"
+                  className="text-[10px] font-extrabold text-red-600 dark:text-red-400 hover:underline flex items-center gap-0.5"
                 >
-                  <span>View Leads</span>
+                  <span>Edit in Fleet</span>
                   <ArrowUpRight className="w-3 h-3" />
                 </button>
               </div>

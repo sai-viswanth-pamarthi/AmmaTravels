@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
-  Users,
   Car,
+  Settings,
   LogOut,
   ArrowLeft
 } from 'lucide-react';
 import { User, Vehicle, InterestSubmission, DashboardStats } from '@/types';
 import { AdminDashboard } from './AdminDashboard';
-import { AdminLeadsCRM } from './AdminLeadsCRM';
 import { AdminFleetManager } from './AdminFleetManager';
+import { AdminSettingsManager } from './AdminSettingsManager';
 import { api } from '@/lib/api';
 
 interface AdminPortalProps {
   currentUser: User;
   onLogout: () => void;
   onReturnToUserSite: () => void;
-  onOpen360: (v: Vehicle) => void;
+  onOpen360?: (v: Vehicle) => void;
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -25,8 +25,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onReturnToUserSite,
   onOpen360,
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'crm' | 'fleet'>('dashboard');
-  const [selectedVehicleForCRM, setSelectedVehicleForCRM] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'settings'>('dashboard');
   const [selectedStatusForFleet, setSelectedStatusForFleet] = useState<string>('all');
 
   const [stats, setStats] = useState<DashboardStats>({
@@ -123,9 +122,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     document.body.removeChild(link);
   };
 
-  const handleSelectVehicleForCRM = (vehicleName: string) => {
-    setSelectedVehicleForCRM(vehicleName);
-    setActiveTab('crm');
+  const handleSelectVehicleForCRM = (_vehicleName: string) => {
+    setActiveTab('fleet');
   };
 
   const handleSelectStatusForFleet = (status: string) => {
@@ -156,7 +154,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
           </div>
 
-          {/* Tab Navigation (Events removed) */}
+          {/* Tab Navigation (Dashboard, Fleet Manager, Hub Settings) */}
           <nav className="hidden md:flex items-center gap-1 bg-neutral-900 p-1.5 rounded-full border border-neutral-800">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -168,21 +166,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span>Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setSelectedVehicleForCRM('all');
-                setActiveTab('crm');
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'crm'
-                  ? 'bg-red-600 text-white shadow-sm'
-                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Interests CRM ({leads.length})</span>
             </button>
 
             <button
@@ -199,13 +182,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <Car className="w-3.5 h-3.5" />
               <span>Fleet Manager ({vehicles.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+                activeTab === 'settings'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>Hub & Contact Settings</span>
+            </button>
           </nav>
 
           {/* Right Header Actions: Return to Site & Logout */}
           <div className="flex items-center gap-2">
             <button
               onClick={onReturnToUserSite}
-              className="min-h-[44px] px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-red-500" />
               <span className="hidden sm:inline">User Site</span>
@@ -213,7 +208,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             <button
               onClick={onLogout}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl bg-neutral-900 hover:bg-red-950 text-neutral-300 hover:text-red-400 border border-neutral-800 transition-colors"
+              className="p-2 rounded-xl bg-neutral-900 hover:bg-red-950 text-neutral-300 hover:text-red-400 border border-neutral-800 transition-colors"
               title="Sign Out"
               aria-label="Sign out"
             >
@@ -222,48 +217,34 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         </div>
 
-        {/* Mobile Tab Navigation */}
-        <div className="md:hidden mt-2.5 pt-2.5 border-t border-neutral-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {/* Mobile Tab Bar */}
+        <div className="md:hidden flex items-center justify-between gap-1 pt-2 border-t border-neutral-800 mt-2">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              activeTab === 'dashboard'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'dashboard' ? 'bg-red-600 text-white' : 'text-neutral-300'
             }`}
           >
-            <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Dashboard</span>
+            Dashboard
           </button>
-
-          <button
-            onClick={() => {
-              setSelectedVehicleForCRM('all');
-              setActiveTab('crm');
-            }}
-            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              activeTab === 'crm'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>CRM ({leads.length})</span>
-          </button>
-
           <button
             onClick={() => {
               setSelectedStatusForFleet('all');
               setActiveTab('fleet');
             }}
-            className={`min-h-[44px] flex-1 min-w-[90px] py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              activeTab === 'fleet'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800'
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'fleet' ? 'bg-red-600 text-white' : 'text-neutral-300'
             }`}
           >
-            <Car className="w-3.5 h-3.5" />
-            <span>Fleet ({vehicles.length})</span>
+            Fleet ({vehicles.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg ${
+              activeTab === 'settings' ? 'bg-red-600 text-white' : 'text-neutral-300'
+            }`}
+          >
+            Settings
           </button>
         </div>
       </header>
@@ -277,19 +258,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             leads={leads}
             currentUser={currentUser}
             onNavigateTab={setActiveTab}
-            onSelectVehicleForCRM={handleSelectVehicleForCRM}
+            onSelectVehicleForCRM={() => setActiveTab('fleet')}
             onSelectStatusForFleet={handleSelectStatusForFleet}
-            onExportCSV={handleExportCSV}
-          />
-        )}
-
-        {activeTab === 'crm' && (
-          <AdminLeadsCRM
-            leads={leads}
-            vehicles={vehicles}
-            initialVehicleFilter={selectedVehicleForCRM}
-            currentUser={currentUser}
-            onRefreshLeads={loadData}
             onExportCSV={handleExportCSV}
           />
         )}
@@ -301,9 +271,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             currentUser={currentUser}
             initialStatusFilter={selectedStatusForFleet}
             onRefreshVehicles={loadData}
-            onOpen360={onOpen360}
-            onViewVehicleInterests={handleSelectVehicleForCRM}
+            onOpen360={onOpen360 || (() => {})}
+            onViewVehicleInterests={() => setActiveTab('fleet')}
           />
+        )}
+
+        {activeTab === 'settings' && (
+          <AdminSettingsManager />
         )}
       </main>
     </div>

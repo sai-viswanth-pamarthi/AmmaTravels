@@ -10,9 +10,11 @@ import {
   ShieldCheck,
   Send
 } from 'lucide-react';
-import { DEFAULT_WHATSAPP_NUMBER, getWhatsAppUrl } from '@/lib/whatsapp';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
+import { useBusinessSettings } from '@/lib/settings';
 
 export const Contact: React.FC = () => {
+  const [settings] = useBusinessSettings();
   const whatsappUrl = getWhatsAppUrl('Hello Amma Travels, I would like to enquire about your services in Kakinada.');
 
   return (
@@ -60,8 +62,13 @@ export const Contact: React.FC = () => {
                   Main Operating Hub
                 </h4>
                 <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
-                  Door No. 12-4-15, Near Bhanugudi Junction, Main Road, Kakinada, Andhra Pradesh 533003
+                  {settings.primaryAddress}
                 </p>
+                {settings.landmark && (
+                  <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-0.5">
+                    Landmark: {settings.landmark}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -74,7 +81,7 @@ export const Contact: React.FC = () => {
                   Phone & Reservations
                 </h4>
                 <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
-                  +91 88857 57966
+                  {settings.phone}
                 </p>
                 <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
                   24/7 Roadside Breakdown Hotline Active
@@ -91,7 +98,7 @@ export const Contact: React.FC = () => {
                   Hub Timings
                 </h4>
                 <p className="text-xs text-stone-600 dark:text-slate-400 mt-0.5">
-                  Monday – Sunday: 6:00 AM – 10:30 PM
+                  {settings.operatingHours}
                 </p>
                 <p className="text-[11px] text-stone-500 dark:text-slate-400">
                   Late night & early train drops coordinated via WhatsApp

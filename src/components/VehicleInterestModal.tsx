@@ -21,6 +21,12 @@ interface VehicleInterestModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (submission: InterestSubmission) => void;
+  selectedColor?: string;
+  initialParams?: {
+    pickupLocation?: string;
+    pickupDate?: string;
+    returnDate?: string;
+  } | null;
 }
 
 export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
@@ -28,7 +34,19 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  selectedColor,
+  initialParams,
 }) => {
+  // Prevent background scrolling while modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [isOpen]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -44,6 +62,15 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
+
+  // Pre-fill fields from search bar if available
+  React.useEffect(() => {
+    if (isOpen && initialParams) {
+      if (initialParams.pickupDate) setPickupDate(initialParams.pickupDate);
+      if (initialParams.returnDate) setReturnDate(initialParams.returnDate);
+      if (initialParams.pickupLocation) setPickupLocation(initialParams.pickupLocation);
+    }
+  }, [isOpen, initialParams]);
 
   if (!isOpen || !vehicle) return null;
 
@@ -110,6 +137,7 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
         type: 'vehicle',
         vehicleId: vehicle.id,
         vehicleName: vehicle.name,
+        selectedColor,
         name: name.trim(),
         phone: cleanPhone,
         email: email.trim(),
@@ -156,14 +184,14 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Inquiry Successfully Registered
+                Interest Successfully Registered
               </span>
               <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                Your Booking Request is Logged!
+                Your Interest is Registered!
               </h3>
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                Our Kakinada fleet manager has received your reservation request for{' '}
-                <strong className="text-slate-900 dark:text-white">{vehicle.name}</strong>.
+                Our Kakinada team has received your enquiry details for{' '}
+                <strong className="text-slate-900 dark:text-white">{vehicle.name}</strong> and will contact you directly to confirm availability and schedule pickup.
               </p>
             </div>
 
@@ -213,9 +241,16 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                   <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                     Express Interest
                   </span>
-                  <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white">
-                    {vehicle.name}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white">
+                      {vehicle.name}
+                    </h3>
+                    {selectedColor && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                        Color: {selectedColor}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

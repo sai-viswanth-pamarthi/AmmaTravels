@@ -14,15 +14,20 @@ import {
   Sparkles,
   ChevronRight,
   FilterX,
-  X
+  X,
+  ArrowRight,
+  Info
 } from 'lucide-react';
 import { Vehicle } from '@/types';
 import { getVehicleWhatsAppUrl } from '@/lib/whatsapp';
+import { resolvePrimaryVehicleImage } from '@/lib/vehicleMedia';
 
 interface VehicleCatalogueProps {
   vehicles: Vehicle[];
-  onOpen360: (vehicle: Vehicle) => void;
+  onOpen360?: (vehicle: Vehicle) => void;
+  onOpenDetails?: (vehicle: Vehicle) => void;
   onSelectInterest: (vehicle: Vehicle) => void;
+  onViewAllVehicles?: () => void;
   externalFilterCategory?: string | null;
   activePromoCode?: string | null;
   isLoading?: boolean;
@@ -56,7 +61,9 @@ export const VehicleSkeletonCard: React.FC = () => (
 export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
   vehicles,
   onOpen360,
+  onOpenDetails,
   onSelectInterest,
+  onViewAllVehicles,
   externalFilterCategory,
   activePromoCode,
   isLoading = false,
@@ -125,6 +132,11 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
     setIsSearchOpen(false);
   };
 
+  // Display 15 vehicles on the home page showcase
+  const displayedVehicles = useMemo(() => {
+    return filteredVehicles.slice(0, 15);
+  }, [filteredVehicles]);
+
   return (
     <section id="vehicles" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
       {/* Section Header */}
@@ -143,11 +155,11 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
         </h2>
 
         <div className="mt-2 text-center font-hand text-xl text-blue-500 font-bold -rotate-1">
-          <span>✓ Full 3D 360° virtual studio on every car • 5-min key pickup ⤵</span>
+          <span>✓ Verified Fleet • Custom Colors & Full Technical Specs • Click "I'm Interested" ⤵</span>
         </div>
 
         <p className="mt-2 text-base text-slate-600 dark:text-slate-300">
-          100% verified ownership, sanitized before every delivery, with comprehensive insurance and 360° virtual studio inspection.
+          Browse verified cars and bikes in Kakinada, inspect detailed photo galleries, choose custom color variants, and express your interest with zero upfront advance.
         </p>
       </div>
 
@@ -180,7 +192,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* Cars Fleet Tab */}
           <button
             onClick={() => handleTabSwitch('car')}
-            className={`relative flex-1 py-2.5 sm:py-3 px-2 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] ${
+            className={`relative flex-1 py-3 px-3 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               selectedType === 'car'
                 ? 'text-white font-extrabold'
                 : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -193,10 +205,9 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <Car className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${selectedType === 'car' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
-            <span className="tracking-tight hidden xs:inline">Cars Fleet</span>
-            <span className="tracking-tight xs:hidden">Cars</span>
-            <span className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold ${
+            <Car className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedType === 'car' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
+            <span className="tracking-tight">Cars Fleet</span>
+            <span className={`text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold ${
               selectedType === 'car' ? 'bg-white/20 text-white' : 'bg-amber-100/60 dark:bg-slate-800 text-stone-700 dark:text-slate-300'
             }`}>
               {carCount}
@@ -206,7 +217,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* Bikes & Scooters Tab */}
           <button
             onClick={() => handleTabSwitch('bike')}
-            className={`relative flex-1 py-2.5 sm:py-3 px-2 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] ${
+            className={`relative flex-1 py-3 px-3 sm:px-6 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               selectedType === 'bike'
                 ? 'text-white font-extrabold'
                 : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -219,10 +230,9 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <Bike className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${selectedType === 'bike' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
-            <span className="tracking-tight hidden xs:inline">Bikes & Scooters</span>
-            <span className="tracking-tight xs:hidden">Bikes</span>
-            <span className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold ${
+            <Bike className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedType === 'bike' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
+            <span className="tracking-tight">Bikes & Scooters</span>
+            <span className={`text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold ${
               selectedType === 'bike' ? 'bg-white/20 text-white' : 'bg-amber-100/60 dark:bg-slate-800 text-stone-700 dark:text-slate-300'
             }`}>
               {bikeCount}
@@ -232,7 +242,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
           {/* All Fleet Toggle */}
           <button
             onClick={() => handleTabSwitch('all')}
-            className={`relative px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] flex items-center justify-center ${
+            className={`relative px-3 sm:px-4 py-3 rounded-full text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               selectedType === 'all'
                 ? 'text-white font-extrabold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -245,8 +255,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 transition={{ type: 'spring', stiffness: 450, damping: 32 }}
               />
             )}
-            <span className="hidden xs:inline">All ({vehicles.length})</span>
-            <span className="xs:hidden">All</span>
+            <span>All ({vehicles.length})</span>
           </button>
         </div>
 
@@ -269,7 +278,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search Swift, BMW, Thar, Himalayan, Activa..."
-                className="flex-1 bg-transparent py-2 text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+                className="flex-1 bg-transparent py-1 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
                 autoFocus
               />
               {searchTerm && (
@@ -307,6 +316,30 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Vehicle Search Bar */}
+      <div className="max-w-2xl mx-auto mb-8 px-2">
+        <div className="relative flex items-center">
+          <Search className="absolute left-4 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search vehicles by name, brand, model, or fuel (e.g. Fortuner, Swift, Thar, BMW, Activa)..."
+            className="w-full pl-11 pr-10 py-3 rounded-2xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Vehicle Grid Anchor and Dynamic Category Header */}
@@ -379,7 +412,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
             transition={{ duration: 0.3 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
-            {filteredVehicles.map((vehicle, index) => {
+            {displayedVehicles.map((vehicle, index) => {
               return (
                 <motion.div
                   key={vehicle.id}
@@ -391,34 +424,31 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                   {/* Image Container with Badges */}
                   <div className="relative h-52 bg-gradient-to-tr from-[#F4EEDF] to-[#FAF6EC] dark:from-slate-950 dark:to-slate-850 overflow-hidden flex items-center justify-center p-4">
                     <img
-                      src={vehicle.primaryImage}
+                      src={resolvePrimaryVehicleImage(vehicle)}
                       alt={vehicle.name}
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 filter drop-shadow-md"
                       loading="lazy"
                     />
 
-                    {/* Top Left: Subtype Tag */}
-                    <span className="absolute top-3.5 left-3.5 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-900/80 text-white backdrop-blur-sm">
-                      {vehicle.subType}
-                    </span>
-
-
-
-                    {/* 360° Studio Quick Trigger Pill */}
-                    <button
-                      onClick={() => onOpen360(vehicle)}
-                      className="absolute bottom-3.5 right-3.5 px-3 py-1 bg-[#FFFDF7]/90 dark:bg-slate-900/90 hover:bg-orange-500 text-slate-900 dark:text-white hover:text-white text-xs font-semibold rounded-full border border-[#E8DFCF] dark:border-slate-700 shadow-sm backdrop-blur-md flex items-center gap-1.5 transition-all active:scale-95 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                      title="Open 360 interactive rotation"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 text-orange-500 group-hover:text-white" />
-                      <span>360° View</span>
-                    </button>
+                    {/* Top Left: Category & Subtype Tag */}
+                    <div className="absolute top-3.5 left-3.5 flex items-center gap-1.5">
+                      <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-white backdrop-blur-md shadow-sm ${
+                        vehicle.type === 'bike'
+                          ? 'bg-amber-600/90 border border-amber-400/40'
+                          : 'bg-blue-600/90 border border-blue-400/40'
+                      }`}>
+                        {vehicle.type === 'bike' ? '🏍️ Two Wheeler' : '🚗 Four Wheeler'}
+                      </span>
+                      <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-slate-900/80 text-white backdrop-blur-sm">
+                        {vehicle.subType}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Card Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-display text-lg font-bold text-stone-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      <h3 className="font-display text-lg font-bold text-stone-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {vehicle.name}
                       </h3>
                       <p className="text-xs text-stone-500 dark:text-slate-400">
@@ -428,15 +458,15 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                       {/* Key Specs Pills */}
                       <div className="grid grid-cols-3 gap-2 my-4 text-[11px] text-stone-700 dark:text-slate-300">
                         <div className="flex items-center gap-1 bg-[#F4EEDF]/80 dark:bg-slate-800/80 p-2 rounded-xl">
-                          <Settings className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                          <Settings className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
                           <span className="truncate">{vehicle.transmission}</span>
                         </div>
                         <div className="flex items-center gap-1 bg-[#F4EEDF]/80 dark:bg-slate-800/80 p-2 rounded-xl">
-                          <Fuel className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                          <Fuel className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
                           <span className="truncate">{vehicle.fuel}</span>
                         </div>
                         <div className="flex items-center gap-1 bg-[#F4EEDF]/80 dark:bg-slate-800/80 p-2 rounded-xl">
-                          <Users className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                          <Users className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
                           <span>{vehicle.seats} Seats</span>
                         </div>
                       </div>
@@ -475,20 +505,22 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
-                        {/* 360 Viewer trigger */}
+                        {/* Show Details trigger */}
                         <button
-                          onClick={() => onOpen360(vehicle)}
-                          className="w-full py-2.5 px-2 min-h-[44px] text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-1.5 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          type="button"
+                          onClick={() => onOpenDetails ? onOpenDetails(vehicle) : onOpen360?.(vehicle)}
+                          className="w-full py-2.5 px-2 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-1.5 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
-                          <RotateCcw className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                          <span>360° Studio</span>
+                          <Info className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <span>Show Details</span>
                         </button>
 
                         {/* Interest form trigger */}
                         <button
+                          type="button"
                           onClick={() => onSelectInterest(vehicle)}
                           disabled={vehicle.status === 'Maintenance'}
-                          className="w-full py-2.5 px-2 min-h-[44px] text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-98 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          className="w-full py-2.5 px-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-98 btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>I'm Interested</span>
@@ -501,6 +533,31 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
             })}
           </motion.div>
         )}
+
+        {/* Show More Vehicles Button - Navigates to full page */}
+        <div className="mt-14 text-center">
+          <div className="inline-flex flex-col items-center gap-3 p-6 sm:p-8 rounded-3xl bg-[#FFFDF7] dark:bg-slate-900 border border-[#E8DFCF] dark:border-slate-800 shadow-xl max-w-xl mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <Car className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-display text-xl font-bold text-slate-900 dark:text-white">
+                Looking for More Vehicles?
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md">
+                Showing 15 featured cars and bikes. Click below to explore our entire fleet inventory ({vehicles.length} vehicles) on a dedicated page with full multi-filters.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onViewAllVehicles}
+              className="mt-2 px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-xl shadow-blue-600/30 flex items-center gap-2.5 transition-all active:scale-95 btn-interactive cursor-pointer"
+            >
+              <span>Show More Vehicles ({vehicles.length} Available)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

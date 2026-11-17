@@ -14,7 +14,7 @@ export const HUB_LOCATIONS = [
     address: 'Near Bhanugudi Junction, Main Road, Kakinada, AP - 533003',
     hours: '24/7 All Day Pick-Up & Drop',
     phone: '+91 88857 57966',
-    tag: 'Flagship 360° Studio Hub',
+    tag: 'Flagship Operations Hub',
     distance: '0.0 km',
   },
   {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   RotateCcw,
   Play,
@@ -18,7 +18,11 @@ import {
   Briefcase,
   Gauge,
   PhoneCall,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon,
+  Eye,
+  Info
 } from 'lucide-react';
 import { Vehicle } from '@/types';
 import { getVehicleWhatsAppUrl } from '@/lib/whatsapp';
@@ -46,16 +50,70 @@ export const Vehicle360Viewer: React.FC<Vehicle360ViewerProps> = ({
   const startXRef = useRef(0);
   const startFrameRef = useRef(0);
 
+  const [studioLighting, setStudioLighting] = useState<'day' | 'night' | 'sunset'>('day');
+  const [showHotspots, setShowHotspots] = useState(true);
+  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
+  const [rotationSpeed, setRotationSpeed] = useState<number>(1);
+
   const totalFrames = 36; // 36 frames = 10 degrees per frame
 
-  // Auto-rotate effect
+  // Derive high-res quadrant perspective images for this vehicle
+  const angleImages = useMemo(() => {
+    const list = [vehicle.primaryImage, ...(vehicle.gallery || [])].filter(Boolean);
+    return {
+      front: list[0] || vehicle.primaryImage,
+      right: list[1] || list[0] || vehicle.primaryImage,
+      rear: list[2] || list[1] || list[0] || vehicle.primaryImage,
+      left: list[3] || list[1] || list[0] || vehicle.primaryImage,
+    };
+  }, [vehicle]);
+
+  const currentPerspective = useMemo(() => {
+    const deg = (currentFrame * 10) % 360;
+    if (deg >= 315 || deg < 45) {
+      return { img: angleImages.front, label: 'Front Profile (0°)', quadrant: 'front' };
+    } else if (deg >= 45 && deg < 135) {
+      return { img: angleImages.right, label: 'Right Side Profile (90°)', quadrant: 'right' };
+    } else if (deg >= 135 && deg < 225) {
+      return { img: angleImages.rear, label: 'Rear Tail View (180°)', quadrant: 'rear' };
+    } else {
+      return { img: angleImages.left, label: 'Left Side Profile (270°)', quadrant: 'left' };
+    }
+  }, [currentFrame, angleImages]);
+
+  const hotspots = useMemo(() => [
+    {
+      id: 'powertrain',
+      title: 'Powertrain & Specs',
+      desc: `${vehicle.specs.powerBhp || `${vehicle.specs.engineCc || 1500} cc`} • ${vehicle.transmission} • ${vehicle.fuel}`,
+      x: '28%',
+      y: '52%',
+    },
+    {
+      id: 'cabin',
+      title: 'Comfort & Seating',
+      desc: `${vehicle.seats} Ergo Seats • Dual Zone Climate Control & Infotainment`,
+      x: '52%',
+      y: '42%',
+    },
+    {
+      id: 'boot',
+      title: 'Luggage Storage',
+      desc: `${vehicle.specs.bootSpaceLiters ? `${vehicle.specs.bootSpaceLiters} L Boot Capacity` : 'Spacious Trunk Room'}`,
+      x: '76%',
+      y: '50%',
+    },
+  ], [vehicle]);
+
+  // Auto-rotate effect with dynamic speed
   useEffect(() => {
     if (!isOpen || !isAutoRotating || activeTab !== '360') return;
+    const intervalTime = Math.max(50, Math.round(120 / rotationSpeed));
     const interval = setInterval(() => {
       setCurrentFrame((prev) => (prev + 1) % totalFrames);
-    }, 120);
+    }, intervalTime);
     return () => clearInterval(interval);
-  }, [isOpen, isAutoRotating, activeTab]);
+  }, [isOpen, isAutoRotating, activeTab, rotationSpeed]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -189,119 +247,244 @@ export const Vehicle360Viewer: React.FC<Vehicle360ViewerProps> = ({
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
           {/* Main Visualizer Area (8 cols on lg) */}
-          <div className="lg:col-span-8 p-6 flex flex-col justify-between bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 select-none">
+          <div className={`lg:col-span-8 p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 select-none transition-colors duration-300 ${
+            studioLighting === 'night'
+              ? 'bg-gradient-to-b from-slate-950 via-[#060a14] to-slate-950 text-white'
+              : studioLighting === 'sunset'
+              ? 'bg-gradient-to-b from-amber-950/30 via-slate-950 to-slate-900 text-white'
+              : 'bg-gradient-to-b from-slate-100/80 via-white to-slate-50 dark:from-slate-950 dark:to-slate-900'
+          }`}>
             {activeTab === '360' && (
-              vehicle.model3dUrl ? (
-                <div className="relative flex-1 w-full min-h-[380px] sm:min-h-[440px] flex flex-col rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
-                  <Vehicle3DCanvas
-                    modelUrl={vehicle.model3dUrl}
-                    textureBasePath={vehicle.textureBasePath}
-                    vehicleName={vehicle.name}
-                    fallbackImage={vehicle.primaryImage}
-                  />
-                </div>
-              ) : (
-                <div className="relative flex-1 flex flex-col items-center justify-center min-h-[340px] sm:min-h-[420px]">
-                  {/* 360° Interactive Canvas Box */}
+              <div className="relative flex-1 flex flex-col items-center justify-between min-h-[360px] sm:min-h-[440px]">
+                {/* 360° Interactive Canvas Box */}
+                <div
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
+                  className="relative w-full max-w-2xl h-72 sm:h-96 flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-3xl group"
+                >
+                  {/* Studio Spotlight Dynamic Beam */}
                   <div
-                    onPointerDown={handlePointerDown}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerLeave={handlePointerUp}
-                    className="relative w-full max-w-xl h-64 sm:h-80 flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-2xl group"
-                  >
-                    {/* Procedural / Photographic 360 vehicle projection */}
+                    className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay transition-all duration-100"
+                    style={{
+                      background: `linear-gradient(${currentDegrees + 45}deg, transparent 15%, rgba(255,255,255,0.4) 50%, transparent 85%)`,
+                    }}
+                  />
+
+                  {/* 3D Turntable Base Platform */}
+                  <div className="absolute bottom-6 sm:bottom-8 w-[380px] sm:w-[480px] h-24 pointer-events-none flex items-center justify-center">
                     <div
-                      className="relative w-full h-full flex items-center justify-center transition-transform duration-75"
+                      className="w-full h-full rounded-[100%] border-2 border-blue-500/50 dark:border-blue-400/60 shadow-[0_0_35px_rgba(59,130,246,0.25)] transition-transform duration-75 relative flex items-center justify-center"
                       style={{
-                        transform: `scale(${zoomLevel}) rotate(${
-                          // Subtle 3D tilt perspective simulation
-                          Math.sin((currentDegrees * Math.PI) / 180) * 2
-                        }deg)`,
+                        transform: `rotateX(72deg) rotateZ(${currentDegrees}deg)`,
                       }}
                     >
-                      <img
-                        src={vehicle.primaryImage}
-                        alt={`${vehicle.name} view at ${currentDegrees}°`}
-                        className="w-full h-full object-contain filter drop-shadow-2xl pointer-events-none transition-all duration-100"
-                        style={{
-                          // Hue and lighting shift simulating 360 light rotation
-                          filter: `drop-shadow(0 20px 25px rgba(0, 0, 0, 0.25)) brightness(${
-                            0.92 + Math.cos((currentDegrees * Math.PI) / 180) * 0.12
-                          })`,
-                        }}
-                      />
-                    </div>
-
-                    {/* Drag to rotate hint pill */}
-                    <div className="absolute top-4 left-4 bg-slate-950/80 text-white text-[11px] font-medium px-3 py-1 rounded-full backdrop-blur-md border border-white/10 flex items-center gap-1.5 opacity-90 pointer-events-none">
-                      <RotateCcw className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Drag horizontally to rotate 360°</span>
-                    </div>
-
-                    {/* Angle Compass Badge */}
-                    <div className="absolute top-4 right-4 bg-slate-950/80 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-md border border-blue-500/30 flex items-center gap-1.5">
-                      <Compass className="w-3.5 h-3.5" />
-                      <span>{getAngleLabel(currentDegrees)}</span>
+                      <div className="w-[88%] h-[88%] rounded-[100%] border border-dashed border-blue-400/40" />
+                      <span className="absolute top-1 text-[9px] font-mono text-blue-500 dark:text-blue-400 font-extrabold uppercase">
+                        ▲ FRONT 0°
+                      </span>
+                      <span className="absolute right-2 text-[9px] font-mono text-blue-500 dark:text-blue-400 font-extrabold uppercase">
+                        90° RIGHT
+                      </span>
+                      <span className="absolute bottom-1 text-[9px] font-mono text-blue-500 dark:text-blue-400 font-extrabold uppercase">
+                        180° REAR
+                      </span>
+                      <span className="absolute left-2 text-[9px] font-mono text-blue-500 dark:text-blue-400 font-extrabold uppercase">
+                        270° LEFT
+                      </span>
                     </div>
                   </div>
 
-                  {/* 360 Studio Bottom Toolbar */}
-                  <div className="w-full max-w-xl mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
-                    {/* Auto-rotate toggle */}
+                  {/* Procedural / Multi-Angle 360 Vehicle Projection */}
+                  <div
+                    className="relative w-full h-full flex items-center justify-center transition-transform duration-100 z-10"
+                    style={{
+                      transform: `scale(${zoomLevel}) rotate(${
+                        Math.sin((currentDegrees * Math.PI) / 180) * 1.8
+                      }deg)`,
+                    }}
+                  >
+                    <img
+                      key={currentPerspective.quadrant}
+                      src={currentPerspective.img}
+                      alt={`${vehicle.name} view at ${currentDegrees}°`}
+                      className="max-h-[82%] max-w-[92%] object-contain filter pointer-events-none transition-all duration-200 animate-in fade-in"
+                      style={{
+                        filter: `drop-shadow(0 25px 30px rgba(0, 0, 0, 0.45)) brightness(${
+                          studioLighting === 'night'
+                            ? 0.88 + Math.cos((currentDegrees * Math.PI) / 180) * 0.15
+                            : studioLighting === 'sunset'
+                            ? 1.05 + Math.cos((currentDegrees * Math.PI) / 180) * 0.1
+                            : 0.95 + Math.cos((currentDegrees * Math.PI) / 180) * 0.12
+                        }) contrast(1.05)`,
+                      }}
+                    />
+
+                    {/* Interactive Hotspots Overlays */}
+                    {showHotspots && hotspots.map((spot) => (
+                      <div
+                        key={spot.id}
+                        className="absolute z-20"
+                        style={{ left: spot.x, top: spot.y }}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveHotspot(activeHotspot === spot.id ? null : spot.id);
+                          }}
+                          className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/50 hover:scale-125 transition-transform animate-pulse"
+                          title={spot.title}
+                        >
+                          <span className="text-[10px] font-black">+</span>
+                        </button>
+
+                        {/* Hotspot Popover Detail */}
+                        {activeHotspot === spot.id && (
+                          <div className="absolute left-8 top-1/2 -translate-y-1/2 z-30 w-48 p-2.5 rounded-xl bg-slate-900/95 text-white border border-blue-500/40 shadow-xl backdrop-blur-md animate-in fade-in">
+                            <p className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">{spot.title}</p>
+                            <p className="text-[10px] text-slate-200 mt-0.5 leading-snug">{spot.desc}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Top Left: Drag to rotate hint & Hotspots toggle */}
+                  <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+                    <div className="bg-slate-950/80 text-white text-[11px] font-medium px-3 py-1 rounded-full backdrop-blur-md border border-white/10 flex items-center gap-1.5 shadow-sm">
+                      <RotateCcw className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Drag to rotate 360°</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowHotspots(!showHotspots)}
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md border transition-all ${
+                        showHotspots
+                          ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
+                          : 'bg-slate-950/80 text-slate-300 border-white/10 hover:text-white'
+                      }`}
+                    >
+                      Hotspots {showHotspots ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+
+                  {/* Top Right: Live Angle Compass Badge */}
+                  <div className="absolute top-4 right-4 z-20 bg-slate-950/80 text-blue-400 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md border border-blue-500/40 flex items-center gap-1.5 shadow-md">
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>{currentPerspective.label}</span>
+                  </div>
+                </div>
+
+                {/* 360 Studio Bottom Toolbar */}
+                <div className="w-full max-w-2xl mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  {/* Auto-rotate toggle & Speed */}
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setIsAutoRotating(!isAutoRotating)}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg border flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                      className={`px-3 py-1.5 font-semibold rounded-xl border flex items-center gap-1.5 transition-all active:scale-95 ${
                         isAutoRotating
-                          ? 'bg-blue-600 text-white border-blue-500'
+                          ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
                           : 'bg-[#FFFDF7] dark:bg-slate-800 text-stone-700 dark:text-slate-200 border-[#E8DFCF] dark:border-slate-700 hover:bg-[#F3EBD8]'
                       }`}
                     >
                       {isAutoRotating ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                      <span>{isAutoRotating ? 'Pause Spin' : 'Auto Rotate'}</span>
+                      <span>{isAutoRotating ? 'Pause' : 'Rotate'}</span>
                     </button>
 
-                    {/* Angle scrubber slider */}
-                    <div className="flex-1 max-w-[200px] flex items-center gap-2">
-                      <span className="text-[10px] text-stone-500 dark:text-slate-400">0°</span>
-                      <input
-                        type="range"
-                        min={0}
-                        max={totalFrames - 1}
-                        value={currentFrame}
-                        onChange={(e) => {
-                          setIsAutoRotating(false);
-                          setCurrentFrame(Number(e.target.value));
-                        }}
-                        className="w-full accent-blue-600 cursor-pointer h-1.5 bg-stone-200 dark:bg-slate-700 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                        aria-label="Rotate angle slider"
-                      />
-                      <span className="text-[10px] text-stone-500 dark:text-slate-400">360°</span>
-                    </div>
+                    {/* Speed Selector */}
+                    {isAutoRotating && (
+                      <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5 border border-slate-200 dark:border-slate-700">
+                        {[0.5, 1, 2].map((spd) => (
+                          <button
+                            key={spd}
+                            type="button"
+                            onClick={() => setRotationSpeed(spd)}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all ${
+                              rotationSpeed === spd
+                                ? 'bg-blue-600 text-white'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                          >
+                            {spd}x
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                    {/* Zoom controls */}
-                    <div className="flex items-center gap-1 bg-[#FFFDF7] dark:bg-slate-800 border border-[#E8DFCF] dark:border-slate-700 rounded-lg p-0.5">
-                      <button
-                        onClick={() => setZoomLevel((z) => Math.max(0.8, z - 0.2))}
-                        className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-blue-500 focus-visible:outline-none focus-visible:text-blue-500"
-                        title="Zoom Out"
-                      >
-                        <ZoomOut className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="text-[10px] font-bold px-1 text-slate-700 dark:text-slate-200">
-                        {Math.round(zoomLevel * 100)}%
-                      </span>
-                      <button
-                        onClick={() => setZoomLevel((z) => Math.min(1.8, z + 0.2))}
-                        className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-blue-500 focus-visible:outline-none focus-visible:text-blue-500"
-                        title="Zoom In"
-                      >
-                        <ZoomIn className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                  {/* Angle scrubber slider */}
+                  <div className="flex-1 min-w-[160px] max-w-[220px] flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-stone-500 dark:text-slate-400">0°</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={totalFrames - 1}
+                      value={currentFrame}
+                      onChange={(e) => {
+                        setIsAutoRotating(false);
+                        setCurrentFrame(Number(e.target.value));
+                      }}
+                      className="w-full accent-blue-600 cursor-pointer h-1.5 bg-stone-200 dark:bg-slate-700 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      aria-label="Rotate angle slider"
+                    />
+                    <span className="text-[10px] font-mono text-stone-500 dark:text-slate-400">360°</span>
+                  </div>
+
+                  {/* Studio Lighting Mood Switcher */}
+                  <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5 border border-slate-200 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setStudioLighting('day')}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
+                        studioLighting === 'day'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                      title="Daylight Studio"
+                    >
+                      <Sun className="w-3 h-3" />
+                      <span className="hidden sm:inline">Day</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStudioLighting('night')}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
+                        studioLighting === 'night'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                      title="Neon Night Mood"
+                    >
+                      <Moon className="w-3 h-3" />
+                      <span className="hidden sm:inline">Night</span>
+                    </button>
+                  </div>
+
+                  {/* Zoom controls */}
+                  <div className="flex items-center gap-1 bg-[#FFFDF7] dark:bg-slate-800 border border-[#E8DFCF] dark:border-slate-700 rounded-xl p-0.5">
+                    <button
+                      onClick={() => setZoomLevel((z) => Math.max(0.8, Number((z - 0.2).toFixed(1))))}
+                      className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-blue-500"
+                      title="Zoom Out"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[10px] font-bold px-1 text-slate-700 dark:text-slate-200">
+                      {Math.round(zoomLevel * 100)}%
+                    </span>
+                    <button
+                      onClick={() => setZoomLevel((z) => Math.min(2.0, Number((z + 0.2).toFixed(1))))}
+                      className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-blue-500"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-              )
+              </div>
             )}
 
             {/* Gallery View Tab */}
