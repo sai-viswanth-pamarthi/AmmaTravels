@@ -12,7 +12,10 @@ import {
   Sparkles,
   MessageSquare,
   AlertCircle,
-  Flame
+  Flame,
+  Eye,
+  ExternalLink,
+  FileText
 } from 'lucide-react';
 import { InterestSubmission, LeadStage, User, ActivityLog, Vehicle } from '@/types';
 import { api } from '@/lib/api';
@@ -56,6 +59,37 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
   const [editStage, setEditStage] = useState<LeadStage>('New');
   const [isUpdating, setIsUpdating] = useState(false);
   const [leadLogs, setLeadLogs] = useState<ActivityLog[]>([]);
+  const [previewDocUrl, setPreviewDocUrl] = useState<{ url: string; title: string } | null>(null);
+
+  const handleDownloadDoc = (dataUrlOrHttp: string, customerName: string) => {
+    try {
+      if (dataUrlOrHttp.startsWith('data:')) {
+        const parts = dataUrlOrHttp.split(';base64,');
+        const contentType = parts[0].replace('data:', '') || 'application/octet-stream';
+        const ext = contentType.includes('pdf') ? 'pdf' : contentType.includes('png') ? 'png' : 'jpg';
+        const byteCharacters = atob(parts[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${(customerName || 'Customer').replace(/[^a-zA-Z0-9_-]/g, '_')}_ID_Proof.${ext}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      } else {
+        window.open(dataUrlOrHttp, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err) {
+      console.error('Failed to download document', err);
+      window.open(dataUrlOrHttp, '_blank');
+    }
+  };
 
   useEffect(() => {
     if (initialVehicleFilter) {
@@ -434,16 +468,74 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
                   </div>
                 )}
                 {activeLead.idProofUrl && (
-                  <div className="py-1 border-b border-neutral-100 dark:border-neutral-800">
-                    <span className="text-neutral-400 block mb-1">ID Proof / DL:</span>
-                    <a
-                      href={activeLead.idProofUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-600 underline font-bold break-all"
-                    >
-                      {activeLead.idProofUrl}
-                    </a>
+                  <div className="py-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <span className="text-neutral-400 block mb-1 text-[11px] font-semibold uppercase tracking-wider">
+                      Customer Identity Document / DL:
+                    </span>
+                    {activeLead.idProofUrl.startsWith('data:image/') ? (
+                      <div className="flex flex-col gap-2 mt-1 p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700">
+                        <div
+                          className="relative group cursor-pointer overflow-hidden rounded-lg max-h-48 border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900"
+                          onClick={() => setPreviewDocUrl({ url: activeLead.idProofUrl!, title: `${activeLead.name || 'Customer'} - ID Document` })}
+                        >
+                          <img
+                            src={activeLead.idProofUrl}
+                            alt="Customer ID Document"
+                            className="w-full h-auto object-contain max-h-44 mx-auto transition-transform group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-bold text-xs">
+                            <Eye className="w-4 h-4" /> Click to Enlarge
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDocUrl({ url: activeLead.idProofUrl!, title: `${activeLead.name || 'Customer'} - ID Document` })}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View Full Image
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadDoc(activeLead.idProofUrl!, activeLead.name || 'Customer')}
+                            className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-100 font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Save / Download
+                          </button>
+                        </div>
+                      </div>
+                    ) : activeLead.idProofUrl.startsWith('data:application/pdf') ? (
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-red-500" />
+                          <span className="font-semibold text-xs">Customer ID Document (PDF format)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadDoc(activeLead.idProofUrl!, activeLead.name || 'Customer')}
+                          className="flex items-center gap-1 py-1 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" /> Open / Download PDF
+                        </button>
+                      </div>
+                    ) : activeLead.idProofUrl.startsWith('http://') || activeLead.idProofUrl.startsWith('https://') ? (
+                      <a
+                        href={activeLead.idProofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:underline font-bold text-xs break-all"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                        {activeLead.idProofUrl}
+                      </a>
+                    ) : (
+                      <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-[11px] text-amber-800 dark:text-amber-200">
+                        <span className="font-bold">Attached Document:</span> {activeLead.idProofUrl}
+                        <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                          (Submitted before file embedding was activated. Request client to re-upload or send via WhatsApp.)
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
                 {activeLead.message && (
@@ -548,6 +640,49 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full-Screen Document Lightbox Modal */}
+      {previewDocUrl && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPreviewDocUrl(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-3.5 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950">
+              <h3 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600" />
+                {previewDocUrl.title}
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadDoc(previewDocUrl.url, previewDocUrl.title)}
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDocUrl(null)}
+                  className="p-1 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-4 flex items-center justify-center overflow-auto max-h-[calc(90vh-65px)] bg-neutral-950">
+              <img
+                src={previewDocUrl.url}
+                alt={previewDocUrl.title}
+                className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
+              />
             </div>
           </div>
         </div>

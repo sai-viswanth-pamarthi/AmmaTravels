@@ -130,7 +130,8 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
     const reader = new FileReader();
     reader.onload = () => {
-      setIdProofUrl(`Uploaded Document: ${file.name} (${Math.round(file.size / 1024)} KB)`);
+      const dataUrl = reader.result as string;
+      setIdProofUrl(dataUrl);
     };
     reader.readAsDataURL(file);
   };
@@ -662,12 +663,31 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={idProofUrl}
-                    onChange={(e) => setIdProofUrl(e.target.value)}
-                    placeholder="Or Drive / DigiLocker / Pickup link"
-                    className="flex-1 px-3.5 py-2.5 min-h-[44px] rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors"
+                    value={idProofUrl.startsWith('data:') ? '' : idProofUrl}
+                    onChange={(e) => {
+                      setIdProofUrl(e.target.value);
+                      setUploadedFileName(null);
+                    }}
+                    placeholder={idProofUrl.startsWith('data:') ? 'Document attached via upload' : 'Or Drive / DigiLocker / Pickup link'}
+                    disabled={idProofUrl.startsWith('data:')}
+                    className="flex-1 px-3.5 py-2.5 min-h-[44px] rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
                   />
                 </div>
+                {uploadedFileName && idProofUrl.startsWith('data:') && (
+                  <div className="flex items-center justify-between mt-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-[11px] text-emerald-700 dark:text-emerald-300">
+                    <span className="truncate">✓ Document ready for verification: {uploadedFileName}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIdProofUrl('');
+                        setUploadedFileName(null);
+                      }}
+                      className="text-xs text-rose-500 hover:text-rose-700 ml-2 font-bold cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
                 {uploadError && (
                   <p className="text-[11px] text-rose-500 mt-1 font-medium">{uploadError}</p>
                 )}
