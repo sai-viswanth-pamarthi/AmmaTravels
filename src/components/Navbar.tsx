@@ -5,7 +5,6 @@ import {
   Calendar,
   Search,
   Phone,
-  Shield,
   Moon,
   Sun,
   Menu,
@@ -19,7 +18,7 @@ import { User } from '@/types';
 
 interface NavbarProps {
   currentUser: User | null;
-  onOpenAdmin: () => void;
+  onOpenAdmin?: () => void;
   onOpenTrack: () => void;
   onOpenLocations: () => void;
   onOpenShuttleTracker: () => void;
@@ -171,15 +170,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Admin Portal access */}
-            <button
-              onClick={onOpenAdmin}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-stone-700 dark:text-slate-300 bg-[#F3EBD8] dark:bg-slate-900 hover:bg-[#EAE1CE] dark:hover:bg-slate-800 border border-[#E8DFCF] dark:border-slate-800 text-xs font-semibold transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            >
-              <Shield className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>{currentUser?.role === 'admin' ? 'Admin Portal' : 'Admin'}</span>
-            </button>
-
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -232,19 +222,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-full text-left px-4 py-3 min-h-[44px] text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition-colors flex items-center"
             >
               Contact Hub in Kakinada
-            </button>
-          </div>
-
-          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAdmin();
-              }}
-              className="w-full py-3 min-h-[44px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30 transition-all duration-200 active:scale-98"
-            >
-              <Shield className="w-4 h-4 text-white" />
-              <span>Admin Portal Login</span>
             </button>
           </div>
         </div>

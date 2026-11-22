@@ -11,7 +11,8 @@ import {
   Clock,
   ShieldCheck,
   AlertCircle,
-  UploadCloud
+  UploadCloud,
+  Search
 } from 'lucide-react';
 import { Vehicle, InterestSubmission } from '@/types';
 import { api } from '@/lib/api';
@@ -28,6 +29,7 @@ interface VehicleInterestModalProps {
     pickupDate?: string;
     returnDate?: string;
   } | null;
+  onOpenTrack?: (refId?: string) => void;
 }
 
 export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
@@ -37,6 +39,7 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   onSuccess,
   selectedColor,
   initialParams,
+  onOpenTrack,
 }) => {
   const resetAndClose = React.useCallback(() => {
     setSubmittedData(null);
@@ -99,6 +102,20 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [activeExistingEnquiry, setActiveExistingEnquiry] = useState<{
+    refId: string;
+    phone?: string;
+    itemName?: string;
+    createdAt?: string;
+    progressStage?: string;
+  } | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const active = api.getActiveUserEnquiry();
+      setActiveExistingEnquiry(active);
+    }
+  }, [isOpen]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -176,6 +193,12 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
       return;
     }
 
+    // Active enquiry check
+    if (activeExistingEnquiry) {
+      setError(`You already have an active reservation enquiry (Ref ID: ${activeExistingEnquiry.refId}). Each user is limited to 1 active enquiry to prevent duplicate submissions.`);
+      return;
+    }
+
     setTouched({ name: true, phone: true, pickupDate: true, returnDate: true });
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -204,9 +227,20 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
         honeypot,
       });
 
+      setActiveExistingEnquiry({
+        refId: submission.refId,
+        phone: cleanPhone,
+        itemName: submission.vehicleName,
+        createdAt: submission.createdAt,
+        progressStage: submission.progressStage,
+      });
       setSubmittedData(submission);
       onSuccess(submission);
     } catch (err: any) {
+      const active = api.getActiveUserEnquiry();
+      if (active) {
+        setActiveExistingEnquiry(active);
+      }
       setError(err?.message || 'Failed to submit booking inquiry. Please try again or WhatsApp us.');
     } finally {
       setSubmitting(false);
@@ -366,6 +400,54 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
                 Free Run: <strong className="text-slate-900 dark:text-white">{vehicle.kmLimit} km/day</strong>
               </span>
             </div>
+
+            {/* Active Reservation Anti-Abuse Notification */}
+            {activeExistingEnquiry && (
+              <div className="mb-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 animate-in fade-in">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center justify-between flex-wrap gap-1.5">
+                      <span className="font-bold text-xs text-amber-800 dark:text-amber-300">
+                        Active Reservation Enquiry Detected
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                        Limit: 1 Active Enquiry
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
+                      You already have an active enquiry (Ref ID: <strong className="font-mono font-bold text-amber-950 dark:text-white">{activeExistingEnquiry.refId}</strong>{activeExistingEnquiry.itemName ? ` for ${activeExistingEnquiry.itemName}` : ''}). To prevent duplicate bookings and spam flood attacks, each customer is limited to 1 active request.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                      {onOpenTrack && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            resetAndClose();
+                            onOpenTrack(activeExistingEnquiry.refId);
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <FileCheck className="w-3.5 h-3.5" />
+                          <span>Track Ref ID: {activeExistingEnquiry.refId}</span>
+                        </button>
+                      )}
+                      <a
+                        href={getVehicleWhatsAppUrl(vehicle.name, activeExistingEnquiry.refId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>Modify via WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Error banner */}
             {error && (
@@ -606,18 +688,29 @@ export const VehicleInterestModal: React.FC<VehicleInterestModalProps> = ({
 
               {/* Submit CTA */}
               <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-3.5 px-4 min-h-[48px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/30 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60 btn-interactive"
-                >
-                  {submitting ? (
-                    <Clock className="w-4 h-4 animate-spin text-white" />
-                  ) : (
-                    <Sparkles className="w-4 h-4 text-white" />
-                  )}
-                  <span>{submitting ? 'Registering Interest...' : "Submit My Interest (I'm Interested)"}</span>
-                </button>
+                {activeExistingEnquiry ? (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
+                    <p className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                      Enquiry already in progress (Ref: {activeExistingEnquiry.refId})
+                    </p>
+                    <p className="text-[11px] text-amber-700/90 dark:text-amber-300/90">
+                      Submissions are restricted to 1 active reservation per user to protect system resources. Please track your enquiry above or contact us directly on WhatsApp to make changes.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full py-3.5 px-4 min-h-[48px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/30 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60 btn-interactive"
+                  >
+                    {submitting ? (
+                      <Clock className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <Sparkles className="w-4 h-4 text-white" />
+                    )}
+                    <span>{submitting ? 'Registering Interest...' : "Submit My Interest (I'm Interested)"}</span>
+                  </button>
+                )}
                 <p className="text-[11px] text-center text-slate-500 dark:text-slate-400 mt-2">
                   🔒 No payment required upfront. Amma Travels team will coordinate your pickup directly.
                 </p>

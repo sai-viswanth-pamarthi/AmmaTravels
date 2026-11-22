@@ -19,7 +19,31 @@ export interface VehicleModelMedia {
 }
 
 export const VEHICLE_MEDIA_CATALOG: VehicleModelMedia[] = [
-  // 1. Maruti Suzuki Swift
+  // 1. Maruti Suzuki Swift Dzire (Checked before swift)
+  {
+    modelKeyword: 'dzire',
+    primaryImage: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Splendid Silver',
+        hex: '#CBD5E1',
+        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        name: 'Arctic White',
+        hex: '#F8FAFC',
+        image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Front Elegant Chrome Stance', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Side Aerodynamic Profile', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Spacious Rear Passenger Cabin', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Deep 382L Luggage Trunk', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 2. Maruti Suzuki Swift
   {
     modelKeyword: 'swift',
     primaryImage: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
@@ -30,81 +54,260 @@ export const VEHICLE_MEDIA_CATALOG: VehicleModelMedia[] = [
         image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
       },
       {
+        name: 'Luster Blue',
+        hex: '#1D4ED8',
+        image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
         name: 'Pearl Arctic White',
         hex: '#F8FAFC',
         image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
       },
+    ],
+    views: [
+      { label: 'Front 3/4 Dynamic Angle', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Side Profile Aerodynamics', url: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Driver Cockpit & Touchscreen', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Precision Alloy Wheels', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 3. Tata Altroz
+  {
+    modelKeyword: 'altroz',
+    primaryImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+    colors: [
       {
-        name: 'Luster Blue',
-        hex: '#1D4ED8',
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Magma Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Splendid Silver',
-        hex: '#CBD5E1',
-        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Midnight Black',
-        hex: '#0F172A',
+        name: 'Cosmo Dark Black',
+        hex: '#0B0F19',
         image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
       },
     ],
     views: [
-      { label: 'Front 3/4 Dynamic Angle', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Side Profile Aerodynamics', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Rear Angle & LED Tail', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Driver Cockpit & Touchscreen', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Alloy Wheels & Chassis', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Signature Dark Edition Front', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: '90-Degree Wide Doors Open', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Harman 8-Speaker Cockpit', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
     ],
   },
 
-  // 2. Toyota Fortuner 4x4
+  // 4. Tata Punch
   {
-    modelKeyword: 'fortuner',
-    primaryImage: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+    modelKeyword: 'punch',
+    primaryImage: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=1200&q=80',
     colors: [
       {
-        name: 'Super White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+        name: 'Atomic Orange',
+        hex: '#EA580C',
+        image: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=1200&q=80',
       },
       {
-        name: 'Attitude Black',
-        hex: '#09090B',
-        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
+        name: 'Daytona Grey',
+        hex: '#4B5563',
+        image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
       },
       {
-        name: 'Avant-Garde Bronze',
-        hex: '#78350F',
-        image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Silver Metallic',
-        hex: '#94A3B8',
-        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Phantom Brown',
-        hex: '#451A03',
+        name: 'Calypso Gold',
+        hex: '#CA8A04',
         image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
       },
     ],
     views: [
-      { label: 'High Clearance 4x4 Front', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Off-Road Trail Profile', url: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Rear Tailgate & Stance', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-      { label: '7-Seater Leather Cabin', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Dashboard & Terrain Controls', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'High Stance Front Grille', url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=1200&q=80' },
+      { label: '187mm High Clearance Side Profile', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Adventure Cockpit & Digital Cluster', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
     ],
   },
 
-  // 3. Toyota Innova Crysta
+  // 5. Tata Tiago
+  {
+    modelKeyword: 'tiago',
+    primaryImage: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Flame Red',
+        hex: '#DC2626',
+        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Compact City Front Fascia', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Automatic AMT Console & Dashboard', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 6. Tata Nexon
+  {
+    modelKeyword: 'nexon',
+    primaryImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Fearless Gold',
+        hex: '#D97706',
+        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Bi-LED Light Bar Front Stance', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80' },
+      { label: '208mm Ground Clearance Profile', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Digital Touchscreen Cockpit', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 7. Hyundai i20
+  {
+    modelKeyword: 'i20',
+    primaryImage: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Fiery Red',
+        hex: '#DC2626',
+        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        name: 'Polar White',
+        hex: '#F8FAFC',
+        image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Parametric Jewel Grille Front', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Sleek Euro Stance Profile', url: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Bose Audio & Digital Cabin', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 8. Hyundai Verna
+  {
+    modelKeyword: 'verna',
+    primaryImage: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Abyss Black',
+        hex: '#0B0F19',
+        image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Futuristic Horizon LED Front', url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Fastback Coupe Sedan Profile', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Ventilated Seats & Dual Screens', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 9. Thar Roxx (5-Door) - (Checked before standard thar)
+  {
+    modelKeyword: 'roxx',
+    primaryImage: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Tango Red',
+        hex: '#B91C1C',
+        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
+      },
+      {
+        name: 'Stealth Black',
+        hex: '#09090B',
+        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: '5-Door Roxx Dominant Grille', url: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Long Wheelbase 5-Door Stance', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Panoramic Skyroof & Ivory Leather Cabin', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 10. Mahindra Thar 4x4
+  {
+    modelKeyword: 'thar',
+    primaryImage: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Deep Forest Green',
+        hex: '#14532D',
+        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Iconic 7-Slot Front Grille', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Rugged Hard-Top Profile', url: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Mechanical 4x4 Transfer Lever', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 11. Mahindra XUV 7XO
+  {
+    modelKeyword: '7xo',
+    primaryImage: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Napoli Black',
+        hex: '#0F172A',
+        image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Executive Flagship LED Front Stance', url: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Commanding 7-Seater Luxury Profile', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Triple Screen High-Tech Cockpit', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 12. Mahindra XEV 9e (Electric)
+  {
+    modelKeyword: 'xev',
+    primaryImage: 'https://images.unsplash.com/photo-1563720223523-491ff04651de?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Everest White',
+        hex: '#F8FAFC',
+        image: 'https://images.unsplash.com/photo-1563720223523-491ff04651de?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Aerodynamic Electric Coupe Front', url: 'https://images.unsplash.com/photo-1563720223523-491ff04651de?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Sloping Coupe Roofline Profile', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Triple 12.3-inch Panoramic Display', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 13. Mahindra Scorpio-N
+  {
+    modelKeyword: 'scorpio',
+    primaryImage: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Everest White',
+        hex: '#F8FAFC',
+        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Commanding Big Daddy Front Chrome Grille', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'High Seating 7-Passenger Stance', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
+      { label: '4XPLOR Terrain Modes & Leather Console', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 14. Maruti Suzuki Ertiga
+  {
+    modelKeyword: 'ertiga',
+    primaryImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+    colors: [
+      {
+        name: 'Pearl Arctic White',
+        hex: '#F8FAFC',
+        image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+      },
+    ],
+    views: [
+      { label: 'Family 7-Seater Front Chrome', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Extended Family Cabin Profile', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Folding 3-Row Flexible Seating', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    ],
+  },
+
+  // 15. Toyota Innova Crysta
   {
     modelKeyword: 'innova',
     primaryImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
@@ -115,527 +318,133 @@ export const VEHICLE_MEDIA_CATALOG: VehicleModelMedia[] = [
         image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
       },
       {
-        name: 'Attitude Black',
-        hex: '#0F172A',
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
         name: 'Silver Metallic',
         hex: '#CBD5E1',
         image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
       },
-      {
-        name: 'Garnet Red',
-        hex: '#991B1B',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Avant-Garde Bronze',
-        hex: '#78350F',
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
-      },
     ],
     views: [
-      { label: 'Executive Chrome Front', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Long Wheelbase Side Profile', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Rear Angle & Tailgate', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Captain Chairs Luxury Middle Row', url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Spacious Luggage Boot Space', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Executive Chrome Front Grille', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Long Wheelbase Luxury Profile', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
+      { label: 'Captain Chairs Luxury Middle Row', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
     ],
   },
 
-  // 4. Mahindra Thar 4x4
-  {
-    modelKeyword: 'thar',
-    primaryImage: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-    colors: [
-      {
-        name: 'Napoli Black',
-        hex: '#09090B',
-        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Red Rage',
-        hex: '#DC2626',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Everest White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Aquamarine Blue',
-        hex: '#0284C7',
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Deep Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-      },
-    ],
-    views: [
-      { label: 'Iconic 7-Slot Front Grille', url: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Rugged Hard-Top Profile', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Rear Mounted Spare Tyre', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Washable Adventure Interior', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Mechanical 4x4 Transfer Lever', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  },
-
-  // 5. Hyundai Creta
-  {
-    modelKeyword: 'creta',
-    primaryImage: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-    colors: [
-      {
-        name: 'Atlas White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Abyss Black',
-        hex: '#0F172A',
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Ranger Khaki',
-        hex: '#4D533C',
-        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Fiery Red',
-        hex: '#DC2626',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Titan Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Robust Emerald',
-        hex: '#064E3B',
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-      },
-    ],
-    views: [
-      { label: 'Parametric LED Front Face', url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Compact Urban SUV Profile', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Horizon Connected Tail-lamps', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Panoramic Voice Sunroof Interior', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Dual Digital Display Cockpit', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  },
-
-  // 6. Mahindra XUV700
-  {
-    modelKeyword: 'xuv700',
-    primaryImage: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-    colors: [
-      {
-        name: 'Midnight Black',
-        hex: '#09090B',
-        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Everest White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Electric Blue',
-        hex: '#1E40AF',
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Red Rage',
-        hex: '#DC2626',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Dazzling Silver',
-        hex: '#CBD5E1',
-        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
-      },
-    ],
-    views: [
-      { label: 'Twin-Peak Grille & C-LED Headlamps', url: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Flush Door Handles Side Profile', url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Arrow-tip Rear LED Cluster', url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Dual 10.25-inch Superscreen Cockpit', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Panoramic Skyroof Luxury Seating', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  },
-
-  // 7. BMW M3 Touring
-  {
-    modelKeyword: 'bmw',
-    primaryImage: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-    colors: [
-      {
-        name: 'Isle of Man Green',
-        hex: '#0B5345',
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Alpine White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Black Sapphire',
-        hex: '#0F172A',
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Toronto Red',
-        hex: '#DC2626',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Portimao Blue',
-        hex: '#1D4ED8',
-        image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-      },
-    ],
-    views: [
-      { label: 'Aggressive M Double-Kidney Front', url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Sports Estate Wagon Stance', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Quad Exhaust Sports Diffuser', url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'M Carbon Bucket Seats & Wheel', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Forged M Alloy Brakes', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  },
-
-  // 8. Audi A6 C8 Limousine
-  {
-    modelKeyword: 'audi',
-    primaryImage: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80',
-    colors: [
-      {
-        name: 'Ibis White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Mythos Black',
-        hex: '#0F172A',
-        image: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Navarra Blue',
-        hex: '#1E3A8A',
-        image: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Daytona Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-      },
-      {
-        name: 'Tango Red',
-        hex: '#B91C1C',
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-      },
-    ],
-    views: [
-      { label: 'Singleframe Grille & HD Matrix LED', url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Executive Limousine Profile', url: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Dynamic OLED Rear Tail-lamps', url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Audi Virtual Cockpit Plus', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Bang & Olufsen 3D Sound Interior', url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  },
-
-  // 9. Honda Activa 6G
+  // --- TWO WHEELERS (9 MODELS AS REQUESTED) ---
   {
     modelKeyword: 'activa',
     primaryImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
     colors: [
-      {
-        name: 'Rebel Red Metallic',
-        hex: '#B91C1C',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Pearl Precious White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Decent Blue Metallic',
-        hex: '#1D4ED8',
-        image: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Matte Axis Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Midnight Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
-      },
+      { name: 'Pearl Precious White', hex: '#F8FAFC', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Matte Axis Grey', hex: '#4B5563', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Decent Blue Metallic', hex: '#1D4ED8', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Rebel Red Metallic', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Pearl Siren Blue', hex: '#0284C7', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Midnight Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
     ],
     views: [
-      { label: 'Front Apron with Chrome Wings', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Step-Through City Commuter Stance', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Rear External Fuel Lid & Tail', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Spacious Underseat Helmet Storage', url: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Easy Telescopic Front Suspension', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Full Scooter Profile', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Digital Speedometer & Controls', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
     ],
   },
-
-  // 10. Royal Enfield Classic 350
   {
-    modelKeyword: 'classic',
+    modelKeyword: 'fascino',
     primaryImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
     colors: [
-      {
-        name: 'Stealth Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Halcyon Green',
-        hex: '#14532D',
-        image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Redditch Red',
-        hex: '#B91C1C',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Chrome Bronze',
-        hex: '#78350F',
-        image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Marsh Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
+      { name: 'Vivid Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Metallic Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
     ],
     views: [
-      { label: 'Iconic Teardrop Tank & Headlamp', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Vintage Cruiser Side Profile', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Long Chrome Exhaust Thumper', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Retro Digilog Speedometer Cockpit', url: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Sprung Touring Saddle Seat', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'European Retro Scooter Fascia', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Deep Underseat 21L Storage', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
     ],
   },
-
-  // 11. Royal Enfield Himalayan 450
-  {
-    modelKeyword: 'himalayan',
-    primaryImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-    colors: [
-      {
-        name: 'Hanle Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Kamet White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Slate Himalayan Salt',
-        hex: '#9A3412',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Kaza Brown',
-        hex: '#78350F',
-        image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    views: [
-      { label: 'Adventure Windscreen & High Stance', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Long Travel 21-inch Wheel Profile', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Sherpa 450 Liquid-Cooled Engine', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Full Round TFT Google Maps Display', url: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Rear Pannier Rack & High Exhaust', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-    ],
-  },
-
-  // 12. Royal Enfield Hunter 350
-  {
-    modelKeyword: 'hunter',
-    primaryImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-    colors: [
-      {
-        name: 'Dapper Ash',
-        hex: '#71717A',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Rebel Blue',
-        hex: '#2563EB',
-        image: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Rebel Red',
-        hex: '#DC2626',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Dapper Grey',
-        hex: '#3F3F46',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    views: [
-      { label: 'Urban Roadster Front Stance', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Compact City Flick Profile', url: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Short Throaty Exhaust Canister', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Tuck-and-Roll Single Piece Saddle', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Alloy Wheels & Tubeless Tyres', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-    ],
-  },
-
-  // 13. Yamaha MT-15 V2
-  {
-    modelKeyword: 'mt-15',
-    primaryImage: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
-    colors: [
-      {
-        name: 'Cyan Storm',
-        hex: '#06B6D4',
-        image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Metallic Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Racing Blue',
-        hex: '#1D4ED8',
-        image: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Ice Fluo Vermillion',
-        hex: '#EA580C',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    views: [
-      { label: 'Predatory Twin LED Eyeline Front', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Hyper Naked Streetfighter Profile', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Golden Upside-Down Front Forks', url: 'https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Liquid Cooled VVA Engine & DeltaBox', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Negative LCD Bluetooth Instrument Cluster', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-    ],
-  },
-
-  // 14. Bajaj Pulsar NS200
   {
     modelKeyword: 'pulsar',
     primaryImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
     colors: [
-      {
-        name: 'Burnt Red',
-        hex: '#B91C1C',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Pewter Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Metallic Pearl White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Glossy Ebony Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
-      },
+      { name: 'Solar Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Neon Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
     ],
     views: [
-      { label: 'Streetfighter Wolf-Eyed Visor Front', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Aggressive Perimeter Frame Stance', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Underbelly Silencer Exhaust', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Triple Spark 4-Valve Engine', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Split Seat & Sporty Clip-on Handlebars', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Sporty Wolf-Eyed Headlamp Profile', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Twin Strip LED Tail Stance', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
     ],
   },
-
-  // 15. Ather 450X Gen 3
   {
-    modelKeyword: 'ather',
+    modelKeyword: 'bullet',
     primaryImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
     colors: [
-      {
-        name: 'Cosmic Black',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Lunar Grey',
-        hex: '#4B5563',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Salt Green',
-        hex: '#15803D',
-        image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Space Grey White',
-        hex: '#E2E8F0',
-        image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
-      },
+      { name: 'Military Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Military Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Standard Black', hex: '#18181B', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Standard Maroon', hex: '#7F1D1D', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Black Gold', hex: '#CA8A04', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
     ],
     views: [
-      { label: 'Futuristic Sharp LED Headlamp Apron', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Aero Aluminum Chassis Profile', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Interactive 7-inch Touchscreen Cockpit', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Belt-Drive Electric Motor & Monoshock', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Home Fast Charger & Boot Storage', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Handcrafted Heritage Pinstripe Tank', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Iconic Chrome Exhaust & Engine Stance', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
     ],
   },
-
-  // 16. Jawa 42 Bobber
   {
-    modelKeyword: 'jawa',
-    primaryImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
+    modelKeyword: 'gt 650',
+    primaryImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80',
     colors: [
-      {
-        name: 'Moonstone White',
-        hex: '#F8FAFC',
-        image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Mystic Copper',
-        hex: '#9A3412',
-        image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Jasper Red',
-        hex: '#B91C1C',
-        image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        name: 'Black Shield',
-        hex: '#18181B',
-        image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
-      },
+      { name: 'Rocker Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
     ],
     views: [
-      { label: 'Single-Seat Bobber Floating Saddle', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Low-Slung Custom Cruiser Stance', url: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Slash-Cut Twin Chrome Silencers', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Negative LCD Speedometer & Bar-End Mirrors', url: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=1000&q=80' },
-      { label: 'Spoke Wheels & Wide Rear Tyre', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Cafe Racer Twin Cylinder Profile', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Clip-On Handlebars & Fuel Tank', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+    ],
+  },
+  {
+    modelKeyword: 'duke',
+    primaryImage: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
+    colors: [
+      { name: 'Electronic Orange', hex: '#EA580C', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
+    ],
+    views: [
+      { label: 'Aggressive Predator Streetfighter Stance', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'WP APEX Inverted Front Forks & Trellis', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+    ],
+  },
+  {
+    modelKeyword: 'r15',
+    primaryImage: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80',
+    colors: [
+      { name: 'Metallic Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
+    ],
+    views: [
+      { label: 'Aerodynamic Full Racing Fairing', url: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Track-Ready Cockpit & Clip-On Bars', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+    ],
+  },
+  {
+    modelKeyword: 'hunter',
+    primaryImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80',
+    colors: [
+      { name: 'Factory Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Rebel Yellow', hex: '#EAB308', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+    ],
+    views: [
+      { label: 'Agile Urban Roadster Stance', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { label: '17-inch Alloy Wheel & Upswept Exhaust', url: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+    ],
+  },
+  {
+    modelKeyword: 'vespa',
+    primaryImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80',
+    colors: [
+      { name: 'Tuscan Yellow', hex: '#EAB308', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Monte Carlo Blue', hex: '#1D4ED8', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Azzurro Provenza', hex: '#38BDF8', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Pearl White', hex: '#F8FAFC', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Matt Black', hex: '#0F172A', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Passion Red', hex: '#DC2626', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
+    ],
+    views: [
+      { label: 'Italian Monocoque Steel Stance', url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80' },
+      { label: 'Full LED Round Headlamp & Saddle', url: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80' },
     ],
   },
 ];
@@ -644,7 +453,7 @@ export const VEHICLE_MEDIA_CATALOG: VehicleModelMedia[] = [
  * Finds the rich model media entry for a given vehicle, matching by name or model keywords.
  */
 export function findVehicleModelMedia(vehicle: Vehicle): VehicleModelMedia | null {
-  const query = `${vehicle.name} ${vehicle.model} ${vehicle.brand}`.toLowerCase();
+  const query = `${vehicle.name} ${vehicle.model} ${vehicle.brand} ${vehicle.subType || ''}`.toLowerCase();
   for (const entry of VEHICLE_MEDIA_CATALOG) {
     if (query.includes(entry.modelKeyword)) {
       return entry;
@@ -655,46 +464,64 @@ export function findVehicleModelMedia(vehicle: Vehicle): VehicleModelMedia | nul
 
 /**
  * Resolves the primary vehicle image (online model specific).
+ * Prioritizes vehicle.primaryImage if specified, otherwise uses matching model media.
  */
 export function resolvePrimaryVehicleImage(vehicle: Vehicle): string {
+  if (vehicle.primaryImage) return vehicle.primaryImage;
   const match = findVehicleModelMedia(vehicle);
   if (match) return match.primaryImage;
-  return vehicle.primaryImage;
+  return vehicle.primaryImage || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80';
 }
 
 /**
  * Resolves all color variants for a vehicle, with specific photos for each color.
+ * Prioritizes colors defined on the vehicle instance.
  */
 export function resolveVehicleColorVariants(vehicle: Vehicle): VehicleColorVariant[] {
-  const match = findVehicleModelMedia(vehicle);
-  if (match && match.colors && match.colors.length > 0) {
-    return match.colors;
-  }
-
-  // Fallback if vehicle has custom colors in database
+  // 1. If vehicle has its own explicit colors defined, ALWAYS prioritize them
   if (vehicle.colors && vehicle.colors.length > 0) {
+    const match = findVehicleModelMedia(vehicle);
     return vehicle.colors.map((c) => {
-      if (typeof c === 'string') {
-        const lower = c.toLowerCase();
-        let hex = '#4B5563';
-        if (lower.includes('white')) hex = '#F8FAFC';
-        else if (lower.includes('red') || lower.includes('crimson')) hex = '#DC2626';
-        else if (lower.includes('black')) hex = '#0F172A';
-        else if (lower.includes('blue')) hex = '#1D4ED8';
-        else if (lower.includes('silver')) hex = '#CBD5E1';
-        else if (lower.includes('green')) hex = '#15803D';
-        else if (lower.includes('bronze')) hex = '#78350F';
-        return { name: c, hex, image: vehicle.primaryImage };
+      if (typeof c === 'object' && c !== null && 'name' in c && 'hex' in c) {
+        return {
+          name: c.name,
+          hex: c.hex,
+          image: (c as any).image || vehicle.primaryImage,
+        };
       }
+      const colorName = String(c);
+      const lower = colorName.toLowerCase();
+      const foundInMedia = match?.colors?.find(
+        (mc) => mc.name.toLowerCase().includes(lower) || lower.includes(mc.name.toLowerCase())
+      );
+      if (foundInMedia) {
+        return foundInMedia;
+      }
+      let hex = '#4B5563';
+      if (lower.includes('white')) hex = '#F8FAFC';
+      else if (lower.includes('red') || lower.includes('crimson') || lower.includes('tango')) hex = '#DC2626';
+      else if (lower.includes('black') || lower.includes('dark') || lower.includes('stealth')) hex = '#0B0F19';
+      else if (lower.includes('blue')) hex = '#1D4ED8';
+      else if (lower.includes('silver')) hex = '#CBD5E1';
+      else if (lower.includes('green') || lower.includes('forest')) hex = '#14532D';
+      else if (lower.includes('gold') || lower.includes('yellow')) hex = '#D97706';
+      else if (lower.includes('orange')) hex = '#EA580C';
+      else if (lower.includes('grey') || lower.includes('gray')) hex = '#6B7280';
       return {
-        name: c.name,
-        hex: c.hex,
+        name: colorName,
+        hex,
         image: vehicle.primaryImage,
       };
     });
   }
 
-  // Generic fallback
+  // 2. Fallback to model media catalog
+  const match = findVehicleModelMedia(vehicle);
+  if (match && match.colors && match.colors.length > 0) {
+    return match.colors;
+  }
+
+  // 3. Generic fallback
   return vehicle.type === 'bike'
     ? [
         { name: 'Stealth Black', hex: '#18181B', image: vehicle.primaryImage },
@@ -719,9 +546,10 @@ export function resolveVehicleImageForColor(vehicle: Vehicle, colorName: string)
   }
 
   // Check partial name match
-  const partial = colors.find((c) =>
-    colorName.toLowerCase().includes(c.name.toLowerCase()) ||
-    c.name.toLowerCase().includes(colorName.toLowerCase())
+  const partial = colors.find(
+    (c) =>
+      colorName.toLowerCase().includes(c.name.toLowerCase()) ||
+      c.name.toLowerCase().includes(colorName.toLowerCase())
   );
   if (partial && partial.image) {
     return partial.image;

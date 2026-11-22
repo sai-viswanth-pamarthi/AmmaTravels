@@ -63,12 +63,13 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
     }
   }, [initialVehicleFilter]);
 
-  // Extract unique vehicle names for dropdown
+  // Extract unique vehicle and package names for dropdown
   const vehicleOptions = useMemo(() => {
     const names = new Set<string>();
     vehicles.forEach((v) => names.add(v.name));
     leads.forEach((l) => {
       if (l.vehicleName) names.add(l.vehicleName);
+      if (l.packageName) names.add(l.packageName);
     });
     return Array.from(names);
   }, [vehicles, leads]);
@@ -79,7 +80,9 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
       if (
         selectedVehicle !== 'all' &&
         lead.vehicleId !== selectedVehicle &&
-        lead.vehicleName?.toLowerCase() !== selectedVehicle.toLowerCase()
+        lead.vehicleName?.toLowerCase() !== selectedVehicle.toLowerCase() &&
+        lead.packageId !== selectedVehicle &&
+        lead.packageName?.toLowerCase() !== selectedVehicle.toLowerCase()
       ) {
         return false;
       }
@@ -89,7 +92,7 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
         const matchRef = lead.refId.toLowerCase().includes(q);
         const matchName = lead.name.toLowerCase().includes(q);
         const matchPhone = lead.phone.includes(q);
-        const matchItem = (lead.vehicleName || '').toLowerCase().includes(q);
+        const matchItem = (lead.vehicleName || lead.packageName || '').toLowerCase().includes(q);
         if (!matchRef && !matchName && !matchPhone && !matchItem) return false;
       }
       return true;
@@ -280,20 +283,27 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
                     {/* Vehicle */}
                     <td className="py-3 px-4">
                       <span className="font-black text-black dark:text-white block">
-                        {lead.vehicleName}
+                        {lead.vehicleName || lead.packageName}
                       </span>
-                      <span className="text-[10px] uppercase font-bold text-red-600">
-                        {lead.type || 'Vehicle'}
-                      </span>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] uppercase font-bold text-red-600">
+                          {lead.type || 'Vehicle'}
+                        </span>
+                        {lead.selectedColor && (
+                          <span className="text-[10px] text-neutral-500 font-medium">
+                            • {lead.selectedColor}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Schedule & Hub */}
                     <td className="py-3 px-4">
                       <span className="font-semibold text-neutral-800 dark:text-neutral-200 block">
-                        {lead.pickupDate} → {lead.returnDate}
+                        {lead.pickupDate ? `${lead.pickupDate} → ${lead.returnDate}` : (lead.eventDate ? `Date: ${lead.eventDate}` : 'Scheduled')}
                       </span>
                       <span className="text-[10px] text-neutral-400 block truncate max-w-[180px]">
-                        {lead.pickupLocation || 'Kakinada Hub'}
+                        {lead.pickupLocation || lead.cityVenue || 'Kakinada Hub'}
                       </span>
                     </td>
 
@@ -375,14 +385,19 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
               <div className="my-4 p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-extrabold uppercase text-red-600">
-                    Interested Fleet Vehicle
+                    {activeLead.type === 'event' ? 'Interested Event Package' : 'Interested Fleet Vehicle'}
                   </span>
                   <p className="font-display font-black text-base text-black dark:text-white">
-                    {activeLead.vehicleName}
+                    {activeLead.vehicleName || activeLead.packageName}
                   </p>
+                  {activeLead.selectedColor && (
+                    <p className="text-xs text-neutral-500 font-medium mt-0.5">
+                      Color Choice: <span className="font-bold text-black dark:text-white">{activeLead.selectedColor}</span>
+                    </p>
+                  )}
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white">
-                  {activeLead.pickupDate} → {activeLead.returnDate}
+                  {activeLead.pickupDate ? `${activeLead.pickupDate} → ${activeLead.returnDate}` : (activeLead.eventDate ? `Date: ${activeLead.eventDate}` : 'Date TBA')}
                 </span>
               </div>
 
@@ -397,9 +412,27 @@ export const AdminLeadsCRM: React.FC<AdminLeadsCRMProps> = ({
                   <span>{activeLead.email || 'Not provided'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
-                  <span className="text-neutral-400">Pickup Hub:</span>
-                  <span>{activeLead.pickupLocation || 'Kakinada Hub'}</span>
+                  <span className="text-neutral-400">Pickup Hub / Venue:</span>
+                  <span>{activeLead.pickupLocation || activeLead.cityVenue || 'Kakinada Hub'}</span>
                 </div>
+                {activeLead.eventType && (
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                    <span className="text-neutral-400">Event Type:</span>
+                    <span className="font-bold">{activeLead.eventType}</span>
+                  </div>
+                )}
+                {activeLead.guestCount && (
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                    <span className="text-neutral-400">Guest Count:</span>
+                    <span className="font-bold">{activeLead.guestCount} Guests</span>
+                  </div>
+                )}
+                {activeLead.budgetRange && (
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                    <span className="text-neutral-400">Budget Range:</span>
+                    <span className="font-bold text-red-600">{activeLead.budgetRange}</span>
+                  </div>
+                )}
                 {activeLead.idProofUrl && (
                   <div className="py-1 border-b border-neutral-100 dark:border-neutral-800">
                     <span className="text-neutral-400 block mb-1">ID Proof / DL:</span>

@@ -191,7 +191,7 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by vehicle name, brand, model, transmission, or fuel (e.g. Fortuner, Swift, Diesel, Automatic)..."
+              placeholder="Search by vehicle name, brand, model, transmission, or fuel (e.g. Thar Roxx, Swift, XUV 7XO, Automatic, Electric)..."
               className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all"
             />
             {searchTerm && (

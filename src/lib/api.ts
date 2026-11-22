@@ -3,11 +3,12 @@ import { SEED_VEHICLES, SEED_PACKAGES, SEED_INTERESTS } from '../../server/seed-
 
 // Local storage keys for resilient offline / zero-setup client execution
 const STORAGE_KEYS = {
-  VEHICLES: 'at_vehicles_v5',
+  VEHICLES: 'at_vehicles_v7',
   PACKAGES: 'at_packages_v3',
-  INTERESTS: 'at_interests_v3',
-  LOGS: 'at_activity_logs_v3',
+  INTERESTS: 'at_interests_v4',
+  LOGS: 'at_activity_logs_v4',
   AUTH: 'at_auth_user',
+  ACTIVE_ENQUIRY: 'at_active_user_enquiry',
 };
 
 function getStorage<T>(key: string, fallback: T): T {
@@ -215,22 +216,108 @@ export const api = {
     }
   },
 
+  // --- ACTIVE ENQUIRY TRACKING (ANTI-SPAM / SINGLE ENQUIRY ENFORCEMENT) ---
+  getActiveUserEnquiry(): { refId: string; phone?: string; itemName?: string; createdAt?: string; progressStage?: string } | null {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_ENQUIRY);
+      if (!data) return null;
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  },
+
+  setActiveUserEnquiry(enquiry: { refId: string; phone?: string; itemName?: string; createdAt?: string; progressStage?: string } | null): void {
+    try {
+      if (enquiry) {
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_ENQUIRY, JSON.stringify(enquiry));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.ACTIVE_ENQUIRY);
+      }
+    } catch {}
+  },
+
   // --- INTEREST SUBMISSIONS & CRM ---
   async submitInterest(data: Partial<InterestSubmission> & { honeypot?: string }): Promise<InterestSubmission> {
+    const cleanPhone = (data.phone || '').replace(/[^0-9]/g, '').slice(-10);
+
+    // Check if user already has an active reservation in local session
+    const existingSessionEnquiry = this.getActiveUserEnquiry();
+    if (existingSessionEnquiry) {
+      throw new Error(`You already have an active reservation enquiry (Ref ID: ${existingSessionEnquiry.refId}). To prevent duplicate bookings and spam attacks, each user is limited to 1 active enquiry at a time.`);
+    }
+
     try {
       const res = await fetch('/api/interests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+
       if (res.ok) {
         const result = await res.json();
-        if (result.interest) return result.interest;
+        if (result.interest) {
+          this.setActiveUserEnquiry({
+            refId: result.interest.refId,
+            phone: cleanPhone,
+            itemName: result.interest.vehicleName || result.interest.packageName,
+            createdAt: result.interest.createdAt,
+            progressStage: result.interest.progressStage,
+          });
+          return result.interest;
+        }
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        if (errJson?.error) {
+          if (errJson.refId) {
+            this.setActiveUserEnquiry({
+              refId: errJson.refId,
+              phone: cleanPhone,
+              itemName: errJson.existing?.itemName,
+              createdAt: errJson.existing?.createdAt,
+              progressStage: errJson.existing?.progressStage,
+            });
+          }
+          throw new Error(errJson.error);
+        }
       }
-    } catch {}
+    } catch (fetchErr: any) {
+      const isNetworkOrUrlErr =
+        !fetchErr?.message ||
+        fetchErr.message.includes('Failed to fetch') ||
+        fetchErr.message.includes('Failed to parse URL') ||
+        fetchErr.message.includes('Invalid URL') ||
+        fetchErr.code === 'ERR_INVALID_URL';
 
-    // Fallback store handling
+      if (!isNetworkOrUrlErr) {
+        throw fetchErr;
+      }
+      // Offline / Node test fallback handling
+    }
+
+    // Fallback store handling (resilient offline/client mode)
     const list = getStorage<InterestSubmission[]>(STORAGE_KEYS.INTERESTS, SEED_INTERESTS as any);
+
+    const isTerminal = (stage?: string, status?: string) =>
+      ['Completed', 'Rejected', 'Cancelled'].includes(stage || '') || status === 'Cancelled' || status === 'Completed';
+
+    // Duplicate check by phone in offline store
+    const existing = list.find((i) => {
+      const iPhone = (i.phone || '').replace(/[^0-9]/g, '').slice(-10);
+      return iPhone === cleanPhone && !isTerminal(i.progressStage, i.status);
+    });
+
+    if (existing) {
+      this.setActiveUserEnquiry({
+        refId: existing.refId,
+        phone: existing.phone,
+        itemName: existing.vehicleName || existing.packageName,
+        createdAt: existing.createdAt,
+        progressStage: existing.progressStage,
+      });
+      throw new Error(`You already have an active enquiry (Ref ID: ${existing.refId}). To prevent duplicate bookings and spam attacks, each user is limited to 1 active enquiry.`);
+    }
+
     const seq = 1000 + list.length + 1;
     const refId = data.type === 'vehicle' ? `AT-V-${seq}` : `AT-E-${seq + 1000}`;
 
@@ -265,6 +352,14 @@ export const api = {
 
     list.unshift(newSub);
     setStorage(STORAGE_KEYS.INTERESTS, list);
+
+    this.setActiveUserEnquiry({
+      refId: newSub.refId,
+      phone: cleanPhone,
+      itemName: newSub.vehicleName || newSub.packageName,
+      createdAt: newSub.createdAt,
+      progressStage: newSub.progressStage,
+    });
 
     return newSub;
   },
@@ -367,11 +462,32 @@ export const api = {
 
   // --- ENQUIRY TRACKER ---
   async trackEnquiry(refId: string, phone: string): Promise<InterestSubmission | null> {
+    const handleResult = (tracking: InterestSubmission | null) => {
+      if (tracking) {
+        if (
+          ['Completed', 'Rejected', 'Cancelled'].includes(tracking.progressStage || '') ||
+          tracking.status === 'Cancelled' ||
+          tracking.status === 'Completed'
+        ) {
+          this.setActiveUserEnquiry(null);
+        } else {
+          this.setActiveUserEnquiry({
+            refId: tracking.refId,
+            phone: tracking.phone,
+            itemName: tracking.vehicleName || tracking.packageName,
+            createdAt: tracking.createdAt,
+            progressStage: tracking.progressStage,
+          });
+        }
+      }
+      return tracking;
+    };
+
     try {
       const res = await fetch(`/api/track?refId=${encodeURIComponent(refId)}&phone=${encodeURIComponent(phone)}`);
       if (res.ok) {
         const data = await res.json();
-        return data.tracking;
+        return handleResult(data.tracking);
       }
     } catch {}
 
@@ -383,7 +499,7 @@ export const api = {
         i.phone.replace(/[^0-9]/g, '').slice(-10) === cleanPhone
     );
 
-    return found || null;
+    return handleResult(found || null);
   },
 
   // --- DASHBOARD STATS ---
@@ -409,20 +525,18 @@ export const api = {
       eventEnquiries: iList.filter((i) => i.type === 'event').length,
       estimatedRevenue: iList.length * 4500,
       enquiriesOverTime: [
-        { date: '2026-10-22', count: 3 },
-        { date: '2026-10-23', count: 6 },
-        { date: '2026-10-24', count: 5 },
-        { date: '2026-10-25', count: 9 },
-        { date: '2026-10-26', count: 7 },
-        { date: '2026-10-27', count: 11 },
-        { date: '2026-10-28', count: 5 },
+        { date: '2026-11-17', count: 4 },
+        { date: '2026-11-18', count: 6 },
+        { date: '2026-11-19', count: 8 },
+        { date: '2026-11-20', count: 12 },
+        { date: '2026-11-21', count: 9 },
       ],
       mostRequestedVehicles: [
-        { name: 'Toyota Innova Crysta', count: 14 },
-        { name: 'Royal Enfield Himalayan 450', count: 11 },
-        { name: 'Hyundai Creta SX(O)', count: 9 },
-        { name: 'Mahindra Thar 4x4 Hardtop', count: 8 },
-        { name: 'Honda Activa 6G', count: 8 },
+        { name: 'Mahindra Thar Roxx Star Edition (5-Door)', count: 16 },
+        { name: 'Toyota Innova Crysta 2.4 VX', count: 14 },
+        { name: 'Royal Enfield Continental GT 650', count: 12 },
+        { name: 'Mahindra XUV 7XO AX7 L Automatic', count: 10 },
+        { name: 'Honda Activa 6G', count: 9 },
       ],
     };
   },
@@ -450,18 +564,21 @@ export const api = {
     const isAdminUser =
       cleanUser === 'admin' ||
       cleanUser === 'admin@ammatravelskkd.com' ||
-      cleanUser === 'admin@ammatravels.in' ||
-      cleanUser === 'amma' ||
-      cleanUser === 'ammatravels' ||
-      cleanUser === 'ammatravelskkd';
+      cleanUser === 'admin@ammatravels.in';
 
     const isAdminPass =
+      cleanPass === 'AmmaTravels@2026' ||
+      cleanPass === '"AmmaTravels@2026"' ||
       cleanPass === 'AmmaAdmin#Kkd2026' ||
-      cleanPass === '"AmmaAdmin#Kkd2026"' ||
-      cleanPass === 'admin' ||
-      cleanPass === 'admin123' ||
-      cleanPass === 'admin@123' ||
-      cleanPass === 'ammaadmin';
+      cleanPass === '"AmmaAdmin#Kkd2026"';
+
+    const isStaffUser =
+      cleanUser === 'staff' ||
+      cleanUser === 'staff@ammatravelskkd.com';
+
+    const isStaffPass =
+      cleanPass === 'Staff@2026' ||
+      cleanPass === '"Staff@2026"';
 
     // Try backend authentication first
     try {
@@ -481,9 +598,17 @@ export const api = {
         };
         this.setCurrentUser(user);
         return user;
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (errData?.error) {
+          throw new Error(errData.error);
+        }
       }
-    } catch {
-      // Backend not running or offline, proceed to client verification
+    } catch (fetchErr: any) {
+      if (fetchErr?.message && !fetchErr.message.includes('Failed to fetch')) {
+        throw fetchErr;
+      }
+      // Backend offline or unreachable, proceed to resilient client verification
     }
 
     // Client-side resilient verification (supports offline, dev mode, and direct client execution)
@@ -499,7 +624,19 @@ export const api = {
       return adminUser;
     }
 
-    throw new Error('Invalid administrator credentials. Username: admin, Password: AmmaAdmin#Kkd2026');
+    if (isStaffUser && isStaffPass) {
+      const staffUser: User = {
+        id: 'u-staff-01',
+        name: 'Amma Travels Staff',
+        email: 'staff@ammatravelskkd.com',
+        role: 'staff',
+        token: `client-token-staff-${Date.now()}`,
+      };
+      this.setCurrentUser(staffUser);
+      return staffUser;
+    }
+
+    throw new Error('Invalid administrator credentials. Please check your username and password.');
   },
 
   logout(): void {

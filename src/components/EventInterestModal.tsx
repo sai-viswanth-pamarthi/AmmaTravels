@@ -8,7 +8,8 @@ import {
   X,
   PhoneCall,
   Clock,
-  AlertCircle
+  AlertCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { EventPackage, InterestSubmission } from '@/types';
 import { api } from '@/lib/api';
@@ -41,12 +42,31 @@ export const EventInterestModal: React.FC<EventInterestModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<InterestSubmission | null>(null);
+  const [activeExistingEnquiry, setActiveExistingEnquiry] = useState<{
+    refId: string;
+    phone?: string;
+    itemName?: string;
+    createdAt?: string;
+    progressStage?: string;
+  } | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const active = api.getActiveUserEnquiry();
+      setActiveExistingEnquiry(active);
+    }
+  }, [isOpen]);
 
   if (!isOpen || !eventPackage) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (honeypot) return;
+
+    if (activeExistingEnquiry) {
+      setError(`You already have an active enquiry (Ref ID: ${activeExistingEnquiry.refId}). Each customer is limited to 1 active enquiry to prevent duplicate submissions.`);
+      return;
+    }
 
     if (!name.trim() || !phone.trim() || !eventDate) {
       setError('Please provide your Name, Phone Number, and tentative Event Date.');
@@ -79,9 +99,20 @@ export const EventInterestModal: React.FC<EventInterestModalProps> = ({
         honeypot,
       });
 
+      setActiveExistingEnquiry({
+        refId: submission.refId,
+        phone: cleanPhone,
+        itemName: submission.packageName,
+        createdAt: submission.createdAt,
+        progressStage: submission.progressStage,
+      });
       setSubmittedData(submission);
       onSuccess(submission);
     } catch (err: any) {
+      const active = api.getActiveUserEnquiry();
+      if (active) {
+        setActiveExistingEnquiry(active);
+      }
       setError(err?.message || 'Failed to submit event inquiry. Please try again.');
     } finally {
       setSubmitting(false);
@@ -189,6 +220,41 @@ export const EventInterestModal: React.FC<EventInterestModalProps> = ({
                 Capacity: <strong className="text-charcoal-900 dark:text-warm-100">{eventPackage.guestCapacity}</strong>
               </span>
             </div>
+
+            {/* Active Reservation Anti-Abuse Notification */}
+            {activeExistingEnquiry && (
+              <div className="mb-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center justify-between flex-wrap gap-1.5">
+                      <span className="font-bold text-xs text-amber-800 dark:text-amber-300">
+                        Active Reservation Enquiry Detected
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                        Limit: 1 Active Enquiry
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
+                      You already have an active enquiry (Ref ID: <strong className="font-mono font-bold text-amber-950 dark:text-white">{activeExistingEnquiry.refId}</strong>{activeExistingEnquiry.itemName ? ` for ${activeExistingEnquiry.itemName}` : ''}). To prevent duplicate bookings and spam flood attacks, each customer is limited to 1 active request.
+                    </p>
+                    <div className="mt-3">
+                      <a
+                        href={getEventWhatsAppUrl(eventPackage.title, activeExistingEnquiry.refId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>Modify via WhatsApp (Ref: {activeExistingEnquiry.refId})</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {error && (
               <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
@@ -313,18 +379,29 @@ export const EventInterestModal: React.FC<EventInterestModalProps> = ({
               </div>
 
               <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-400 text-teal-950 font-bold text-sm tracking-wide shadow-md shadow-saffron-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
-                >
-                  {submitting ? (
-                    <Clock className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                  <span>{submitting ? 'Submitting Details...' : 'Request Tailored Event Quote'}</span>
-                </button>
+                {activeExistingEnquiry ? (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-1.5">
+                    <p className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                      Enquiry in progress (Ref: {activeExistingEnquiry.refId})
+                    </p>
+                    <p className="text-[11px] text-amber-700/90 dark:text-amber-300/90">
+                      Submissions are restricted to 1 active reservation per user to protect system resources. Please contact us directly on WhatsApp to make changes.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-400 text-teal-950 font-bold text-sm tracking-wide shadow-md shadow-saffron-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {submitting ? (
+                      <Clock className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )}
+                    <span>{submitting ? 'Submitting Details...' : 'Request Tailored Event Quote'}</span>
+                  </button>
+                )}
               </div>
             </form>
           </div>

@@ -3,7 +3,6 @@ import {
   Car,
   Calendar,
   Search,
-  Shield,
   Phone,
   Mail,
   MapPin,
@@ -19,15 +18,37 @@ import { getGeneralSupportWhatsAppUrl } from '@/lib/whatsapp';
 interface FooterProps {
   onSelectSection: (section: string) => void;
   onOpenTrack: () => void;
-  onOpenAdmin: () => void;
+  onOpenAdmin?: () => void;
+  onSecretAdminTrigger?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onSelectSection,
   onOpenTrack,
   onOpenAdmin,
+  onSecretAdminTrigger,
 }) => {
   const [settings] = useBusinessSettings();
+  const secretClickRef = React.useRef<{ count: number; timer: NodeJS.Timeout | null }>({ count: 0, timer: null });
+
+  const handleSecretClick = () => {
+    secretClickRef.current.count += 1;
+    if (secretClickRef.current.count >= 4) {
+      if (secretClickRef.current.timer) clearTimeout(secretClickRef.current.timer);
+      secretClickRef.current.count = 0;
+      if (onSecretAdminTrigger) {
+        onSecretAdminTrigger();
+      } else if (onOpenAdmin) {
+        onOpenAdmin();
+      }
+      return;
+    }
+
+    if (secretClickRef.current.timer) clearTimeout(secretClickRef.current.timer);
+    secretClickRef.current.timer = setTimeout(() => {
+      secretClickRef.current.count = 0;
+    }, 1500);
+  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -185,16 +206,6 @@ export const Footer: React.FC<FooterProps> = ({
                 </a>
               </div>
             </div>
-
-            <div className="pt-3">
-              <button
-                onClick={onOpenAdmin}
-                className="px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-blue-400 border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>Admin Portal</span>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -286,7 +297,12 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 border-t border-slate-800/80">
-          <p>© {new Date().getFullYear()} Amma Travels. All rights reserved. Platform engineered by <span className="text-white font-bold">Pivot Tech</span>.</p>
+          <p
+            onClick={handleSecretClick}
+            className="cursor-default select-none"
+          >
+            © {new Date().getFullYear()} Amma Travels. All rights reserved. Platform engineered by <span className="text-white font-bold">Pivot Tech</span>.
+          </p>
 
           <div className="flex items-center gap-4">
             <button

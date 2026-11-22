@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AmmaAdmin#Kkd2026';
-const JWT_SECRET = process.env.JWT_SECRET || 'at-kakinada-secret-key-2026';
+const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || 'admin').replace(/^"|"$/g, '').trim();
+const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || 'AmmaTravels@2026').replace(/^"|"$/g, '').trim();
+const JWT_SECRET = (process.env.JWT_SECRET || 'amma-travels-kakinada-secret-key-prod-2026').replace(/^"|"$/g, '').trim();
 
 export function createToken(user) {
   const payload = `${user.id}:${user.role}:${Date.now()}`;
@@ -34,21 +34,18 @@ export function authenticate(username, password) {
   const cleanUser = (username || '').trim().toLowerCase();
   const cleanPass = (password || '').trim();
 
+  // Admin credentials verification
   const isUserValid =
     cleanUser === ADMIN_USERNAME.toLowerCase() ||
     cleanUser === 'admin' ||
     cleanUser === 'admin@ammatravelskkd.com' ||
-    cleanUser === 'admin@ammatravels.in' ||
-    cleanUser === 'amma' ||
-    cleanUser === 'ammatravels';
+    cleanUser === 'admin@ammatravels.in';
 
   const isPassValid =
     cleanPass === ADMIN_PASSWORD ||
     cleanPass === `"${ADMIN_PASSWORD}"` ||
     cleanPass === 'AmmaAdmin#Kkd2026' ||
-    cleanPass === 'admin' ||
-    cleanPass === 'admin123' ||
-    cleanPass === 'admin@123';
+    cleanPass === 'AmmaTravels@2026';
 
   if (isUserValid && isPassValid) {
     const user = {
@@ -60,9 +57,32 @@ export function authenticate(username, password) {
     return { success: true, user, token: createToken(user) };
   }
 
+  // Staff credentials verification
+  const STAFF_USERNAME = (process.env.STAFF_USERNAME || 'staff').replace(/^"|"$/g, '').trim();
+  const STAFF_PASSWORD = (process.env.STAFF_PASSWORD || 'Staff@2026').replace(/^"|"$/g, '').trim();
+
+  const isStaffUser =
+    cleanUser === STAFF_USERNAME.toLowerCase() ||
+    cleanUser === 'staff@ammatravelskkd.com';
+
+  const isStaffPass =
+    cleanPass === STAFF_PASSWORD ||
+    cleanPass === `"${STAFF_PASSWORD}"`;
+
+  if (isStaffUser && isStaffPass) {
+    const user = {
+      id: 'u-staff-01',
+      name: 'Amma Travels Staff',
+      email: 'staff@ammatravelskkd.com',
+      role: 'staff',
+    };
+    return { success: true, user, token: createToken(user) };
+  }
+
+  // Secure generic error response - never disclose actual credentials
   return {
     success: false,
-    error: 'Invalid administrator username or password. Username: admin, Password: AmmaAdmin#Kkd2026',
+    error: 'Invalid administrator credentials. Please check your username and password.',
   };
 }
 

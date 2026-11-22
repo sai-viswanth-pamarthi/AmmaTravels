@@ -277,7 +277,7 @@ export const VehicleCatalogue: React.FC<VehicleCatalogueProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search Swift, BMW, Thar, Himalayan, Activa..."
+                placeholder="Search Swift, Thar Roxx, Bullet 350, GT 650, R15, Vespa, Activa..."
                 className="flex-1 bg-transparent py-1 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
                 autoFocus
               />

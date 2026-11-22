@@ -67,10 +67,13 @@ const authRateLimiter = createRateLimiter({
 });
 
 const interestRateLimiter = createRateLimiter({
-  windowMs: 60 * 60 * 1000,
-  maxRequests: 40,
-  message: 'Hourly submission limit reached. Please contact us directly on WhatsApp.',
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 10,
+  message: 'Submission limit reached. Please wait before submitting another enquiry or contact us directly on WhatsApp.',
 });
+
+// In-memory cache for device/IP submissions to block rapid flood attacks
+const recentIpSubmissions = new Map();
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
@@ -269,6 +272,72 @@ app.post('/api/interests', interestRateLimiter, (req, res) => {
     return res.status(400).json({ success: false, error: 'Name, phone, and type are required' });
   }
 
+  const cleanPhone = phone.replace(/[^0-9]/g, '').slice(-10);
+  if (cleanPhone.length < 10) {
+    return res.status(400).json({ success: false, error: 'Please enter a valid 10-digit mobile number' });
+  }
+
+  // Active enquiry state check helper
+  const isTerminal = (stage, status) => {
+    return ['Completed', 'Rejected', 'Cancelled'].includes(stage) || status === 'Cancelled' || status === 'Completed';
+  };
+
+  // 1. Strict duplicate check by phone number (1 active enquiry per user)
+  const existingByPhone = db.data.interests.find((i) => {
+    const iPhone = (i.phone || '').replace(/[^0-9]/g, '').slice(-10);
+    return iPhone === cleanPhone && !isTerminal(i.progressStage, i.status);
+  });
+
+  if (existingByPhone) {
+    return res.status(409).json({
+      success: false,
+      error: `You already have an active reservation enquiry (Ref ID: ${existingByPhone.refId}). To prevent duplicate bookings and spam attacks, only 1 active enquiry is permitted per user.`,
+      refId: existingByPhone.refId,
+      existing: {
+        refId: existingByPhone.refId,
+        itemName: existingByPhone.vehicleName || existingByPhone.packageName,
+        progressStage: existingByPhone.progressStage,
+        status: existingByPhone.status,
+        createdAt: existingByPhone.createdAt,
+      },
+    });
+  }
+
+  // 2. Strict duplicate check by email if provided
+  const cleanEmail = email ? email.trim().toLowerCase() : '';
+  if (cleanEmail) {
+    const existingByEmail = db.data.interests.find((i) => {
+      const iEmail = (i.email || '').trim().toLowerCase();
+      return iEmail === cleanEmail && !isTerminal(i.progressStage, i.status);
+    });
+
+    if (existingByEmail) {
+      return res.status(409).json({
+        success: false,
+        error: `An active enquiry (Ref ID: ${existingByEmail.refId}) is already linked with ${cleanEmail}. Submissions are limited to 1 active enquiry per user.`,
+        refId: existingByEmail.refId,
+        existing: {
+          refId: existingByEmail.refId,
+          itemName: existingByEmail.vehicleName || existingByEmail.packageName,
+          progressStage: existingByEmail.progressStage,
+          status: existingByEmail.status,
+          createdAt: existingByEmail.createdAt,
+        },
+      });
+    }
+  }
+
+  // 3. Device/IP cooldown to stop rapid automated bot spam
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const lastIpSubmission = recentIpSubmissions.get(clientIp);
+  if (lastIpSubmission && Date.now() - lastIpSubmission.timestamp < 3 * 60 * 1000) {
+    return res.status(429).json({
+      success: false,
+      error: `An enquiry has already been submitted from this device recently. Please track your active enquiry (Ref ID: ${lastIpSubmission.refId}) or wait before submitting another.`,
+      refId: lastIpSubmission.refId,
+    });
+  }
+
   // Reference ID Generator
   let refId = '';
   if (type === 'vehicle') {
@@ -319,6 +388,8 @@ app.post('/api/interests', interestRateLimiter, (req, res) => {
     notes: `Customer enquiry received for ${newInterest.vehicleName || newInterest.packageName}. Reference ID: ${refId}.`,
     createdAt: new Date().toISOString(),
   });
+
+  recentIpSubmissions.set(clientIp, { timestamp: Date.now(), refId });
 
   db.save();
 
@@ -493,19 +564,19 @@ app.get('/api/stats', requireAuth(), (req, res) => {
     .reduce((sum, i) => sum + (i.type === 'vehicle' ? 3500 : 75000), 0);
 
   const enquiriesOverTime = [
-    { date: 'Oct 23', count: 3 },
-    { date: 'Oct 24', count: 5 },
-    { date: 'Oct 25', count: 4 },
-    { date: 'Oct 26', count: 8 },
-    { date: 'Oct 27', count: 6 },
+    { date: 'Nov 17', count: 4 },
+    { date: 'Nov 18', count: 6 },
+    { date: 'Nov 19', count: 8 },
+    { date: 'Nov 20', count: 12 },
+    { date: 'Nov 21', count: 9 },
   ];
 
   const mostRequestedVehicles = [
-    { name: 'Royal Enfield Classic 350', count: 18 },
-    { name: 'Hyundai Creta SX', count: 14 },
-    { name: 'Honda Activa 6G', count: 12 },
-    { name: 'Maruti Suzuki Ertiga', count: 9 },
-    { name: 'Mahindra Thar 4x4', count: 7 },
+    { name: 'Mahindra Thar Roxx Star Edition (5-Door)', count: 16 },
+    { name: 'Toyota Innova Crysta 2.4 VX', count: 14 },
+    { name: 'Royal Enfield Continental GT 650', count: 12 },
+    { name: 'Mahindra XUV 7XO AX7 L Automatic', count: 10 },
+    { name: 'Honda Activa 6G', count: 9 },
   ];
 
   res.json({

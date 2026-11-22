@@ -26,20 +26,62 @@ import { Vehicle, InterestSubmission, User } from '@/types';
 import { api } from '@/lib/api';
 import { CheckCircle2, X, ChevronDown, Sparkles } from 'lucide-react';
 
+// Helpers to detect admin and dedicated vehicles page URL routes
+const isAdminPath = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+  const hash = window.location.hash.toLowerCase();
+  return path === '/admin' || path === '/admin-portal' || hash === '#admin' || hash === '#portal';
+};
+
+const isVehiclesPath = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+  const hash = window.location.hash.toLowerCase();
+  return path === '/vehicles' || hash === '#vehicles-page';
+};
+
 export function App() {
   const [loading, setLoading] = useState(true);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      return api.getCurrentUser();
+    }
+    return null;
+  });
 
   // View state: 'public' (Home page) | 'vehicles-page' (Full vehicles list) | 'admin'
-  const [currentView, setCurrentView] = useState<'public' | 'vehicles-page' | 'admin'>('public');
+  const [currentView, setCurrentView] = useState<'public' | 'vehicles-page' | 'admin'>(() => {
+    if (typeof window !== 'undefined') {
+      const user = api.getCurrentUser();
+      const isAdminRole = user && (user.role === 'admin' || user.role === 'staff');
+      if (isAdminPath() && isAdminRole) {
+        return 'admin';
+      }
+      if (isVehiclesPath()) {
+        return 'vehicles-page';
+      }
+    }
+    return 'public';
+  });
 
   // Modals state
   const [selectedVehicleForDetails, setSelectedVehicleForDetails] = useState<Vehicle | null>(null);
   const [selectedVehicleForInterest, setSelectedVehicleForInterest] = useState<Vehicle | null>(null);
   const [selectedColorForInterest, setSelectedColorForInterest] = useState<string | undefined>(undefined);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
-  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [trackerPrefillRefId, setTrackerPrefillRefId] = useState<string>('');
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const user = api.getCurrentUser();
+      const isAdminRole = user && (user.role === 'admin' || user.role === 'staff');
+      if (isAdminPath() && !isAdminRole) {
+        return true;
+      }
+    }
+    return false;
+  });
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
   const [isShuttleTrackerOpen, setIsShuttleTrackerOpen] = useState(false);
 
@@ -137,6 +179,9 @@ export function App() {
   // Navigation handlers
   const handleSelectSection = (sectionId: string) => {
     if (currentView !== 'public') {
+      if (isAdminPath() || isVehiclesPath()) {
+        window.history.pushState({ view: 'public' }, '', '/');
+      }
       setCurrentView('public');
       setTimeout(() => {
         const el = document.getElementById(sectionId);
@@ -149,23 +194,100 @@ export function App() {
   };
 
   const handleOpenAdminTrigger = () => {
-    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff')) {
+    const user = currentUser || api.getCurrentUser();
+    if (user && (user.role === 'admin' || user.role === 'staff')) {
+      if (!isAdminPath()) {
+        window.history.pushState({ view: 'admin' }, '', '/admin');
+      }
       setCurrentView('admin');
+      setIsAdminLoginOpen(false);
     } else {
+      if (!isAdminPath()) {
+        window.history.pushState({ view: 'admin' }, '', '/admin');
+      }
       setIsAdminLoginOpen(true);
     }
   };
 
+  const handleCloseAdminLogin = () => {
+    setIsAdminLoginOpen(false);
+    if (isAdminPath()) {
+      window.history.replaceState({ view: 'public' }, '', '/');
+    }
+  };
+
+  const handleReturnToUserSite = () => {
+    if (isAdminPath()) {
+      window.history.pushState({ view: 'public' }, '', '/');
+    }
+    setCurrentView('public');
+  };
+
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
+    if (!isAdminPath()) {
+      window.history.pushState({ view: 'admin' }, '', '/admin');
+    }
     setCurrentView('admin');
+    setIsAdminLoginOpen(false);
+    setToastMessage(`Welcome, ${user.name}. Administrator portal session active.`);
   };
 
   const handleLogout = () => {
     api.logout();
     setCurrentUser(null);
+    if (isAdminPath()) {
+      window.history.pushState({ view: 'public' }, '', '/');
+    }
     setCurrentView('public');
+    setToastMessage('Signed out of admin portal session.');
   };
+
+  // Synchronize browser history and hash routing (back/forward button & direct URL access)
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isAdminPath()) {
+        const user = api.getCurrentUser();
+        if (user && (user.role === 'admin' || user.role === 'staff')) {
+          setCurrentUser(user);
+          setCurrentView('admin');
+          setIsAdminLoginOpen(false);
+        } else {
+          setCurrentView('public');
+          setIsAdminLoginOpen(true);
+        }
+      } else if (isVehiclesPath()) {
+        setCurrentView('vehicles-page');
+        setIsAdminLoginOpen(false);
+      } else {
+        setCurrentView('public');
+        setIsAdminLoginOpen(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
+  }, []);
+
+  // Secure keyboard shortcut for website administrators (Ctrl+Shift+A or Cmd+Shift+A)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        if (currentView === 'admin') {
+          handleReturnToUserSite();
+        } else {
+          handleOpenAdminTrigger();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [currentView, currentUser]);
 
   const handleVehicleInterestSuccess = (submission: InterestSubmission) => {
     setToastMessage(`Your reservation enquiry is recorded! Ref ID: ${submission.refId}`);
@@ -235,7 +357,7 @@ export function App() {
             <AdminPortal
               currentUser={currentUser}
               onLogout={handleLogout}
-              onReturnToUserSite={() => setCurrentView('public')}
+              onReturnToUserSite={handleReturnToUserSite}
               onOpen360={(v) => setSelectedVehicleForDetails(v)}
             />
           </motion.div>
@@ -251,6 +373,9 @@ export function App() {
             <VehiclesPage
               vehicles={vehicles}
               onBackToHome={() => {
+                if (isVehiclesPath()) {
+                  window.history.pushState({ view: 'public' }, '', '/');
+                }
                 setCurrentView('public');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
@@ -277,7 +402,6 @@ export function App() {
             {/* Top Navigation */}
             <Navbar
               currentUser={currentUser}
-              onOpenAdmin={handleOpenAdminTrigger}
               onOpenTrack={() => setIsTrackerOpen(true)}
               onOpenLocations={() => setIsLocationsOpen(true)}
               onOpenShuttleTracker={() => setIsShuttleTrackerOpen(true)}
@@ -331,6 +455,9 @@ export function App() {
                     setSelectedVehicleForInterest(v);
                   }}
                   onViewAllVehicles={() => {
+                    if (!isVehiclesPath()) {
+                      window.history.pushState({ view: 'vehicles' }, '', '/vehicles');
+                    }
                     setCurrentView('vehicles-page');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -388,7 +515,7 @@ export function App() {
             <Footer
               onSelectSection={handleSelectSection}
               onOpenTrack={() => setIsTrackerOpen(true)}
-              onOpenAdmin={handleOpenAdminTrigger}
+              onSecretAdminTrigger={handleOpenAdminTrigger}
             />
 
             {/* Persistent On-Scroll Construction Card */}
@@ -453,19 +580,28 @@ export function App() {
           selectedColor={selectedColorForInterest}
           onSuccess={handleVehicleInterestSuccess}
           initialParams={lastSearchParams}
+          onOpenTrack={(refId) => {
+            setSelectedVehicleForInterest(null);
+            setTrackerPrefillRefId(refId || '');
+            setIsTrackerOpen(true);
+          }}
         />
       )}
 
       {/* Public Reservation & Enquiry Tracker Modal */}
       <EnquiryTracker
         isOpen={isTrackerOpen}
-        onClose={() => setIsTrackerOpen(false)}
+        onClose={() => {
+          setIsTrackerOpen(false);
+          setTrackerPrefillRefId('');
+        }}
+        prefillRefId={trackerPrefillRefId}
       />
 
       {/* Admin Login Modal */}
       <AdminLoginModal
         isOpen={isAdminLoginOpen}
-        onClose={() => setIsAdminLoginOpen(false)}
+        onClose={handleCloseAdminLogin}
         onLoginSuccess={handleLoginSuccess}
       />
     </div>
