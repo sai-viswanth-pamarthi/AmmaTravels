@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '10000', 10);
 
 // Security Headers Middleware
 app.use((req, res, next) => {
@@ -633,7 +633,7 @@ if (fs.existsSync(distPath)) {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`[AmmaTravels Server] Express API running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[AmmaTravels Server] Express API running on port ${PORT} (0.0.0.0)`);
   console.log(`[AmmaTravels Server] Persistent storage active: ${path.join(__dirname, 'data/store.json')}`);
 });
